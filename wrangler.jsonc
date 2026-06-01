@@ -5,6 +5,9 @@
 	"compatibility_date": "2026-02-24",
 	"compatibility_flags": ["nodejs_compat"],
 	"routes": [{ "pattern": "benchmarks.law", "custom_domain": true }],
+	// Keep the workers.dev URL live too — the admin passkey was registered on
+	// benchmarks-law.cicero-im.workers.dev, and passkeys are bound to that origin.
+	"workers_dev": true,
 	"d1_databases": [
 		{
 			"binding": "DB",
