@@ -106,6 +106,9 @@ describe("public/_headers", () => {
 		expect(block).toMatch(/frame-ancestors 'self'/);
 		expect(block).not.toMatch(/https?:\/\//);
 	});
+	it("tells Cloudflare not to inject its analytics beacon into the demos (no-transform)", () => {
+		expect(block).toMatch(/Cache-Control: [^\n]*public[^\n]*no-transform/);
+	});
 });
 
 describe("sync:demos", () => {
