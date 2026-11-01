@@ -330,8 +330,8 @@ function render() {
     for (const p of pageIdx) {
       const wrap = document.createElement('div'); wrap.style.position = 'relative'; wrap.style.marginBottom = '8px';
       const a = (c.pages[ovlA]||[])[p], b = (c.pages[ovlB]||[])[p];
-      wrap.innerHTML = (a ? `<img src="${a}" alt="">` : '<div class="missing">no page</div>') +
-        (b ? `<img class="top" src="${b}" alt="" style="opacity:${alpha/100};mix-blend-mode:${blend}">` : '');
+      wrap.innerHTML = (a ? `<img src="${a}" width="1020" height="1320" alt="">` : '<div class="missing">no page</div>') +
+        (b ? `<img class="top" src="${b}" width="1020" height="1320" alt="" style="opacity:${alpha/100};mix-blend-mode:${blend}">` : '');
       ov.appendChild(wrap);
     }
     return;

@@ -37,4 +37,14 @@ describe("viewer page images reserve their space", () => {
 		const tpl = s.match(/<img src="\$\{src\}"[^`]*>/)?.[0] ?? "";
 		expect(tpl).toMatch(/width="1020" height="1320"/);
 	});
+	it("every sized page image keeps its aspect ratio (height:auto beats the height attribute)", () => {
+		const css = src(`${BENCH}/_static/bench.css`);
+		expect(css).toMatch(/^\.page img\{[^}]*height:auto/m);
+		expect(css).toMatch(/^#overlay img\{[^}]*height:auto/m);
+	});
+	it.each(["index.html", "redlines/index.html"])("%s overlay (the mobile default) too", (p) => {
+		const s = src(`${BENCH}/${p}`);
+		expect(s).toContain('`<img src="${a}" width="1020" height="1320" alt="">`');
+		expect(s).toMatch(/`<img class="top" src="\$\{b\}" width="1020" height="1320" alt=""/);
+	});
 });

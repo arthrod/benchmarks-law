@@ -133,7 +133,7 @@ body.viewer #main{overflow:auto;padding:14px var(--px) 40px;min-height:0}
 .page img{width:100%;height:auto;display:block;background:#fff;border:var(--border-faint)}
 .missing{width:100%;aspect-ratio:8.5/11;display:flex;align-items:center;justify-content:center;color:var(--muted);font-family:var(--mono);font-size:11px;letter-spacing:.04em;background:repeating-linear-gradient(45deg,var(--faint) 0 1px,transparent 1px 12px),var(--bg);border:1px dashed var(--muted)}
 #overlay{position:relative;max-width:100%}
-#overlay img{width:100%;display:block}
+#overlay img{width:100%;height:auto;display:block}
 #overlay img.top{position:absolute;inset:0}
 #more{display:block;margin:4px 0 24px;padding:8px 18px}
 
