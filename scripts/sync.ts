@@ -189,7 +189,7 @@ async function content() {
 			continue;
 		}
 		const md = readFileSync(abs, "utf8");
-		const updated = lastCommitDate(file.path) ?? statSync(abs).mtime.toISOString().slice(0, 10);
+		const updated = lastCommitDate(file.path) ?? statSync(abs).mtime.toLocaleDateString("en-CA");
 		const entry = buildEntry(file, md, { blobBase: BLOB, updated, docx: docxFor(file.path) });
 		upsert("reports", entry.slug, { ...entry.data }, bySlug);
 	}
