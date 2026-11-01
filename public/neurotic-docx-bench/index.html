@@ -100,7 +100,8 @@ state.fx = Object.assign({ group: '', pages: '', eng: '', metric: '', max: '', d
 
 // Deep links: #scores opens the table, #<group>/<case> opens that case in the viewer.
 function applyHash() {
-  const h = decodeURIComponent(location.hash.slice(1));
+  let h;
+  try { h = decodeURIComponent(location.hash.slice(1)); } catch { return false; }
   if (h === 'scores') { state.view = 'scores'; return true; }
   const i = DATA.findIndex(c => c.group + '/' + c.case === h);
   if (i >= 0) { state.sel = i; state.view = 'viewer'; state.shown = PAGE_STEP; return true; }
@@ -299,7 +300,7 @@ function render() {
   if (MOBILE) renderMobile(c);
   const table = state.view === 'scores';
   $('#viewToggle').textContent = table ? 'Viewer' : 'Scores table';
-  history.replaceState(null, '', '#' + (table ? 'scores' : c.group + '/' + c.case));
+  history.replaceState(null, '', '#' + (table ? 'scores' : encodeURIComponent(c.group + '/' + c.case)));
   $('#scores').classList.toggle('hidden', !table);
   if (table) {
     for (const id of ['#grid', '#overlay', '#more']) $(id).classList.add('hidden');

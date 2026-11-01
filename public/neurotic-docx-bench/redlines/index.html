@@ -90,16 +90,19 @@ const store = k => { try { return JSON.parse(localStorage.getItem('ec.redline.'+
 const save = (k,v) => { try { localStorage.setItem('ec.redline.'+k, JSON.stringify(v)); } catch {} };
 
 let state = Object.assign({ on: {},
-  shown: PAGE_STEP, zoom: 600, ovl: false, ovlA: 'reference', ovlB: 'generated', blend: 'normal', alpha: 50, sel: 0, filter: '',
+  shown: PAGE_STEP, zoom: 600, ovl: false, ovlA: 'reference', ovlB: 'jubarte-rust', blend: 'normal', alpha: 50, sel: 0, filter: '',
   view: 'viewer', sort: { col: 0, dir: 1 } },
   store('state') || {});
 // Engines added after a viewer state was saved default to visible.
 for (const [k] of ENGINES) if (state.on[k] == null) state.on[k] = true;
+// A saved overlay pair naming an engine this viewer does not have falls back to one it has.
+for (const k of ['ovlA', 'ovlB']) if (!ENGINES.some(([e]) => e === state[k])) state[k] = k === 'ovlA' ? 'reference' : 'jubarte-rust';
 state.fx = Object.assign({ group: '', pages: '', eng: '', metric: '', max: '', differ: false }, state.fx || {});
 
 // Deep links: #scores opens the table, #<group>/<case> opens that case in the viewer.
 function applyHash() {
-  const h = decodeURIComponent(location.hash.slice(1));
+  let h;
+  try { h = decodeURIComponent(location.hash.slice(1)); } catch { return false; }
   if (h === 'scores') { state.view = 'scores'; return true; }
   const i = DATA.findIndex(c => c.group + '/' + c.case === h);
   if (i >= 0) { state.sel = i; state.view = 'viewer'; state.shown = PAGE_STEP; return true; }
@@ -298,7 +301,7 @@ function render() {
   if (MOBILE) renderMobile(c);
   const table = state.view === 'scores';
   $('#viewToggle').textContent = table ? 'Viewer' : 'Scores table';
-  history.replaceState(null, '', '#' + (table ? 'scores' : c.group + '/' + c.case));
+  history.replaceState(null, '', '#' + (table ? 'scores' : encodeURIComponent(c.group + '/' + c.case)));
   $('#scores').classList.toggle('hidden', !table);
   if (table) {
     for (const id of ['#grid', '#overlay', '#more']) $(id).classList.add('hidden');
