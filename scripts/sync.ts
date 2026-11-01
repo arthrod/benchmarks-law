@@ -3,8 +3,9 @@
  *
  *   pnpm sync:assets    # figures, .docx downloads, neurotic link fixes → public/
  *   pnpm sync:content   # upsert every report into the EmDash `reports` collection
+ *   pnpm sync:vendors   # upsert the field's vendors into the EmDash `vendors` collection
  *
- * REPORTS_ROOT  editors_trial checkout (default ../../temp/T/editors_trial)
+ * REPORTS_ROOT  editors_trial checkout (default ../../editors_trial); every command stops if it is absent
  * EMDASH_URL    EmDash instance (default https://benchmarks.law)
  * EMDASH_TOKEN  personal access token with content:write
  */
@@ -15,11 +16,17 @@ import { benchPage } from "../src/lib/navbar";
 import { patchNeuroticHtml } from "../src/lib/neurotic";
 import vendorsData from "../src/data/vendors.json" with { type: "json" };
 import { REPORT_FILES, buildEntry, extractTitle, splitSections } from "../src/lib/reports";
+import { reportsRoot } from "../src/lib/root";
 
 const SITE = resolve(import.meta.dirname, "..");
-const ROOT = resolve(process.env.REPORTS_ROOT ?? join(SITE, "../../editors_trial"));
+const ROOT = reportsRoot(process.env, SITE);
 const URL_ = process.env.EMDASH_URL ?? "https://benchmarks.law";
 const BLOB = "https://github.com/arthrod/editors_trial/blob/benchmark-fairness-reports/";
+
+/** Writes to a remote EmDash need a token; a local dev instance does not. */
+function requireToken() {
+	if (!process.env.EMDASH_TOKEN && !/^http:\/\/localhost/.test(URL_)) throw new Error("EMDASH_TOKEN is not set");
+}
 
 function walk(dir: string): string[] {
 	if (!existsSync(dir)) return [];
@@ -162,6 +169,7 @@ function existing(collection: string): Map<string, string> {
 }
 
 function vendors() {
+	requireToken();
 	ensureSchema("vendors", "Vendors", "Vendor", VENDOR_FIELDS);
 	const about = splitSections(readFileSync(join(ROOT, "reports/vendors.md"), "utf8"));
 	const bySlug = existing("vendors");
@@ -186,7 +194,7 @@ function vendors() {
 }
 
 async function content() {
-	if (!process.env.EMDASH_TOKEN && !/^http:\/\/localhost/.test(URL_)) throw new Error("EMDASH_TOKEN is not set");
+	requireToken();
 	ensureSchema("reports", "Reports", "Report", FIELDS);
 	const bySlug = existing("reports");
 	for (const file of REPORT_FILES) {
