@@ -139,13 +139,19 @@ function rewriteTarget(target: string, ctx: RewriteContext): string {
 
 /** Rewrites repo-relative links and figure paths; code spans and fences are left as written. */
 export function rewriteLinks(md: string, ctx: RewriteContext): string {
-	const parts = md.split(/(```[\s\S]*?```|~~~[\s\S]*?~~~|`[^`\n]*`)/g);
+	const parts = md.split(/(```[\s\S]*?```|~~~[\s\S]*?~~~)/g);
 	return parts
 		.map((part, i) => {
 			if (i % 2 === 1) return part;
-			return part.replace(LINK_RE, (_all, label: string, target: string, title = "") => {
-				return `${label}(${rewriteTarget(target, ctx)}${title})`;
-			});
+			// Inline code is swapped for placeholders, so a link written inside code stays as written
+			// while a link whose label is code (`[`path`](target)`) is still rewritten.
+			const spans: string[] = [];
+			const masked = part.replace(/`[^`\n]*`/g, (s) => `\u0000${spans.push(s) - 1}\u0000`);
+			return masked
+				.replace(LINK_RE, (_all, label: string, target: string, title = "") => {
+					return `${label}(${rewriteTarget(target, ctx)}${title})`;
+				})
+				.replace(/\u0000(\d+)\u0000/g, (_m, n: string) => spans[Number(n)]);
 		})
 		.join("");
 }
