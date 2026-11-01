@@ -216,7 +216,7 @@
 		"critical": "25/29",
 		"safety": 0.32,
 		"site": "https://apryse.com/products/webviewer",
-		"renderSection": "",
+		"renderSection": "2.14 Apryse WebViewer — Word's pages, and a trial stamp on every one",
 		"lane": "lane-apryse",
 		"position": 130
 	},
@@ -227,7 +227,7 @@
 		"maker": "The Document Foundation",
 		"license": "MPL-2.0",
 		"kind": "The baseline: a full office suite, converted headlessly",
-		"leads": "With Docxodus, one of two renderers that match Word's pagination and every piece of page furniture",
+		"leads": "With Docxodus and Apryse WebViewer, one of three renderers that match Word's pagination and every piece of page furniture",
 		"detail": "Report C: exactly 6 pages, the header, the page number and the footer all where Word puts them. On the round trip it is the calibration floor at 86.9%, not a candidate.",
 		"roundtrip": 86.9,
 		"critical": "23/29",
