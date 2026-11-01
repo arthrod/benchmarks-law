@@ -1,6 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { describe, expect, it } from "vitest";
+import { rewriteLinks } from "../src/lib/reports";
 
 const src = (p: string) => readFileSync(new URL(`../${p}`, import.meta.url), "utf8");
 const SITE = resolve(import.meta.dirname, "..");
@@ -105,5 +106,18 @@ describe.skipIf(!existsSync(mainReport))("editors trial at-a-glance scorecard", 
 		expect(html).toContain("99 checks");
 		expect(html).toContain("<b>3</b><span>perfect round trips</span>");
 		expect(html).toContain("corrected 2026-11-01");
+	});
+});
+
+// #31 review 5726972304, outside-diff (CodeRabbit): inline code must not cross a CRLF blank line
+describe("inline-code masking across paragraphs", () => {
+	const ctx = { fromPath: "reports/Report C - Rendering Versus Word (2026).md", blobBase: "https://github.com/o/r/blob/b/" };
+	const want = "[doc](https://github.com/o/r/blob/b/README.md)";
+	it.each([
+		["LF", "a `x\n\n[doc](../README.md) `y`"],
+		["CRLF", "a `x\r\n\r\n[doc](../README.md) `y`"],
+		["CRLF with a blank line of spaces", "a `x\r\n  \r\n[doc](../README.md) `y`"],
+	])("%s: the link after the blank line is still rewritten", (_k, md) => {
+		expect(rewriteLinks(md, ctx)).toContain(want);
 	});
 });
