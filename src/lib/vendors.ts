@@ -67,7 +67,7 @@ export function ordinal(n: number): string {
  */
 export const SAFETY_PASS = 0.2;
 
-export function safetyVerdict(grade: number | null): "pass" | "below" | "ungraded" {
+export function safetyVerdict(grade: number | null | undefined): "pass" | "below" | "ungraded" {
 	if (grade === null || grade === undefined) return "ungraded";
 	return grade >= SAFETY_PASS ? "pass" : "below";
 }
@@ -81,4 +81,9 @@ export function safeSiteUrl(u: string | null | undefined): string | null {
 	} catch {
 		return null;
 	}
+}
+
+/** A score with fixed decimals, or null when the field is absent (CMS score fields are optional). */
+export function fmtScore(v: number | null | undefined, digits: number): string | null {
+	return v === null || v === undefined ? null : v.toFixed(digits);
 }

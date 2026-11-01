@@ -7,7 +7,8 @@ import emdash from "emdash/astro";
 
 // CMS-backed public pages. EmDash purges a page's tags whenever its content is
 // written, so the max age only bounds staleness after a deploy changes markup.
-const PUBLIC_PAGE = { maxAge: 300, swr: 3600 };
+// Every page renders the site title from settings (Site.astro), hence the tag.
+const PUBLIC_PAGE = { maxAge: 300, swr: 3600, tags: ["emdash:settings"] };
 
 export default defineConfig({
 	site: "https://benchmarks.law",
@@ -31,7 +32,7 @@ export default defineConfig({
 				// Pre-bundle so it isn't discovered mid-render, which would trigger
 				// a Vite dep re-optimization and break in-flight worker imports
 				// under the Cloudflare dev runner (workerd).
-				include: ["@astrojs/internal-helpers > picomatch"],
+				include: ["astro > @astrojs/internal-helpers > picomatch"],
 			},
 		},
 	},
@@ -40,6 +41,8 @@ export default defineConfig({
 		emdash({
 			database: d1({ binding: "DB", session: "auto" }),
 			storage: r2({ binding: "MEDIA" }),
+			// Shared caching would otherwise hand signed-in editors the anonymous page, toolbar-less.
+			toolbar: "client",
 		}),
 	],
 	devToolbar: { enabled: false },

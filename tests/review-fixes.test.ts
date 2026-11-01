@@ -42,6 +42,6 @@ describe("review fixes (#21)", () => {
 		expect(extractDek("# T\n\n**Status: interim (2026-10-31).** Word column pending.\n\nThe real summary.")).toBe("The real summary.");
 	});
 	it("encodes figure paths", () => {
-		expect(rewriteLinks("![a](../out/my%20fig.png)", ctx)).toContain("](/editors-trial/figures/my%20fig.png)");
+		expect(rewriteLinks("![a](../out/ui/figures/my%20fig.png)", ctx)).toContain("](/editors-trial/figures/ui/figures/my%20fig.png)");
 	});
 });

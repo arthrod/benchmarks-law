@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import io
 from pathlib import Path
+from xml.sax.saxutils import escape
 
 import httpx
 import typer
@@ -36,6 +37,12 @@ ITALIC_URLS = [
 ]
 
 app = typer.Typer(add_completion=False)
+
+
+
+def attr(value: str) -> str:
+    """Escape a value for a double-quoted XML attribute (&, <, > and ")."""
+    return escape(value, {'"': "&quot;"})
 
 
 def fetch_font(italic: bool = False) -> TTFont:
@@ -112,7 +119,7 @@ def main(
         color = accent if is_accent else ink
         if dstr:
             pieces.append(
-                f'<path transform="translate({cursor:.2f} 0)" fill="{color}" d="{dstr}"/>'
+                f'<path transform="translate({cursor:.2f} 0)" fill="{attr(color)}" d="{dstr}"/>'
             )
         cursor += gset[gname].width + tracking_units
 
@@ -125,7 +132,7 @@ def main(
         f'<svg xmlns="http://www.w3.org/2000/svg" '
         f'viewBox="0 0 {total_w_px:.2f} {total_h_px:.2f}" '
         f'width="{total_w_px:.0f}" height="{total_h_px:.0f}" '
-        f'role="img" aria-label="{text}">\n'
+        f'role="img" aria-label="{attr(text)}">\n'
         f'  <g transform="matrix({scale:.5f} 0 0 {-scale:.5f} {pad:.2f} {baseline:.2f})">\n'
         f"    " + "\n    ".join(pieces) + "\n"
         f"  </g>\n</svg>\n"

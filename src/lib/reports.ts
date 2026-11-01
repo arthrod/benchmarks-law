@@ -136,7 +136,8 @@ function rewriteTarget(target: string, ctx: RewriteContext): string {
 	const resolved = normalise(`${dirname(ctx.fromPath)}/${decoded}`);
 	const slug = slugForPath(resolved);
 	if (slug) return `/editors-trial/${slug}${hash}`;
-	if (resolved.startsWith("out/") && /\.(png|jpe?g|webp|gif|svg)$/i.test(resolved)) {
+	// Exactly the files `sync:assets` copies: images directly inside a `figures/` folder under out/.
+	if (/^out\/(?:.*\/)?figures\/[^/]+\.(png|jpe?g|webp)$/.test(resolved)) {
 		return `/editors-trial/figures/${resolved.slice(4).split("/").map(encodeURIComponent).join("/")}`;
 	}
 	const encoded = resolved.split("/").map(encodeURIComponent).join("/");
@@ -144,15 +145,40 @@ function rewriteTarget(target: string, ctx: RewriteContext): string {
 }
 
 /** Rewrites repo-relative links and figure paths; code spans and fences are left as written. */
+/**
+ * Splits markdown into prose (even indices) and fenced code blocks (odd indices). A fence opens only at the start
+ * of a line (up to three spaces of indent) and closes at a line of at least as many of the same character, so
+ * backticks or tildes inside inline code never open one. An unclosed fence runs to the end, as in GFM.
+ */
+function splitFences(md: string): string[] {
+	const out: string[] = [];
+	// A backtick fence's info string cannot contain a backtick (GFM 4.5); "```a``` b" is inline code.
+	const open = /^ {0,3}(`{3,}(?=[^`\n]*$)|~{3,})[^\n]*$/gm;
+	let last = 0;
+	for (let m = open.exec(md); m; m = open.exec(md)) {
+		const fence = m[1];
+		const close = new RegExp(`^ {0,3}${fence[0] === "`" ? "`" : "~"}{${fence.length},}[ \\t]*$`, "gm");
+		close.lastIndex = open.lastIndex;
+		const c = close.exec(md);
+		const end = c ? c.index + c[0].length : md.length;
+		out.push(md.slice(last, m.index), md.slice(m.index, end));
+		last = end;
+		open.lastIndex = end;
+	}
+	out.push(md.slice(last));
+	return out;
+}
+
 export function rewriteLinks(md: string, ctx: RewriteContext): string {
-	const parts = md.split(/(```[\s\S]*?```|~~~[\s\S]*?~~~)/g);
+	const parts = splitFences(md);
 	return parts
 		.map((part, i) => {
 			if (i % 2 === 1) return part;
 			// Inline code is swapped for placeholders, so a link written inside code stays as written
 			// while a link whose label is code (`[`path`](target)`) is still rewritten.
 			const spans: string[] = [];
-			const masked = part.replace(/`[^`\n]*`/g, (s) => `\u0000${spans.push(s) - 1}\u0000`);
+			// A code span may wrap single line breaks but not cross a blank line, and may use any run of backticks.
+			const masked = part.replace(/(`+)(?!`)(?:[^\n]|\n(?![ \t]*\n))*?(?<!`)\1(?!`)/g, (s) => `\u0000${spans.push(s) - 1}\u0000`);
 			return masked
 				.replace(LINK_RE, (_all, label: string, target: string, title = "") => {
 					return `${label}(${rewriteTarget(target, ctx)}${title})`;

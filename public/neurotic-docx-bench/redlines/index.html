@@ -10,6 +10,7 @@
 <link rel="preload" href="../_static/fonts/roboto-mono.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="../_static/bench.css">
 <link rel="stylesheet" href="/nav.css"><script src="/nav.js" defer></script>
+<link rel="icon" type="image/svg+xml" href="/b-law.svg">
 </head>
 <body class="viewer">
 <header id="brand" class="site-nav"><a class="wm" href="/neurotic-docx-bench/home/"><span class="logo"><span class="del">CHILL</span><span class="ins">NEUROTIC</span></span><span class="dot">.</span>DOCX<span class="dot">.</span>BENCH</a><span class="crumb">/ Redlines vs Microsoft Word</span><nav aria-label="Site"><a class="home-link" href="/">benchmarks.law</a><a href="/neurotic-docx-bench/home/">Benches</a><a href="/neurotic-docx-bench/">DOCX → PDF</a><a href="/neurotic-docx-bench/redlines/" aria-current="page">Redlines</a><a href="/neurotic-docx-bench/speed/">Speed</a><details class="nav-dd"><summary>Editors trial</summary><div class="nav-panel"><div class="nav-group"><p class="nav-glabel">The trial</p><ol><li><a href="/neurotic-docx-bench/editors/"><span class="nav-title">At a glance</span></a></li><li><a href="/editors-trial/"><span class="nav-title">All reports</span></a></li><li><a href="/editors-trial/vendors"><span class="nav-title">The field</span></a></li></ol></div><div class="nav-group"><p class="nav-glabel">Reports</p><ol><li><a href="/editors-trial/round-trip"><span class="nav-code">Main report</span><span class="nav-title">Open-Source DOCX Editors, Re-verified Against Code and Measured by Round-Trip (2026-10-29)</span></a></li><li><a href="/editors-trial/report-a"><span class="nav-code">Report A</span><span class="nav-title">Serialization: What Each Namespace Does, and What It Costs When It Is Lost (2026-10-30)</span></a></li><li><a href="/editors-trial/report-a2"><span class="nav-code">Report A2</span><span class="nav-title">Pass-Through: What Each Editor Copies, and What That Costs (2026-10-30)</span></a></li><li><a href="/editors-trial/report-b"><span class="nav-code">Report B</span><span class="nav-title">Malformed Parts: Causes, Detection, and Repair (2026-10-30)</span></a></li><li><a href="/editors-trial/report-c"><span class="nav-code">Report C</span><span class="nav-title">Rendering: What Each Editor Actually Shows, Measured Against Word (2026-10-30)</span></a></li><li><a href="/editors-trial/report-d"><span class="nav-code">Report D</span><span class="nav-title">Safety, Resource Bombs and Hostile Input (2026)</span></a></li><li><a href="/editors-trial/report-d1-jubarte"><span class="nav-code">Report D1</span><span class="nav-title">Jubarte on the Hostile Packages (2026)</span></a></li><li><a href="/editors-trial/report-d2-word"><span class="nav-code">Report D2</span><span class="nav-title">What Microsoft Word protects against, and what it does not (2026)</span></a></li></ol></div><div class="nav-group"><p class="nav-glabel">Notes</p><ol><li><a href="/editors-trial/vendor-notes"><span class="nav-code">Vendors</span><span class="nav-title">Vendors</span></a></li><li><a href="/editors-trial/rendering-openability"><span class="nav-code">Note</span><span class="nav-title">Rendering openability</span></a></li></ol></div><div class="nav-group"><p class="nav-glabel">Lane notes</p><ol><li><a href="/editors-trial/lane-canvas"><span class="nav-title">canvas-editor</span></a></li><li><a href="/editors-trial/lane-docen"><span class="nav-title">Docen</span></a></li><li><a href="/editors-trial/lane-docsplus"><span class="nav-title">docs.plus</span></a></li><li><a href="/editors-trial/lane-docxodus"><span class="nav-title">Docxodus</span></a></li><li><a href="/editors-trial/lane-eigenpal"><span class="nav-title">eigenpal</span></a></li><li><a href="/editors-trial/lane-fidus"><span class="nav-title">Fidus Writer</span></a></li><li><a href="/editors-trial/lane-folio"><span class="nav-title">Folio</span></a></li><li><a href="/editors-trial/lane-genoffice"><span class="nav-title">GenOffice</span></a></li><li><a href="/editors-trial/lane-lo-baseline"><span class="nav-title">LibreOffice</span></a></li><li><a href="/editors-trial/lane-officeopen"><span class="nav-title">office-open</span></a></li><li><a href="/editors-trial/lane-plate"><span class="nav-title">Plate.js</span></a></li><li><a href="/editors-trial/lane-superdoc"><span class="nav-title">SuperDoc</span></a></li><li><a href="/editors-trial/lane-wordcraft"><span class="nav-title">WordCraft</span></a></li></ol></div></div></details><a href="https://github.com/jandira-tech/neurotic_docx_bench" rel="noopener">Bench repo →</a><a class="nav-contact" href="https://arthur.law/contact" rel="noopener">Contact</a></nav></header>
@@ -25,9 +26,9 @@
   <span class="grp"><label>zoom <input type="range" id="zoom" min="200" max="1400" value="600" step="20"></label></span>
   <span class="grp">
     <label><input type="checkbox" id="ovl"> overlay</label>
-    <select id="ovlA"></select> under <select id="ovlB"></select>
-    <select id="blend"><option value="normal">opacity</option><option value="difference">difference</option><option value="multiply">multiply</option></select>
-    <input type="range" id="alpha" min="0" max="100" value="50">
+    <select id="ovlA" aria-label="Engine under"></select> under <select id="ovlB" aria-label="Engine over"></select>
+    <select id="blend" aria-label="Blend mode"><option value="normal">opacity</option><option value="difference">difference</option><option value="multiply">multiply</option></select>
+    <input type="range" id="alpha" aria-label="Overlay opacity" min="0" max="100" value="50">
   </span>
   <span class="grp"><button id="viewToggle">Scores table</button></span>
   <span id="keys" class="hidden"><kbd>1</kbd>-<kbd>5</kbd> engines &nbsp;<kbd>&uarr;</kbd><kbd>&darr;</kbd> cases &nbsp;<kbd>r</kbd> random &nbsp;<kbd>s</kbd> side panel &nbsp;<kbd>o</kbd> overlay &nbsp;<kbd>m</kbd> more pages &nbsp;<kbd>t</kbd> scores table</span>
@@ -37,7 +38,7 @@
 <aside id="side" aria-label="Cases"><div id="sidehead"><input id="filter" type="search" autocomplete="off" aria-label="Filter cases" placeholder="filter cases (name, group)…"><div id="fx">
   <label for="fxGroup">group</label><select id="fxGroup"><option value="">all groups</option></select>
   <label for="fxPages">pages</label><select id="fxPages"><option value="">any</option><option value="1-1">1</option><option value="2-3">2–3</option><option value="4-10">4–10</option><option value="11-">11+</option></select>
-  <label for="fxEng">score</label><span class="row"><select id="fxEng"></select><select id="fxMetric"></select> ≤ <input type="number" id="fxMax" min="0" max="100" step="1" placeholder="any"></span>
+  <label for="fxEng">score</label><span class="row"><select id="fxEng"></select><select id="fxMetric" aria-label="Score metric"></select> ≤ <input type="number" id="fxMax" aria-label="Maximum score" min="0" max="100" step="1" placeholder="any"></span>
   <label for="fxDiffer">pages</label><span class="row"><label><input type="checkbox" id="fxDiffer"> differ from Word</label></span>
   <span class="foot"><span id="fxn"></span><button id="fxRand" title="open a random case of this list (r)">random</button><button id="fxClear" title="clear every filter">clear</button></span>
 </div></div><div id="list"><div class="case" aria-busy="true"><span class="name">Loading cases…</span><span class="grp">data.json</span></div></div></aside>
@@ -53,6 +54,8 @@
 <script>
 // Cases live in data.json so the page paints before the data arrives and the file caches on its own.
 const $ = s => document.querySelector(s);
+// Data strings reach innerHTML (list rows, score cells): escape them.
+const escHtml = t => String(t ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 (async () => {
   let DATA;
   try {
@@ -90,16 +93,19 @@ const store = k => { try { return JSON.parse(localStorage.getItem('ec.redline.'+
 const save = (k,v) => { try { localStorage.setItem('ec.redline.'+k, JSON.stringify(v)); } catch {} };
 
 let state = Object.assign({ on: {},
-  shown: PAGE_STEP, zoom: 600, ovl: false, ovlA: 'reference', ovlB: 'generated', blend: 'normal', alpha: 50, sel: 0, filter: '',
+  shown: PAGE_STEP, zoom: 600, ovl: false, ovlA: 'reference', ovlB: 'jubarte-rust', blend: 'normal', alpha: 50, sel: 0, filter: '',
   view: 'viewer', sort: { col: 0, dir: 1 } },
   store('state') || {});
 // Engines added after a viewer state was saved default to visible.
 for (const [k] of ENGINES) if (state.on[k] == null) state.on[k] = true;
+// A saved overlay pair naming an engine this viewer does not have falls back to one it has.
+for (const k of ['ovlA', 'ovlB']) if (!ENGINES.some(([e]) => e === state[k])) state[k] = k === 'ovlA' ? 'reference' : 'jubarte-rust';
 state.fx = Object.assign({ group: '', pages: '', eng: '', metric: '', max: '', differ: false }, state.fx || {});
 
 // Deep links: #scores opens the table, #<group>/<case> opens that case in the viewer.
 function applyHash() {
-  const h = decodeURIComponent(location.hash.slice(1));
+  let h;
+  try { h = decodeURIComponent(location.hash.slice(1)); } catch { return false; }
   if (h === 'scores') { state.view = 'scores'; return true; }
   const i = DATA.findIndex(c => c.group + '/' + c.case === h);
   if (i >= 0) { state.sel = i; state.view = 'viewer'; state.shown = PAGE_STEP; return true; }
@@ -241,7 +247,7 @@ function renderList() {
   for (const [c,i] of visibleCases()) {
     const d = document.createElement('div');
     d.className = 'case' + (i === state.sel ? ' sel' : '');
-    d.innerHTML = `<span class="name" title="${c.case}">${c.case}</span><span class="grp">${c.group}</span>`;
+    d.innerHTML = `<span class="name" title="${escHtml(c.case)}">${escHtml(c.case)}</span><span class="grp">${escHtml(c.group)}</span>`;
     d.onclick = () => { state.sel = i; state.shown = PAGE_STEP; state.view = 'viewer'; closeDrawer(); render(); };
     list.appendChild(d);
   }
@@ -253,8 +259,8 @@ function renderScores() {
   const tableCols = TABLE_COLS.filter(m => m !== 'pixel' || rows.some(r => Object.values(r.c.scores).some(s => s.pixel != null)));
   // Sort columns: 0 case (manifest order), 1 group, 2 reference pages, then one per engine×metric.
   const cols = [
-    { get: r => r.i, show: r => r.c.case },
-    { get: r => r.c.group, show: r => r.c.group },
+    { get: r => r.i, show: r => escHtml(r.c.case) },
+    { get: r => r.c.group, show: r => escHtml(r.c.group) },
     { get: r => (r.c.page_counts || {}).reference ?? (r.c.pages.reference || []).length, show: r => (r.c.page_counts || {}).reference ?? (r.c.pages.reference || []).length, num: true },
   ];
   for (const [k] of engines) for (const m of tableCols)
@@ -263,6 +269,7 @@ function renderScores() {
   const { col: sc, dir } = state.sort; const sortCol = cols[sc] || cols[0];
   rows.sort((a, b) => {
     const x = sortCol.get(a), y = sortCol.get(b);
+    if (x == null && y == null) return 0;
     if (x == null) return 1; if (y == null) return -1;
     return dir * (typeof x === 'string' ? x.localeCompare(y) : x - y);
   });
@@ -298,7 +305,7 @@ function render() {
   if (MOBILE) renderMobile(c);
   const table = state.view === 'scores';
   $('#viewToggle').textContent = table ? 'Viewer' : 'Scores table';
-  history.replaceState(null, '', '#' + (table ? 'scores' : c.group + '/' + c.case));
+  history.replaceState(null, '', '#' + (table ? 'scores' : encodeURIComponent(c.group + '/' + c.case)));
   $('#scores').classList.toggle('hidden', !table);
   if (table) {
     for (const id of ['#grid', '#overlay', '#more']) $(id).classList.add('hidden');
@@ -324,8 +331,8 @@ function render() {
     for (const p of pageIdx) {
       const wrap = document.createElement('div'); wrap.style.position = 'relative'; wrap.style.marginBottom = '8px';
       const a = (c.pages[ovlA]||[])[p], b = (c.pages[ovlB]||[])[p];
-      wrap.innerHTML = (a ? `<img src="${a}" alt="">` : '<div class="missing">no page</div>') +
-        (b ? `<img class="top" src="${b}" alt="" style="opacity:${alpha/100};mix-blend-mode:${blend}">` : '');
+      wrap.innerHTML = (a ? `<img src="${a}" width="1020" height="1320" alt="">` : '<div class="missing">no page</div>') +
+        (b ? `<img class="top" src="${b}" width="1020" height="1320" alt="" style="opacity:${alpha/100};mix-blend-mode:${blend}">` : '');
       ov.appendChild(wrap);
     }
     return;
@@ -349,7 +356,7 @@ function render() {
     for (const p of pageIdx) {
       const src = (c.pages[key]||[])[p];
       const d = document.createElement('div'); d.className = 'page' + (MOBILE && state.m.layout === 'half' ? ' half' : '');
-      d.innerHTML = src ? `<img src="${src}" loading="lazy" decoding="async" alt="${label}, page ${p+1}">` : `<div class="missing">no page ${c.shown ? c.shown[p] : p+1}</div>`;
+      d.innerHTML = src ? `<img src="${src}" width="1020" height="1320" loading="lazy" decoding="async" alt="${label}, page ${p+1}">` : `<div class="missing">no page ${c.shown ? c.shown[p] : p+1}</div>`;
       col.appendChild(d);
     }
     cols.push(col);
@@ -373,7 +380,8 @@ $('#filter').oninput = e => { state.filter = e.target.value; renderList(); };
 setupFx();
 if (!linked) pickRandom();
 document.onkeydown = e => {
-  if (e.target.tagName === 'SELECT' || (e.target.tagName === 'INPUT' && ['text', 'number'].includes(e.target.type))) return;
+  if (e.ctrlKey || e.metaKey || e.altKey) return;
+  if (e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA' || (e.target.tagName === 'INPUT' && ['text', 'search', 'number', 'range'].includes(e.target.type))) return;
   const vis = visibleCases().map(([,i]) => i); const at = vis.indexOf(state.sel);
   if (e.key === 'ArrowDown') { state.sel = vis[Math.min(at+1, vis.length-1)] ?? state.sel; state.shown = PAGE_STEP; }
   else if (e.key === 'ArrowUp') { state.sel = vis[Math.max(at-1, 0)] ?? state.sel; state.shown = PAGE_STEP; }
