@@ -188,7 +188,7 @@
 		"name": "Plate.js",
 		"license": "MIT",
 		"repo": "https://github.com/udecode/plate",
-		"commit": "08b1571",
+		"commit": "08b1571f2df0c377923ace3a90f994a482decfba",
 		"app": "/demo-apps/plate/",
 		"docx": "/editors-trial/demo-files/plate.docx",
 		"removed": [
