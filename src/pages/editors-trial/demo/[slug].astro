@@ -2,7 +2,7 @@
 import demos from "../../../data/demos.json" with { type: "json" };
 import Site from "../../../layouts/Site.astro";
 import { listReports } from "../../../lib/cms";
-import type { DemoEntry } from "../../../lib/demos";
+import { type DemoEntry, commitUrl } from "../../../lib/demos";
 
 const { slug } = Astro.params;
 const demo = (demos as Record<string, DemoEntry>)[slug ?? ""];
@@ -13,7 +13,7 @@ const { cacheHint } = await listReports();
 Astro.cache.set(cacheHint);
 
 const ORIGINAL = "https://github.com/arthrod/editors_trial/blob/main/fixture/complex.docx";
-const commitUrl = `${demo.repo.replace(/\/$/, "")}/tree/${demo.commit}`;
+const commitHref = commitUrl(demo.repo, demo.commit);
 ---
 
 <Site title={`${demo.name}, live`} current="editors" description={`${demo.name} running in your browser, from the commit the editors trial measured, on a sanitized copy of the trial's fixture.`}>
@@ -22,7 +22,7 @@ const commitUrl = `${demo.repo.replace(/\/$/, "")}/tree/${demo.commit}`;
 		<p class="eyebrow">Editors trial<span class="sep">·</span>Live demo<span class="sep">·</span>{demo.license}</p>
 		<h1>{demo.name}, <span class="mark">live</span>.</h1>
 		<p class="demo-note">
-			This is {demo.name}'s own code, built from commit <a href={commitUrl} rel="noopener"><code>{demo.commit}</code></a>, the
+			This is {demo.name}'s own code, built from commit <a href={commitHref} rel="noopener"><code>{demo.commit}</code></a>, the
 			one the trial measured. It runs entirely in your browser: nothing you open or type leaves this page. The document is a
 			sanitized copy of the trial's fixture, so it opens everywhere. The scores come from the{" "}
 			<a href={ORIGINAL} rel="noopener">unsanitized original (fixture/complex.docx)</a>.

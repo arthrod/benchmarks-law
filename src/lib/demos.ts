@@ -28,6 +28,12 @@ export function parseSourceTxt(txt: string): { repo: string; commit: string } {
 	return { repo: repo.replace(/[.,;)]+$/, ""), commit };
 }
 
+/** A link to the measured commit's tree: GitHub uses /tree/, Forgejo and Gitea (Fidus Writer's host) /src/commit/. */
+export function commitUrl(repo: string, commit: string): string {
+	const base = repo.replace(/\/$/, "");
+	return new URL(base).hostname === "github.com" ? `${base}/tree/${commit}` : `${base}/src/commit/${commit}`;
+}
+
 export function buildDemoEntry(slug: string, manifest: DemoManifest, sourceTxt: string, vendor: { name: string; license: string }): DemoEntry {
 	if (manifest.editor !== slug) throw new Error(`manifest is for ${manifest.editor}, not ${slug}`);
 	return {

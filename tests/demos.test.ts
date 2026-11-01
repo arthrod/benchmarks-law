@@ -2,7 +2,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import demos from "../src/data/demos.json" with { type: "json" };
 import vendors from "../src/data/vendors.json" with { type: "json" };
-import { type DemoEntry, buildDemoEntry, parseSourceTxt } from "../src/lib/demos";
+import { type DemoEntry, buildDemoEntry, commitUrl, parseSourceTxt } from "../src/lib/demos";
 
 const src = (p: string) => readFileSync(new URL(`../${p}`, import.meta.url), "utf8");
 const here = (p: string) => existsSync(new URL(`../${p}`, import.meta.url));
@@ -32,6 +32,17 @@ describe("buildDemoEntry", () => {
 	});
 	it("refuses a manifest for another editor", () => {
 		expect(() => buildDemoEntry("plate", manifest, "https://x\ncommit 1\n", { name: "P", license: "MIT" })).toThrow(/manifest is for superdoc/);
+	});
+});
+
+describe("commitUrl", () => {
+	it("uses /tree/ on GitHub", () => {
+		expect(commitUrl("https://github.com/udecode/plate/", "08b1571")).toBe("https://github.com/udecode/plate/tree/08b1571");
+	});
+	it("uses /src/commit/ on a Forgejo or Gitea host (Fidus Writer)", () => {
+		expect(commitUrl("https://git.fiduswriter.org/fiduswriter/fiduswriter-document-ts", "dc0981d")).toBe(
+			"https://git.fiduswriter.org/fiduswriter/fiduswriter-document-ts/src/commit/dc0981d",
+		);
 	});
 });
 
