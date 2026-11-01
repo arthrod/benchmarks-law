@@ -3,6 +3,7 @@ import { getEmDashEntry } from "emdash";
 import Site from "../../layouts/Site.astro";
 import { type ReportData, docxHref, listReports, sourceHref } from "../../lib/cms";
 import { renderMarkdown, wordCount } from "../../lib/reports";
+import { switcherGroups } from "../../lib/switcher";
 
 const { slug } = Astro.params;
 const { entry, cacheHint } = await getEmDashEntry("reports", slug!);
@@ -19,12 +20,35 @@ const { rows } = await listReports();
 const i = rows.findIndex((r) => r.slug === slug);
 const prev = i > 0 ? rows[i - 1] : null;
 const next = i >= 0 && i < rows.length - 1 ? rows[i + 1] : null;
+const groups = switcherGroups(rows, slug!);
 ---
 
 <Site title={d.title} description={d.dek} current="editors" progress>
 	<div class="wrap">
 		<div class="lr-head">
-			<a class="back" href="/editors-trial/">← Editors trial</a>
+			<div class="lr-top">
+				<a class="back" href="/editors-trial/">← Editors trial</a>
+				<details class="r-switch" id="r-switch">
+					<summary>All reports · {rows.length}</summary>
+					<nav class="r-panel" aria-label="All reports">
+						{groups.map((g) => (
+							<div class="r-group">
+								<p class="r-glabel">{g.label}</p>
+								<ol>
+									{g.items.map((it) => (
+										<li>
+											<a href={it.href} class={it.current ? "on" : undefined} aria-current={it.current ? "page" : undefined}>
+												{it.code && <span class="r-code">{it.code}</span>}
+												<span class="r-title">{it.title}</span>
+											</a>
+										</li>
+									))}
+								</ol>
+							</div>
+						))}
+					</nav>
+				</details>
+			</div>
 			<p class="sec-label" style="margin-bottom:22px"><span class="sq"></span> {d.code} · editors_trial</p>
 			<h1>{d.title}</h1>
 			<p class="lr-meta">
@@ -89,6 +113,21 @@ const next = i >= 0 && i < rows.length - 1 ? rows[i + 1] : null;
 		if (!mq.matches && toc.parentElement !== aside) aside.appendChild(toc);
 	}
 	placeToc();
+	const sw = document.getElementById("r-switch") as HTMLDetailsElement | null;
+	if (sw) {
+		sw.addEventListener("toggle", () => {
+			if (sw.open) sw.querySelector<HTMLElement>("a.on")?.scrollIntoView({ block: "nearest" });
+		});
+		document.addEventListener("click", (e) => {
+			if (sw.open && !sw.contains(e.target as Node)) sw.open = false;
+		});
+		document.addEventListener("keydown", (e) => {
+			if (e.key === "Escape" && sw.open) {
+				sw.open = false;
+				sw.querySelector("summary")?.focus();
+			}
+		});
+	}
 	mq.addEventListener("change", placeToc);
 	for (const a of links) {
 		a.addEventListener("click", () => {
