@@ -322,8 +322,9 @@ function render() {
   $('#more').textContent = `more pages (${left} left)`;
 
   const grid = $('#grid'), ov = $('#overlay');
-  const ovlOn = MOBILE ? mOvl() : state.ovl, ovlA = MOBILE ? 'reference' : state.ovlA, ovlB = MOBILE ? mSecond(c) : state.ovlB;
+  const ovlOn = MOBILE ? mOvl() : state.ovl, ovlA = MOBILE ? 'reference' : state.ovlA, ovlB = MOBILE ? mSecond(c) : ovlTop(c, state.ovlB);
   const blend = MOBILE ? state.m.blend : state.blend, alpha = MOBILE ? state.m.alpha : state.alpha;
+  if (!MOBILE && ovlB) $('#ovlB').value = ovlB; // the selector names the engine actually drawn
   grid.classList.toggle('hidden', ovlOn); ov.classList.toggle('hidden', !ovlOn);
   if (ovlOn) {
     ov.style.width = MOBILE ? '' : state.zoom + 'px'; ov.innerHTML = '';
@@ -381,7 +382,7 @@ setupFx();
 if (!linked) pickRandom();
 document.onkeydown = e => {
   if (e.ctrlKey || e.metaKey || e.altKey) return;
-  if (e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA' || (e.target.tagName === 'INPUT' && ['text', 'search', 'number', 'range'].includes(e.target.type))) return;
+  if (e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA' || (e.target.tagName === 'INPUT' && ['text', 'search', 'number', 'range', 'radio'].includes(e.target.type))) return;
   const vis = visibleCases().map(([,i]) => i); const at = vis.indexOf(state.sel);
   if (e.key === 'ArrowDown') { state.sel = vis[Math.min(at+1, vis.length-1)] ?? state.sel; state.shown = PAGE_STEP; }
   else if (e.key === 'ArrowUp') { state.sel = vis[Math.max(at-1, 0)] ?? state.sel; state.shown = PAGE_STEP; }
@@ -403,6 +404,13 @@ const isMobile = () => forcedMobile === '1' || (forcedMobile !== '0' && MQ.match
 let MOBILE = false;
 state.m = Object.assign({ layout: 'half', second: '', blend: 'normal', alpha: 50, ovl: null, exp: false }, state.m || {});
 function mEngines(c) { return ENGINES.filter(([k]) => k !== 'reference' && !(c.dropped || []).includes(k) && (c.pages[k] || []).some(Boolean)); }
+// The overlay's top engine: the one chosen, or, when this case has no pages from it, the first engine
+// that has some (never Word itself, never one dropped from the case). The saved choice is kept.
+function ovlTop(c, want) {
+  const has = k => k !== 'reference' && !(c.dropped || []).includes(k) && ((c.pages || {})[k] || []).length > 0;
+  if (has(want)) return want;
+  return Object.keys(c.pages || {}).find(has) ?? null;
+}
 function mSecond(c) { const list = mEngines(c); return list.some(([k]) => k === state.m.second) ? state.m.second : (list[0]?.[0] ?? null); }
 function mOvl() { return state.m.ovl ?? (state.m.layout === 'overlay'); }
 function closeDrawer() { document.body.classList.remove('drawer'); $('#mMenu').setAttribute('aria-expanded', 'false'); }

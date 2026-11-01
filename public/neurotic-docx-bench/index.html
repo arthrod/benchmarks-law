@@ -380,7 +380,7 @@ setupFx();
 if (!linked) pickRandom();
 document.onkeydown = e => {
   if (e.ctrlKey || e.metaKey || e.altKey) return;
-  if (e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA' || (e.target.tagName === 'INPUT' && ['text', 'search', 'number', 'range'].includes(e.target.type))) return;
+  if (e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA' || (e.target.tagName === 'INPUT' && ['text', 'search', 'number', 'range', 'radio'].includes(e.target.type))) return;
   const vis = visibleCases().map(([,i]) => i); const at = vis.indexOf(state.sel);
   if (e.key === 'ArrowDown') { state.sel = vis[Math.min(at+1, vis.length-1)] ?? state.sel; state.shown = PAGE_STEP; }
   else if (e.key === 'ArrowUp') { state.sel = vis[Math.max(at-1, 0)] ?? state.sel; state.shown = PAGE_STEP; }
