@@ -2,10 +2,12 @@
 import { getEmDashEntry } from "emdash";
 import Site from "../../layouts/Site.astro";
 import { type ReportData, docxHref, listReports, sourceHref } from "../../lib/cms";
-import { renderMarkdown, wordCount } from "../../lib/reports";
+import { RENAMED_SLUGS, renderMarkdown, wordCount } from "../../lib/reports";
 import { switcherGroups } from "../../lib/switcher";
 
 const { slug } = Astro.params;
+const renamed = RENAMED_SLUGS[slug!];
+if (renamed) return Astro.redirect(`/editors-trial/${renamed}`, 301);
 const { entry, cacheHint } = await getEmDashEntry("reports", slug!);
 if (!entry) return Astro.rewrite("/404");
 Astro.cache.set(cacheHint);

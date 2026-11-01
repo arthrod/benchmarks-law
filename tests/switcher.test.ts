@@ -23,7 +23,7 @@ describe("switcherGroups", () => {
 	});
 
 	it("drops a leading 'Report X —' from the title, which the code column already shows", () => {
-		const [g] = switcherGroups([row("report-e-word", 61, "Report E · Word", "Report E — What Microsoft Word protects against (2026)")], "x");
+		const [g] = switcherGroups([row("report-d2-word", 52, "Report D2", "Report D2 — What Microsoft Word protects against (2026)")], "x");
 		expect(g.items[0].title).toBe("What Microsoft Word protects against (2026)");
 	});
 });

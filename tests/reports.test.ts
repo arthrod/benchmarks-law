@@ -18,8 +18,9 @@ describe("slugForPath", () => {
 	it("maps every known report file to a short stable slug", () => {
 		expect(slugForPath("reports/Report A - Serialization by Namespace (2026).md")).toBe("report-a");
 		expect(slugForPath("reports/Report A2 - Pass-Through (2026).md")).toBe("report-a2");
-		expect(slugForPath("reports/Report E - Jubarte on the Hostile Packages (2026).md")).toBe("report-e-jubarte");
-		expect(slugForPath("reports/Report E - What Word Protects Against (2026).md")).toBe("report-e-word");
+		expect(slugForPath("reports/Report D1 - Jubarte on the Hostile Packages (2026).md")).toBe("report-d1-jubarte");
+		expect(slugForPath("reports/Report D2 - What Word Protects Against (2026).md")).toBe("report-d2-word");
+		expect(slugForPath("reports/Report E - What Word Protects Against (2026).md")).toBeNull();
 		expect(
 			slugForPath("Open-Source DOCX Editors Re-verified Against Code and Measured Round-Trip (2026).md"),
 		).toBe("round-trip");
@@ -123,12 +124,12 @@ describe("wordCount", () => {
 import { buildEntry } from "../src/lib/reports";
 
 describe("buildEntry", () => {
-	const file = REPORT_FILES.find((f) => f.slug === "report-e-word")!;
-	const md = "# Report E — What Word protects against (2026)\n\n**Status: INTERIM (2026-10-31, 11 of 28 fixtures run).** Rows marked *pending* are still running.\n\n## One\n\nSee [D](Report%20D%20-%20Safety%2C%20Resource%20Bombs%20and%20Hostile%20Input%20(2026).md).";
+	const file = REPORT_FILES.find((f) => f.slug === "report-d2-word")!;
+	const md = "# Report D2 — What Word protects against (2026)\n\n**Status: INTERIM (2026-10-31, 11 of 28 fixtures run).** Rows marked *pending* are still running.\n\n## One\n\nSee [D](Report%20D%20-%20Safety%2C%20Resource%20Bombs%20and%20Hostile%20Input%20(2026).md).";
 	const e = buildEntry(file, md, { blobBase: "https://g/", updated: "2026-10-31", docx: null });
 	it("carries the slug, code, position and series", () => {
-		expect(e.slug).toBe("report-e-word");
-		expect(e.data).toMatchObject({ code: "Report E · Word", position: 61, series: "editors-trial" });
+		expect(e.slug).toBe("report-d2-word");
+		expect(e.data).toMatchObject({ code: "Report D2", position: 52, series: "editors-trial" });
 	});
 	it("stores rewritten markdown in the body", () => {
 		expect(e.data.body).toContain("(/editors-trial/report-d)");
