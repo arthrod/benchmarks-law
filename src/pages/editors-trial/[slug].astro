@@ -120,7 +120,14 @@ const groups = switcherGroups(rows, slug!);
 	const sw = document.getElementById("r-switch") as HTMLDetailsElement | null;
 	if (sw) {
 		sw.addEventListener("toggle", () => {
-			if (sw.open) sw.querySelector<HTMLElement>("a.on")?.scrollIntoView({ block: "nearest" });
+			if (!sw.open) return;
+			// Scroll the panel only: scrollIntoView would also move the page when the item is off screen.
+			const on = sw.querySelector<HTMLElement>("a.on");
+			const panel = sw.querySelector<HTMLElement>(".r-panel");
+			if (on && panel) {
+				const d = on.getBoundingClientRect().top - panel.getBoundingClientRect().top;
+				panel.scrollTop += d - (panel.clientHeight - on.offsetHeight) / 2;
+			}
 		});
 		document.addEventListener("click", (e) => {
 			if (sw.open && !sw.contains(e.target as Node)) sw.open = false;

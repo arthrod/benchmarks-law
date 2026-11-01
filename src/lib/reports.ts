@@ -176,7 +176,8 @@ export function rewriteLinks(md: string, ctx: RewriteContext): string {
 			// Inline code is swapped for placeholders, so a link written inside code stays as written
 			// while a link whose label is code (`[`path`](target)`) is still rewritten.
 			const spans: string[] = [];
-			const masked = part.replace(/(`+)(?!`)[^\n]*?(?<!`)\1(?!`)/g, (s) => `\u0000${spans.push(s) - 1}\u0000`);
+			// A code span may wrap single line breaks but not cross a blank line, and may use any run of backticks.
+			const masked = part.replace(/(`+)(?!`)(?:[^\n]|\n(?![ \t]*\n))*?(?<!`)\1(?!`)/g, (s) => `\u0000${spans.push(s) - 1}\u0000`);
 			return masked
 				.replace(LINK_RE, (_all, label: string, target: string, title = "") => {
 					return `${label}(${rewriteTarget(target, ctx)}${title})`;

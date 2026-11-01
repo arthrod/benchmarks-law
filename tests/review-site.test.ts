@@ -188,3 +188,17 @@ describe("sync token check", () => {
 		expect(s).toMatch(/async function content\(\) \{\n\trequireToken\(\);/);
 	});
 });
+
+// CodeAnt #22 nitpick 2: a code span may run over a single line break
+describe("multi-line code spans", () => {
+	it("keeps a link inside a code span that wraps a line", () => {
+		const md = "see `the [x](../README.md)\nfile` and [y](../README.md)";
+		const out = rewriteLinks(md, ctx);
+		expect(out).toContain("`the [x](../README.md)\nfile`");
+		expect(out).toContain("[y](https://github.com/o/r/blob/b/README.md)");
+	});
+	it("does not let a lone backtick swallow the next paragraph", () => {
+		const out = rewriteLinks("a ` b\n\n[y](../README.md) `", ctx);
+		expect(out).toContain("[y](https://github.com/o/r/blob/b/README.md)");
+	});
+});
