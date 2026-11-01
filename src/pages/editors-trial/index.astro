@@ -1,0 +1,76 @@
+---
+import Site from "../../layouts/Site.astro";
+import { listReports } from "../../lib/cms";
+
+const { reports, notes, lanes, cacheHint } = await listReports();
+Astro.cache.set(cacheHint);
+---
+
+<Site title="Editors trial" current="editors" description="Twelve open-source DOCX editors run through their own import and export on one adversarial document, scored against Microsoft Word, and then given ten hostile packages.">
+	<div class="wrap">
+		<div class="page-head">
+			<p class="eyebrow">Bench 01<span class="sep">·</span>editors_trial<span class="sep">·</span>2026</p>
+			<h1>Open-source DOCX editors, <span class="mark">re-verified</span> against code.</h1>
+			<p>
+				Each editor's own code imports one purpose-built adversarial document and exports it again. The reports below take
+				that result apart by namespace, by pass-through, by malformed part, by what each editor puts on the page, and by what
+				it does with hostile input.
+			</p>
+		</div>
+
+		<a class="feature field-cta" href="/editors-trial/vendors">
+			<div class="body">
+				<span class="tag">The field · 12 tools and a baseline</span>
+				<h3>Every tool here leads somewhere.</h3>
+				<p>Where each editor places best, round trip and hostile input side by side, with links into the reports that measured it.</p>
+				<span class="go">See the field →</span>
+			</div>
+		</a>
+
+		<section style="padding-top:0">
+			<p class="sec-label"><span class="sq"></span> / Reports</p>
+			<div class="r-list">
+				{
+					reports.map((r) => (
+						<a class="r-row" href={`/editors-trial/${r.slug}`}>
+							<span class="code">{r.data.code}</span>
+							<h3>{r.data.title}</h3>
+							<span class="when">{r.data.notice ? <span class="notice">Interim</span> : r.data.updated}</span>
+							<p>{r.data.dek}</p>
+						</a>
+					))
+				}
+			</div>
+		</section>
+
+		<section>
+			<p class="sec-label"><span class="sq"></span> / Notes</p>
+			<div class="r-list">
+				{
+					notes.map((r) => (
+						<a class="r-row" href={`/editors-trial/${r.slug}`}>
+							<span class="code">{r.data.code}</span>
+							<h3>{r.data.title}</h3>
+							<span class="when">{r.data.updated}</span>
+							<p>{r.data.dek}</p>
+						</a>
+					))
+				}
+			</div>
+		</section>
+
+		<section id="lanes">
+			<p class="sec-label"><span class="sq"></span> / Lane notes · one per tool</p>
+			<div class="lanes">
+				{
+					lanes.map((r) => (
+						<a href={`/editors-trial/${r.slug}`}>
+							<span class="tag">Lane note</span>
+							<b>{r.data.title}</b>
+						</a>
+					))
+				}
+			</div>
+		</section>
+	</div>
+</Site>

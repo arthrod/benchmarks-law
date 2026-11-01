@@ -1,0 +1,97 @@
+---
+import { getSiteSettings } from "emdash";
+import { createPublicPageContext } from "emdash/page";
+import { EmDashBodyEnd, EmDashBodyStart, EmDashHead } from "emdash/ui";
+import "../styles/site.css";
+import "../styles/bench.css";
+
+interface Props {
+	title?: string;
+	description?: string;
+	current?: "home" | "editors" | "neurotic" | "method";
+	progress?: boolean;
+}
+
+const { title, description, current = "home", progress = false } = Astro.props;
+const settings = await getSiteSettings();
+const siteTitle = settings?.title || "benchmarks.law";
+const fullTitle = title ? `${title} · ${siteTitle}` : `${siteTitle} · DOCX tooling measured against Microsoft Word`;
+const siteDescription =
+	description ||
+	"Open benchmarks of DOCX editors and converters for lawyers: every tool run on the same documents, scored against Microsoft Word, with every input, output and log published.";
+
+const pageCtx = createPublicPageContext({
+	Astro,
+	kind: "custom",
+	pageType: "website",
+	title: fullTitle,
+	pageTitle: title ?? siteTitle,
+	description: siteDescription,
+	canonical: Astro.url.href,
+	siteName: siteTitle,
+});
+
+const nav = [
+	{ key: "editors", href: "/editors-trial/", label: "Editors trial" },
+	{ key: "neurotic", href: "/neurotic-docx-bench/home/", label: "DOCX bench" },
+	{ key: "method", href: "/#method", label: "Method" },
+] as const;
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link rel="icon" type="image/svg+xml" href="/b-law.svg" />
+		<link rel="preload" href="/fonts/libre-franklin.woff2" as="font" type="font/woff2" crossorigin />
+		<link rel="preload" href="/fonts/roboto-mono.woff2" as="font" type="font/woff2" crossorigin />
+		<title>{fullTitle}</title>
+		<meta name="description" content={siteDescription} />
+		<meta name="theme-color" content="#FAFAF8" />
+		<EmDashHead page={pageCtx} />
+	</head>
+	<body>
+		<EmDashBodyStart page={pageCtx} />
+		<a class="skip" href="#main">Skip to content</a>
+		{progress && <div id="progress" aria-hidden="true"></div>}
+		<header class="site-header">
+			<div class="wrap nav">
+				<a class="brand" href="/" aria-label="benchmarks.law home">BENCHMARKS<span class="dot">.</span>LAW</a>
+				<nav class="nav-links" aria-label="Primary">
+					{
+						nav.map((n) => (
+							<a href={n.href} class:list={[{ "is-current": current === n.key }, n.key === "editors" && "nav-contact"]} aria-current={current === n.key ? "page" : undefined}>
+								{n.label}
+							</a>
+						))
+					}
+				</nav>
+			</div>
+		</header>
+
+		<main id="main">
+			<slot />
+		</main>
+
+		<footer>
+			<div class="wrap">
+				<div class="foot-top">
+					<span class="c">© MMXXVI benchmarks.law · Arthur Souza Rodrigues · New York · São Paulo</span>
+					<div class="foot-social">
+						<a href="https://github.com/arthrod/editors_trial" rel="noopener" aria-label="Editors trial on GitHub">GH</a>
+						<a href="https://huggingface.co/arthrod" rel="noopener" aria-label="Hugging Face">HF</a>
+						<a href="https://arthur.law/" rel="noopener" aria-label="arthur.law">AR</a>
+					</div>
+				</div>
+				<p class="disclaimer">
+					<strong>Attorney advertising.</strong> This website is for general informational purposes and does not create an
+					attorney-client relationship. Benchmark results describe the named versions on the published inputs only. The
+					maintainer also writes Jubarte, one of the tools measured; its rows follow the same rules. Prior results do not
+					guarantee a similar outcome.
+				</p>
+			</div>
+		</footer>
+		<EmDashBodyEnd page={pageCtx} />
+	</body>
+</html>

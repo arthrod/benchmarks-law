@@ -1,0 +1,132 @@
+---
+import { getEmDashEntry } from "emdash";
+import Site from "../../layouts/Site.astro";
+import { type ReportData, docxHref, listReports, sourceHref } from "../../lib/cms";
+import { renderMarkdown, wordCount } from "../../lib/reports";
+
+const { slug } = Astro.params;
+const { entry, cacheHint } = await getEmDashEntry("reports", slug!);
+if (!entry) return Astro.rewrite("/404");
+Astro.cache.set(cacheHint);
+
+const d = entry.data as unknown as ReportData;
+const { html, toc } = renderMarkdown(d.body ?? "");
+const words = wordCount(d.body ?? "");
+const minutes = Math.max(1, Math.round(words / 230));
+const docx = docxHref(d.docx_path);
+
+const { rows } = await listReports();
+const i = rows.findIndex((r) => r.slug === slug);
+const prev = i > 0 ? rows[i - 1] : null;
+const next = i >= 0 && i < rows.length - 1 ? rows[i + 1] : null;
+---
+
+<Site title={d.title} description={d.dek} current="editors" progress>
+	<div class="wrap">
+		<div class="lr-head">
+			<a class="back" href="/editors-trial/">← Editors trial</a>
+			<p class="sec-label" style="margin-bottom:22px"><span class="sq"></span> {d.code} · editors_trial</p>
+			<h1>{d.title}</h1>
+			<p class="lr-meta">
+				{d.notice && <span class="notice">{d.notice}</span>}
+				{d.updated && <span>Updated {d.updated}</span>}
+				<span>·</span><span>{words.toLocaleString("en-US")} words</span>
+				<span>·</span><span>{minutes} min read</span>
+				{toc.length > 0 && <><span>·</span><span>{toc.length} sections</span></>}
+				{docx && <a href={docx} download>.docx ↓</a>}
+				<a href={sourceHref(d.source_path)} rel="noopener">Markdown source →</a>
+			</p>
+		</div>
+
+		<div class="lr-row">
+			{
+				toc.length > 0 && (
+					<aside class="lr-aside" aria-label="Contents">
+						<p class="ttl">/ Contents</p>
+						<details id="toc-details">
+							<summary>Contents · {toc.length} sections</summary>
+						</details>
+						<ol class="toc" id="toc">
+							{toc.map((t) => (
+								<li>
+									<a href={`#${t.id}`} data-id={t.id}>{t.text}</a>
+									{t.children.length > 0 && (
+										<ol>
+											{t.children.map((c) => (
+												<li><a href={`#${c.id}`} data-id={c.id}>{c.text}</a></li>
+											))}
+										</ol>
+									)}
+								</li>
+							))}
+						</ol>
+					</aside>
+				)
+			}
+			<article class="prose" set:html={html} style={toc.length === 0 ? "grid-column:1 / -1" : undefined} />
+		</div>
+
+		<nav class="p-nav lr-foot" aria-label="More reports">
+			{prev ? <a href={`/editors-trial/${prev.slug}`}><p class="dir">← Previous · {prev.data.code}</p><p class="t">{prev.data.title}</p></a> : <span />}
+			{next && <a class="is-next" href={`/editors-trial/${next.slug}`}><p class="dir">Next · {next.data.code} →</p><p class="t">{next.data.title}</p></a>}
+		</nav>
+	</div>
+	<div style="height:clamp(48px,6vw,88px)"></div>
+</Site>
+
+<script>
+	const bar = document.getElementById("progress");
+	const article = document.querySelector<HTMLElement>(".prose");
+	const links = [...document.querySelectorAll<HTMLAnchorElement>("#toc a[data-id]")];
+	const toc = document.getElementById("toc");
+	const details = document.getElementById("toc-details") as HTMLDetailsElement | null;
+	const aside = document.querySelector(".lr-aside");
+	const mq = matchMedia("(max-width: 960px)");
+	function placeToc() {
+		if (!toc || !details || !aside) return;
+		if (mq.matches && toc.parentElement !== details) details.append(toc);
+		if (!mq.matches && toc.parentElement !== aside) aside.append(toc);
+	}
+	placeToc();
+	mq.addEventListener("change", placeToc);
+	for (const a of links) {
+		a.addEventListener("click", () => {
+			if (mq.matches && details) details.open = false;
+		});
+	}
+	const heads = links.map((a) => document.getElementById(a.dataset.id ?? "")).filter(Boolean) as HTMLElement[];
+	let ticking = false;
+	function update() {
+		ticking = false;
+		if (bar && article) {
+			const r = article.getBoundingClientRect();
+			const total = r.height - innerHeight;
+			const p = total > 0 ? Math.min(1, Math.max(0, -r.top / total)) : 1;
+			bar.style.width = `${p * 100}%`;
+		}
+		let cur: HTMLElement | undefined;
+		for (const h of heads) {
+			if (h.getBoundingClientRect().top < 120) cur = h;
+			else break;
+		}
+		for (const a of links) a.classList.toggle("on", !!cur && a.dataset.id === cur.id);
+		const on = links.find((a) => a.classList.contains("on"));
+		if (on && !mq.matches && aside) {
+			const ar = aside.getBoundingClientRect();
+			const lr = on.getBoundingClientRect();
+			if (lr.top < ar.top || lr.bottom > ar.bottom) on.scrollIntoView({ block: "nearest" });
+		}
+	}
+	addEventListener(
+		"scroll",
+		() => {
+			if (!ticking) {
+				ticking = true;
+				requestAnimationFrame(update);
+			}
+		},
+		{ passive: true },
+	);
+	addEventListener("resize", update);
+	update();
+</script>

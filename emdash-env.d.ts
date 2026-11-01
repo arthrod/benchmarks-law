@@ -3,7 +3,7 @@
 
 /// <reference types="emdash/locals" />
 
-import type { ContentBylineCredit, PortableTextBlock } from "emdash";
+import type { BylineSummary, ContentBylineCredit, TaxonomyTerm, PortableTextBlock } from "emdash";
 
 export interface Page {
   id: string;
@@ -14,11 +14,63 @@ export interface Page {
   createdAt: Date;
   updatedAt: Date;
   publishedAt: Date | null;
+  byline?: BylineSummary | null;
   bylines?: ContentBylineCredit[];
+  terms?: Record<string, TaxonomyTerm[]>;
+}
+
+export interface Report {
+  id: string;
+  slug: string | null;
+  status: string;
+  title: string;
+  code?: string;
+  series?: string;
+  dek?: string;
+  body?: string;
+  position?: number;
+  notice?: string;
+  source_path?: string;
+  docx_path?: string;
+  updated?: string;
+  createdAt: Date;
+  updatedAt: Date;
+  publishedAt: Date | null;
+  byline?: BylineSummary | null;
+  bylines?: ContentBylineCredit[];
+  terms?: Record<string, TaxonomyTerm[]>;
+}
+
+export interface Vendor {
+  id: string;
+  slug: string | null;
+  status: string;
+  title: string;
+  maker?: string;
+  license?: string;
+  kind?: string;
+  leads?: string;
+  detail?: string;
+  roundtrip?: number;
+  critical?: string;
+  safety?: number;
+  site?: string;
+  render_section?: string;
+  lane?: string;
+  about?: string;
+  position?: number;
+  createdAt: Date;
+  updatedAt: Date;
+  publishedAt: Date | null;
+  byline?: BylineSummary | null;
+  bylines?: ContentBylineCredit[];
+  terms?: Record<string, TaxonomyTerm[]>;
 }
 
 declare module "emdash" {
   interface EmDashCollections {
     pages: Page;
+    reports: Report;
+    vendors: Vendor;
   }
 }

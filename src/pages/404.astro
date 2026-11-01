@@ -1,22 +1,19 @@
 ---
-import Base from "../layouts/Base.astro";
+import Site from "../layouts/Site.astro";
+Astro.response.status = 404;
 ---
 
-<Base title="Page not found">
-	<section class="blk">
-		<div class="wrap">
-			<div class="sec-head">
-				<span class="n">404</span>
-				<div>
-					<h3>This page is not on the board.</h3>
-					<div class="h-sub">The link is wrong, retired, or never existed</div>
-				</div>
+<Site title="Not found">
+	<div class="wrap">
+		<div class="page-head">
+			<p class="eyebrow">404<span class="sep">·</span>Not found</p>
+			<h1>This page is not on the bench.</h1>
+			<p>The link is wrong, retired, or never existed. The reports and the interactive benches are one click away.</p>
+			<div class="cta-row" style="margin-top:30px">
+				<a class="btn btn-primary" href="/">benchmarks.law <span class="arr">→</span></a>
+				<a class="btn btn-ghost" href="/editors-trial/">Editors trial</a>
 			</div>
-			<p class="body">
-				What you were looking for isn't here. Head back to the standard and find
-				your way from the masthead.
-			</p>
-			<a href="/" class="toplink">↑ Back to benchmarks.law</a>
 		</div>
-	</section>
-</Base>
+	</div>
+	<div style="height:72px"></div>
+</Site>

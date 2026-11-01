@@ -39,3 +39,7 @@ npm-debug.log*
 .wrangler
 .dev.vars
 .DS_Store
+
+# EmDash local state
+.emdash/
+.emdash-*.json

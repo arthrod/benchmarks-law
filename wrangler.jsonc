@@ -12,6 +12,7 @@
 		{
 			"binding": "DB",
 			"database_name": "benchmarks-law",
+			"database_id": "d9854ec4-1666-4a08-8c97-c5dd26b3856f",
 		},
 	],
 	"r2_buckets": [
