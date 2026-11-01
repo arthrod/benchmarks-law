@@ -152,7 +152,8 @@ function rewriteTarget(target: string, ctx: RewriteContext): string {
  */
 function splitFences(md: string): string[] {
 	const out: string[] = [];
-	const open = /^ {0,3}(`{3,}|~{3,})[^\n]*$/gm;
+	// A backtick fence's info string cannot contain a backtick (GFM 4.5); "```a``` b" is inline code.
+	const open = /^ {0,3}(`{3,}(?=[^`\n]*$)|~{3,})[^\n]*$/gm;
 	let last = 0;
 	for (let m = open.exec(md); m; m = open.exec(md)) {
 		const fence = m[1];

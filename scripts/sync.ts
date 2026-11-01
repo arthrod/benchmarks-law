@@ -16,7 +16,7 @@ import { benchPage } from "../src/lib/navbar";
 import { patchNeuroticHtml } from "../src/lib/neurotic";
 import vendorsData from "../src/data/vendors.json" with { type: "json" };
 import { REPORT_FILES, buildEntry, extractTitle, splitSections } from "../src/lib/reports";
-import { reportsRoot } from "../src/lib/root";
+import { isLocalEmDash, reportsRoot } from "../src/lib/root";
 
 const SITE = resolve(import.meta.dirname, "..");
 const ROOT = reportsRoot(process.env, SITE);
@@ -25,7 +25,7 @@ const BLOB = "https://github.com/arthrod/editors_trial/blob/benchmark-fairness-r
 
 /** Writes to a remote EmDash need a token; a local dev instance does not. */
 function requireToken() {
-	if (!process.env.EMDASH_TOKEN && !/^http:\/\/localhost/.test(URL_)) throw new Error("EMDASH_TOKEN is not set");
+	if (!process.env.EMDASH_TOKEN && !isLocalEmDash(URL_)) throw new Error("EMDASH_TOKEN is not set");
 }
 
 function walk(dir: string): string[] {

@@ -42,9 +42,10 @@ kbd{font-size:10px;font-weight:600;color:var(--muted);border:var(--border-faint)
 /* ---- viewer shell ---- */
 body.viewer{display:grid;grid-template-columns:280px minmax(0,1fr);grid-template-rows:auto auto auto auto minmax(0,1fr) auto;height:100dvh;overflow:hidden}
 body.viewer #brand,#bar,#engines,#legend{grid-column:1/3}
-body.viewer.noside{grid-template-columns:0 minmax(0,1fr)}
-body.noside #side{display:none}
-body.noside #main{grid-column:1/3}
+/* noside is a desktop layout; on the mobile viewer the side panel is a drawer and every row is one column. */
+body.viewer.noside:not(.mobile){grid-template-columns:0 minmax(0,1fr)}
+body.noside:not(.mobile) #side{display:none}
+body.noside:not(.mobile) #main{grid-column:1/3}
 
 /* toolbar */
 #bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:8px var(--px);border-bottom:var(--border-faint);background:var(--bg)}

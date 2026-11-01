@@ -1,4 +1,4 @@
-import { existsSync, mkdtempSync, readFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
@@ -47,6 +47,7 @@ describe("reportsRoot", () => {
 	});
 	it("returns an existing checkout", () => {
 		const dir = mkdtempSync(join(tmpdir(), "et-"));
+		mkdirSync(join(dir, "reports"));
 		expect(reportsRoot({ REPORTS_ROOT: dir }, "/x/site")).toBe(dir);
 	});
 	it("is checked before any sync command runs", () => {
