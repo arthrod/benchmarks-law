@@ -1,4 +1,5 @@
 import { getEmDashCollection } from "emdash";
+import { partitionReports } from "./positions";
 
 export interface ReportData {
 	title: string;
@@ -20,16 +21,8 @@ export interface ReportRow {
 
 export async function listReports() {
 	const { entries, cacheHint } = await getEmDashCollection("reports", { limit: 100 });
-	const rows: ReportRow[] = entries
-		.map((e) => ({ slug: e.id, data: e.data as unknown as ReportData }))
-		.sort((a, b) => (a.data.position ?? 0) - (b.data.position ?? 0));
-	return {
-		rows,
-		cacheHint,
-		reports: rows.filter((r) => r.data.position < 70),
-		notes: rows.filter((r) => r.data.position >= 70 && r.data.position < 100),
-		lanes: rows.filter((r) => r.data.position >= 100),
-	};
+	const parts = partitionReports(entries.map((e) => ({ slug: e.id, data: e.data as unknown as ReportData })));
+	return { ...parts, rows: parts.rows as ReportRow[], cacheHint };
 }
 
 export function docxHref(docxPath: string): string | null {

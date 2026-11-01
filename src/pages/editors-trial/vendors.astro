@@ -2,11 +2,15 @@
 import { getEmDashCollection } from "emdash";
 import GithubSlugger from "github-slugger";
 import Site from "../../layouts/Site.astro";
+import { listReports } from "../../lib/cms";
 import { renderMarkdown } from "../../lib/reports";
-import { SAFETY_PASS, type VendorData, bestPlacement, ordinal, rankOn, safeSiteUrl, safetyVerdict } from "../../lib/vendors";
+import { SAFETY_PASS, type VendorData, bestPlacement, fmtScore, ordinal, rankOn, safeSiteUrl, safetyVerdict } from "../../lib/vendors";
 
 const { entries, cacheHint } = await getEmDashCollection("vendors", { limit: 100 });
 Astro.cache.set(cacheHint);
+// The navbar lists every report, so a report write must purge this page too.
+const { cacheHint: reportsHint } = await listReports();
+Astro.cache.set(reportsHint);
 
 const all = entries
 	.map((e) => ({ slug: e.id, data: e.data as unknown as VendorData }))
@@ -76,12 +80,12 @@ const host = (u: string) => u.replace(/^https:\/\/(www\.)?/, "").replace(/\/$/, 
 								<div class="meter">
 									<dt>Round trip{r && <span> · {ordinal(r.rank)}{r.tied ? "=" : ""}</span>}</dt>
 									<dd>
-										{d.roundtrip === null ? (
+										{d.roundtrip == null ? (
 											<span class="na">Not measured on this axis</span>
 										) : (
 											<>
 												<span class="bar"><span style={`width:${d.roundtrip}%`} /></span>
-												<b>{d.roundtrip.toFixed(1)}%</b>
+												<b>{fmtScore(d.roundtrip, 1)}%</b>
 												{d.critical && <em>{d.critical} critical</em>}
 											</>
 										)}
@@ -90,12 +94,12 @@ const host = (u: string) => u.replace(/^https:\/\/(www\.)?/, "").replace(/\/$/, 
 								<div class="meter">
 									<dt>Hostile input{s && <span> · {ordinal(s.rank)}{s.tied ? "=" : ""}</span>}</dt>
 									<dd>
-										{d.safety === null ? (
+										{d.safety == null ? (
 											<span class="na">Not graded</span>
 										) : (
 											<>
 												<span class="bar is-mark has-pass" style={`--pass:${SAFETY_PASS * 100}%`}><span style={`width:${d.safety * 100}%`} /></span>
-												<b>{d.safety.toFixed(2)}</b>
+												<b>{fmtScore(d.safety, 2)}</b>
 												{safetyVerdict(d.safety) === "pass" ? <em class="pass">Pass</em> : <em class="below">Below the pass line</em>}
 											</>
 										)}
@@ -131,25 +135,26 @@ const host = (u: string) => u.replace(/^https:\/\/(www\.)?/, "").replace(/\/$/, 
 							<p>{v.data.detail}</p>
 							<div class="links">
 								<a class="go" href={`/editors-trial/report-c#${anchor(v.data.render_section)}`}>How it renders →</a>
-								<a class="go" href={v.data.site} rel="noopener">{host(v.data.site)} →</a>
+								{safeSiteUrl(v.data.site) && <a class="go" href={safeSiteUrl(v.data.site)} rel="noopener">{host(safeSiteUrl(v.data.site)!)} →</a>}
 							</div>
 						</div>
 						<dl class="meters">
 							<div class="meter">
 								<dt>Round trip · calibration floor</dt>
-								<dd><span class="bar"><span style={`width:${v.data.roundtrip}%`} /></span><b>{v.data.roundtrip?.toFixed(1)}%</b></dd>
+								<dd>{v.data.roundtrip == null ? <span class="na">Not measured on this axis</span> : <><span class="bar"><span style={`width:${v.data.roundtrip}%`} /></span><b>{fmtScore(v.data.roundtrip, 1)}%</b></>}</dd>
 							</div>
 							<div class="meter">
 								<dt>Hostile input</dt>
-								<dd><span class="bar is-mark has-pass" style={`--pass:${SAFETY_PASS * 100}%`}><span style={`width:${(v.data.safety ?? 0) * 100}%`} /></span><b>{v.data.safety?.toFixed(2)}</b>{safetyVerdict(v.data.safety) === "pass" ? <em class="pass">Pass</em> : <em class="below">Below the pass line</em>}</dd>
+								<dd>{safetyVerdict(v.data.safety) === "ungraded" ? <span class="na">Not graded</span> : <><span class="bar is-mark has-pass" style={`--pass:${SAFETY_PASS * 100}%`}><span style={`width:${(v.data.safety ?? 0) * 100}%`} /></span><b>{fmtScore(v.data.safety, 2)}</b>{safetyVerdict(v.data.safety) === "pass" ? <em class="pass">Pass</em> : <em class="below">Below the pass line</em>}</>}</dd>
 							</div>
 						</dl>
 					</article>
 				))
 			}
 			<p class="fineprint">
-				Scores describe the pinned versions on the published inputs, as of the reports' dates. Every number links back to the
-				report that measured it. Maintainers who want a result re-run or a statement printed beside it can open an issue on{" "}
+				Scores describe the pinned versions on the published inputs, as of the reports' dates. Round trip is measured in{" "}
+				<a href="/editors-trial/round-trip">the main report</a>, hostile input in <a href="/editors-trial/report-d">Report D</a>, and
+				rendering in <a href="/editors-trial/report-c">Report C</a>. Maintainers who want a result re-run or a statement printed beside it can open an issue on{" "}
 				<a href="https://github.com/arthrod/editors_trial/issues" rel="noopener">the trial's repository</a>.
 			</p>
 		</section>
