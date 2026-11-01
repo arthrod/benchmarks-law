@@ -103,7 +103,7 @@ h2.sec-label{font-weight:400;line-height:inherit}
 .feature .shot .ph-sub{font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);opacity:.65}
 .feature .body{padding:clamp(28px,3.4vw,44px);display:flex;flex-direction:column;justify-content:center;gap:14px}
 .feature .tag{font-family:var(--mono);font-size:11px;letter-spacing:0.05em;text-transform:uppercase;color:var(--mark-text);background:var(--mark);align-self:flex-start;padding:3px 9px}
-.feature h3{font-size:clamp(26px,3vw,34px);font-weight:600;letter-spacing:-0.025em;line-height:1.08}
+.feature h2,.feature h3{font-size:clamp(26px,3vw,34px);font-weight:600;letter-spacing:-0.025em;line-height:1.08}
 .feature p{font-size:16px;color:#333;line-height:1.6;max-width:46ch}
 .feature .go{font-family:var(--mono);font-size:13px;letter-spacing:0.04em;text-transform:uppercase;text-decoration:none;
   color:var(--ink);align-self:flex-start;white-space:nowrap;background-image:linear-gradient(var(--mark),var(--mark));

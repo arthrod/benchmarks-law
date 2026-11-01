@@ -9,7 +9,7 @@
 /* ---------- hub ---------- */
 .hero h1{max-width:17ch}
 .hero .lede{max-width:56ch}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--faint);border:1px solid var(--faint);margin-top:44px}
+.stats{list-style:none;padding:0;display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--faint);border:1px solid var(--faint);margin-top:44px}
 .stat{background:var(--bg);padding:20px 22px;display:flex;flex-direction:column;gap:6px}
 .stat b{font-size:clamp(26px,3vw,36px);font-weight:700;letter-spacing:-0.03em;line-height:1}
 .stat span{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);line-height:1.4}
@@ -78,6 +78,9 @@
   .lr-aside details summary::after{content:"+";color:var(--muted)}
   .lr-aside details[open] summary::after{content:"−"}
   .lr-aside .toc{padding:0 8px 14px;border-top:1px solid var(--faint)}
+  /* The server renders the list in the aside; the script moves it into <details>. Hide it until then so
+     the article does not jump up when it moves (it was the whole of Report C's mobile CLS). */
+  .lr-aside > .toc{display:none}
 }
 
 .prose{font-size:17px;line-height:1.68;color:#1E1E1E;max-width:74ch;min-width:0}
