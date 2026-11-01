@@ -26,9 +26,9 @@
   <span class="grp"><label>zoom <input type="range" id="zoom" min="200" max="1400" value="600" step="20"></label></span>
   <span class="grp">
     <label><input type="checkbox" id="ovl"> overlay</label>
-    <select id="ovlA"></select> under <select id="ovlB"></select>
-    <select id="blend"><option value="normal">opacity</option><option value="difference">difference</option><option value="multiply">multiply</option></select>
-    <input type="range" id="alpha" min="0" max="100" value="50">
+    <select id="ovlA" aria-label="Engine under"></select> under <select id="ovlB" aria-label="Engine over"></select>
+    <select id="blend" aria-label="Blend mode"><option value="normal">opacity</option><option value="difference">difference</option><option value="multiply">multiply</option></select>
+    <input type="range" id="alpha" aria-label="Overlay opacity" min="0" max="100" value="50">
   </span>
   <span class="grp"><button id="viewToggle">Scores table</button></span>
   <span id="keys" class="hidden"><kbd>1</kbd>-<kbd>8</kbd> engines &nbsp;<kbd>&uarr;</kbd><kbd>&darr;</kbd> cases &nbsp;<kbd>r</kbd> random &nbsp;<kbd>s</kbd> side panel &nbsp;<kbd>o</kbd> overlay &nbsp;<kbd>m</kbd> more pages &nbsp;<kbd>t</kbd> scores table</span>
@@ -38,7 +38,7 @@
 <aside id="side" aria-label="Cases"><div id="sidehead"><input id="filter" type="search" autocomplete="off" aria-label="Filter cases" placeholder="filter cases (name, group)…"><div id="fx">
   <label for="fxGroup">group</label><select id="fxGroup"><option value="">all groups</option></select>
   <label for="fxPages">pages</label><select id="fxPages"><option value="">any</option><option value="1-1">1</option><option value="2-3">2–3</option><option value="4-10">4–10</option><option value="11-">11+</option></select>
-  <label for="fxEng">score</label><span class="row"><select id="fxEng"></select><select id="fxMetric"></select> ≤ <input type="number" id="fxMax" min="0" max="100" step="1" placeholder="any"></span>
+  <label for="fxEng">score</label><span class="row"><select id="fxEng"></select><select id="fxMetric" aria-label="Score metric"></select> ≤ <input type="number" id="fxMax" aria-label="Maximum score" min="0" max="100" step="1" placeholder="any"></span>
   <label for="fxDiffer">pages</label><span class="row"><label><input type="checkbox" id="fxDiffer"> differ from Word</label></span>
   <span class="foot"><span id="fxn"></span><button id="fxRand" title="open a random case of this list (r)">random</button><button id="fxClear" title="clear every filter">clear</button></span>
 </div></div><div id="list"><div class="case" aria-busy="true"><span class="name">Loading cases…</span><span class="grp">data.json</span></div></div></aside>

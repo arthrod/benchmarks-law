@@ -3,7 +3,7 @@
 @font-face{font-family:"Roboto Mono";font-style:normal;font-weight:100 700;font-display:swap;src:url("fonts/roboto-mono.woff2") format("woff2")}
 :root{color-scheme:light;
   --bg:#FAFAF8;--ink:#0A0A0A;--muted:#6B6B6B;--faint:#E8E8E5;--surface:#FFFFFF;--hover:#F2F2EE;
-  --mark:#FFD400;--mark-text:#0A0A0A;--green:#1F8A5B;
+  --mark:#FFD400;--mark-text:#0A0A0A;--green:#1F8A5B;--green-ink:#166B43;
   --ink-prose:#1E1E1E;--ink-body:#333333;
   --ff:"Libre Franklin",system-ui,-apple-system,sans-serif;
   --mono:"Roboto Mono","Space Mono",ui-monospace,monospace;
@@ -90,6 +90,8 @@ input[type=checkbox]{accent-color:var(--ink);width:13px;height:13px;margin:0}
 #legend .about > summary .hint{color:var(--muted);font-size:11px}
 #legend .about > summary a,#legend .pill{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.04em;padding:2px 10px;border:var(--border-ink);background:var(--surface);color:var(--ink)}
 #legend .about > summary a:hover{background:var(--mark);color:var(--mark-text)}
+/* Tap target: the summary pills are the legend's links; keep them at least 24px tall. */
+#legend .about > summary a{display:inline-flex;align-items:center;min-height:24px}
 #legend .items{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1px;background:var(--faint);border-top:var(--border-faint);align-items:stretch;max-height:38dvh;overflow:auto}
 #legend .item{background:var(--surface);min-width:0}
 #legend .item > summary{padding:7px 12px;display:flex;gap:8px;align-items:baseline;font-size:12px}
@@ -120,7 +122,7 @@ input[type=checkbox]{accent-color:var(--ink);width:13px;height:13px;margin:0}
 #side .grp{color:var(--muted);font-size:10px;letter-spacing:.02em}
 
 /* pages */
-#main{overflow:auto;padding:14px var(--px) 40px;min-height:0}
+body.viewer #main{overflow:auto;padding:14px var(--px) 40px;min-height:0}
 #grid{display:grid;gap:4px 12px;align-items:start}
 .col{min-width:0}
 .colhead{margin:0;min-width:0;font-size:11px;font-weight:500;letter-spacing:.02em;color:var(--muted);position:sticky;top:0;background:var(--bg);padding:6px 0 8px;z-index:1}
@@ -152,7 +154,10 @@ input[type=checkbox]{accent-color:var(--ink);width:13px;height:13px;margin:0}
 
 /* ---- document pages (speed) ---- */
 body.doc{font-size:15px;line-height:1.6;color:var(--ink-prose)}
-body.doc > :not(#brand):not(footer){max-width:var(--page-max);margin-left:auto;margin-right:auto;padding-left:var(--px);padding-right:var(--px)}
+body.doc > :not(#brand):not(footer):not(main){max-width:var(--page-max);margin-left:auto;margin-right:auto;padding-left:var(--px);padding-right:var(--px)}
+/* The page body is a <main> landmark: it carries the column, its children keep the same measure. */
+body.doc main#main{max-width:var(--page-max);margin-left:auto;margin-right:auto}
+body.doc main#main > *{max-width:var(--page-max);margin-left:auto;margin-right:auto;padding-left:var(--px);padding-right:var(--px)}
 body.doc #brand{margin-bottom:28px}
 body.doc nav.crumbs{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 body.doc nav.crumbs a{color:var(--ink);background:none}
@@ -205,7 +210,7 @@ body.doc table.score .b{display:block;height:9px;background:var(--ink);min-width
 body.doc table.score tr.top td{font-weight:600}
 body.doc table.score tr.base td{color:var(--muted);font-style:italic;background:var(--bg)}
 body.doc table.score td.no{color:#B4232F;font-weight:600}
-body.doc table.score td.ok{color:var(--green)}
+body.doc table.score td.ok{color:var(--green-ink)}
 body.doc .reports{list-style:none;padding:0;margin:0;border-top:var(--border-ink)}
 body.doc .reports li{margin:0;max-width:none;display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:4px 18px;align-items:baseline;padding:14px 0;border-bottom:var(--border-faint)}
 body.doc .reports .id{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--ink)}
