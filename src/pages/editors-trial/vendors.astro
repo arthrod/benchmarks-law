@@ -6,6 +6,8 @@ import { listReports } from "../../lib/cms";
 import demos from "../../data/demos.json" with { type: "json" };
 import type { DemoEntry } from "../../lib/demos";
 import { renderMarkdown } from "../../lib/reports";
+import vendorsData from "../../data/vendors.json" with { type: "json" };
+import { Word, fieldCounts, word } from "../../lib/vendorFacts";
 import { SAFETY_PASS, type VendorData, bestPlacement, fmtScore, ordinal, rankOn, safeSiteUrl, safetyVerdict } from "../../lib/vendors";
 
 const { entries, cacheHint } = await getEmDashCollection("vendors", { limit: 100 });
@@ -21,18 +23,20 @@ const rt = rankOn(all, "roundtrip");
 const sf = rankOn(all, "safety");
 const field = all.filter((v) => v.data.position < 200);
 const baseline = all.filter((v) => v.data.position >= 200);
+const n = fieldCounts(vendorsData);
 const anchor = (h: string) => new GithubSlugger().slug(h);
 const host = (u: string) => u.replace(/^https:\/\/(www\.)?/, "").replace(/\/$/, "");
 ---
 
-<Site title="The field" current="editors" description="Every open-source DOCX editor in the trial, with where each one leads: round-trip fidelity, hostile input, rendering and pagination, measured on the same documents.">
+<Site title="The field" current="editors" description="Every DOCX editor in the trial, open-source and commercial, with where each one leads: round-trip fidelity, hostile input, rendering and pagination, measured on the same documents.">
 	<div class="wrap">
 		<div class="page-head">
 			<a class="back" href="/editors-trial/">← Editors trial</a>
 			<p class="eyebrow">Editors trial<span class="sep">·</span>The field<span class="sep">·</span>{field.length} tools and a baseline</p>
 			<h1>Every tool here <span class="mark">leads somewhere</span>.</h1>
 			<p>
-				The projects below are the open-source DOCX editors that legal teams can actually build on. Each was run through its
+				The projects below are DOCX editors that legal teams can actually build on: {word(n.open)} open-source projects and
+				{word(n.commercial)} commercial SDK. Each was run through its
 				own code, on the same documents, against the same reference. No single score captures a tool: the editor that keeps
 				every byte is not the one that refuses a hostile package best, and neither is the one that draws Word's page to the
 				pixel. This page leads with what each one does best, and shows both measurements beside it.
@@ -110,7 +114,7 @@ const host = (u: string) => u.replace(/^https:\/\/(www\.)?/, "").replace(/\/$/, 
 							</dl>
 							<div class="v-links">
 								{(demos as Record<string, DemoEntry>)[v.slug] && <a class="v-demo" href={`/editors-trial/demo/${v.slug}`}>Live demo <span class="arr">→</span></a>}
-								<a href={`/editors-trial/report-c#${anchor(d.render_section)}`}>How it renders <span class="arr">→</span></a>
+								{d.render_section && <a href={`/editors-trial/report-c#${anchor(d.render_section)}`}>How it renders <span class="arr">→</span></a>}
 								{d.lane && <a href={`/editors-trial/${d.lane}`}>Lane note <span class="arr">→</span></a>}
 								{safeSiteUrl(d.site) && <a href={safeSiteUrl(d.site)} rel="noopener">{host(safeSiteUrl(d.site)!)} <span class="arr">→</span></a>}
 							</div>

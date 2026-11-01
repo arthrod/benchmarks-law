@@ -4,7 +4,7 @@
 		"name": "SuperDoc",
 		"license": "AGPL-3.0",
 		"repo": "https://github.com/superdoc/docx-editor",
-		"commit": "f52c959",
+		"commit": "0ee03fd3cffadc448e3d70ca5d87bb1cb48c59e0",
 		"app": "/demo-apps/superdoc/",
 		"docx": "/editors-trial/demo-files/superdoc.docx",
 		"removed": [
@@ -27,7 +27,7 @@
 		"name": "Folio",
 		"license": "Apache-2.0",
 		"repo": "https://github.com/stella/folio",
-		"commit": "c83cfc4",
+		"commit": "958c582cbb6eeb678121765dad74f83bc5d700c1",
 		"app": "/demo-apps/folio/",
 		"docx": "/editors-trial/demo-files/folio.docx",
 		"removed": [
@@ -50,7 +50,7 @@
 		"name": "GenOffice",
 		"license": "Apache-2.0",
 		"repo": "https://github.com/genspark-ai/genoffice",
-		"commit": "a538d04",
+		"commit": "36a509e8fc16ace85ed7afa3c37acb7b9c441ad1",
 		"app": "/demo-apps/genoffice/",
 		"docx": "/editors-trial/demo-files/genoffice.docx",
 		"removed": [
@@ -72,8 +72,8 @@
 		"slug": "eigenpal",
 		"name": "eigenpal",
 		"license": "Apache-2.0 (Pro packages under the EigenPal Pro License)",
-		"repo": "https://github.com/eigenpal/docx-editor.git",
-		"commit": "c6f8f0f",
+		"repo": "https://github.com/eigenpal/docx-editor",
+		"commit": "3425d4d7afb81399edbb1658b7cf403a3da0001a",
 		"app": "/demo-apps/eigenpal/",
 		"docx": "/editors-trial/demo-files/eigenpal.docx",
 		"removed": [
@@ -96,7 +96,7 @@
 		"name": "office-open",
 		"license": "MIT",
 		"repo": "https://github.com/DemoMacro/office-open",
-		"commit": "567addf",
+		"commit": "567addfd44d756c68e65ebad1c2e94b609179bf7",
 		"app": "/demo-apps/office-open/",
 		"docx": "/editors-trial/demo-files/office-open.docx",
 		"removed": [
@@ -142,7 +142,7 @@
 		"name": "WordCraft",
 		"license": "MIT OR Apache-2.0",
 		"repo": "https://github.com/storytold/wordcraft",
-		"commit": "aadb077",
+		"commit": "a88e005256087285bc7d34310cc0f5f932bc8562",
 		"app": "/demo-apps/wordcraft/",
 		"docx": "/editors-trial/demo-files/wordcraft.docx",
 		"removed": [
@@ -164,8 +164,8 @@
 		"slug": "fidus-writer",
 		"name": "Fidus Writer",
 		"license": "AGPL-3.0",
-		"repo": "https://git.fiduswriter.org/fiduswriter/fiduswriter-document-ts",
-		"commit": "dc0981d",
+		"repo": "https://github.com/fiduswriter/fiduswriter-document-ts",
+		"commit": "dc0981db463f0163df2d455aa4e60b7c3645d031",
 		"app": "/demo-apps/fidus-writer/",
 		"docx": "/editors-trial/demo-files/fidus-writer.docx",
 		"removed": [
@@ -188,7 +188,7 @@
 		"name": "Plate.js",
 		"license": "MIT",
 		"repo": "https://github.com/udecode/plate",
-		"commit": "08b1571f2df0c377923ace3a90f994a482decfba",
+		"commit": "60c7f55304781e6e5d5e884544e549d3fcbed9f7",
 		"app": "/demo-apps/plate/",
 		"docx": "/editors-trial/demo-files/plate.docx",
 		"removed": [
@@ -234,7 +234,7 @@
 		"name": "canvas-editor",
 		"license": "MIT",
 		"repo": "https://github.com/Hufe921/canvas-editor",
-		"commit": "8b94772",
+		"commit": "1865c9b063def06a36ba27151a781d4893fca076",
 		"app": "/demo-apps/canvas-editor/",
 		"docx": "/editors-trial/demo-files/canvas-editor.docx",
 		"removed": [
@@ -261,7 +261,7 @@
 		"name": "Docxodus",
 		"license": "MIT",
 		"repo": "https://github.com/JSv4/Docxodus",
-		"commit": "ceb5cde",
+		"commit": "583a11c7f26fd2f4c6843c7d33198febd9127da4",
 		"app": "/demo-apps/docxodus/",
 		"docx": "/editors-trial/demo-files/docxodus.docx",
 		"removed": [

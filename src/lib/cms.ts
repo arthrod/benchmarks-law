@@ -1,3 +1,4 @@
+import release from "../data/release.json" with { type: "json" };
 import { getEmDashCollection } from "emdash";
 import { partitionReports } from "./positions";
 
@@ -32,7 +33,7 @@ export function docxHref(docxPath: string): string | null {
 }
 
 export function sourceHref(path: string): string {
-	return `https://github.com/arthrod/editors_trial/blob/benchmark-fairness-reports/${path.split("/").map(encodeURIComponent).join("/")}`;
+	return `https://github.com/arthrod/editors_trial/blob/${release.trialRef}/${path.split("/").map(encodeURIComponent).join("/")}`;
 }
 
 export function shortDate(iso: string): string {
