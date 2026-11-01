@@ -23,7 +23,7 @@ const next = i >= 0 && i < rows.length - 1 ? rows[i + 1] : null;
 const groups = switcherGroups(rows, slug!);
 ---
 
-<Site title={d.title} description={d.dek} current="editors" progress>
+<Site title={d.title} crumb={d.code} description={d.dek} current="editors" progress>
 	<div class="wrap">
 		<div class="lr-head">
 			<div class="lr-top">

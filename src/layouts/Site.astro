@@ -2,18 +2,22 @@
 import { getSiteSettings } from "emdash";
 import { createPublicPageContext } from "emdash/page";
 import { EmDashBodyEnd, EmDashBodyStart, EmDashHead } from "emdash/ui";
+import { listReports } from "../lib/cms";
+import { navbarHtml } from "../lib/navbar";
 import "../styles/site.css";
 import "../styles/bench.css";
 
 interface Props {
 	title?: string;
 	description?: string;
-	current?: "home" | "editors" | "neurotic" | "method";
+	current?: "home" | "editors";
+	/** Shown after the wordmark: "/ {crumb}". Defaults to the title. */
+	crumb?: string;
 	progress?: boolean;
 	noindex?: boolean;
 }
 
-const { title, description, current = "home", progress = false, noindex = false } = Astro.props;
+const { title, description, current = "home", crumb, progress = false, noindex = false } = Astro.props;
 const settings = await getSiteSettings();
 const siteTitle = settings?.title || "benchmarks.law";
 const fullTitle = title ? `${title} · ${siteTitle}` : `${siteTitle} · DOCX tooling measured against Microsoft Word`;
@@ -32,11 +36,13 @@ const pageCtx = createPublicPageContext({
 	siteName: siteTitle,
 });
 
-const nav = [
-	{ key: "editors", href: "/editors-trial/", label: "Editors trial" },
-	{ key: "neurotic", href: "/neurotic-docx-bench/home/", label: "DOCX bench" },
-	{ key: "method", href: "/#method", label: "Method" },
-] as const;
+const { rows } = await listReports();
+const navbar = navbarHtml({
+	crumb: crumb ?? title ?? "benchmarks.law",
+	current: current === "editors" ? "editors" : "site",
+	path: Astro.url.pathname,
+	rows,
+});
 ---
 
 <!doctype html>
@@ -51,26 +57,15 @@ const nav = [
 		<meta name="description" content={siteDescription} />
 		{noindex && <meta name="robots" content="noindex,follow" />}
 		<meta name="theme-color" content="#FAFAF8" />
+		<link rel="stylesheet" href="/nav.css" />
+		<script is:inline src="/nav.js" defer></script>
 		<EmDashHead page={pageCtx} />
 	</head>
 	<body>
 		<EmDashBodyStart page={pageCtx} />
 		<a class="skip" href="#main">Skip to content</a>
 		{progress && <div id="progress" aria-hidden="true"></div>}
-		<header class="site-header">
-			<div class="wrap nav">
-				<a class="brand" href="/" aria-label="benchmarks.law home">BENCHMARKS<span class="dot">.</span>LAW</a>
-				<nav class="nav-links" aria-label="Primary">
-					{
-						nav.map((n) => (
-							<a href={n.href} class:list={[{ "is-current": current === n.key }, n.key === "editors" && "nav-contact"]} aria-current={current === n.key ? "page" : undefined}>
-								{n.label}
-							</a>
-						))
-					}
-				</nav>
-			</div>
-		</header>
+		<Fragment set:html={navbar} />
 
 		<main id="main">
 			<slot />

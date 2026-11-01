@@ -1,0 +1,53 @@
+/* The site navbar (src/lib/navbar.ts). Shared by the Astro pages and the static bench pages, so every value has a
+   fallback for pages that do not define the bench's custom properties. */
+#brand.site-nav{position:sticky;top:0;z-index:60;display:flex;align-items:center;gap:18px;flex-wrap:wrap;
+  padding:12px var(--px,clamp(16px,3vw,32px));background:color-mix(in srgb,var(--bg,#FAFAF8) 88%,transparent);
+  -webkit-backdrop-filter:saturate(140%) blur(10px);backdrop-filter:saturate(140%) blur(10px);border-bottom:1px solid var(--ink,#0A0A0A)}
+#brand.site-nav .wm{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono,"Roboto Mono",ui-monospace,monospace);font-weight:700;
+  font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink,#0A0A0A);background:none;text-decoration:none}
+#brand.site-nav .wm:hover .ins{background-image:linear-gradient(var(--mark,#FFD400),var(--mark,#FFD400));background-repeat:no-repeat;background-size:100% .55em;background-position:0 78%}
+#brand.site-nav .logo{display:inline-flex;align-items:center;gap:6px;color:var(--ink,#0A0A0A)}
+#brand.site-nav .dot{color:color-mix(in srgb,var(--ink,#0A0A0A) 35%,transparent);opacity:1}
+#brand.site-nav .logo .del{color:#B4232F;text-decoration:line-through;text-decoration-thickness:2px;text-decoration-color:#B4232F}
+#brand.site-nav .logo .ins{color:#2A6FDB;text-decoration:underline double;text-decoration-color:#2A6FDB;text-underline-offset:3px}
+#brand.site-nav .crumb{font-family:var(--mono,"Roboto Mono",monospace);font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted,#6B6B6B)}
+#brand.site-nav nav{margin-left:auto;display:flex;align-items:center;gap:18px;flex-wrap:wrap;font-family:var(--mono,"Roboto Mono",monospace);
+  font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+#brand.site-nav nav > a,#brand.site-nav .nav-dd > summary{display:inline-block;color:var(--muted,#6B6B6B);background:none;text-decoration:none;
+  border-bottom:2px solid transparent;transition:color .18s ease,border-color .18s ease}
+#brand.site-nav nav > a:hover,#brand.site-nav .nav-dd > summary:hover{color:var(--ink,#0A0A0A)}
+#brand.site-nav nav > a[aria-current=page],#brand.site-nav .nav-dd.is-current > summary{color:var(--ink,#0A0A0A);border-bottom-color:var(--mark,#FFD400)}
+#brand.site-nav nav > a.nav-contact{color:var(--ink,#0A0A0A)}
+#brand.site-nav a:focus-visible,#brand.site-nav summary:focus-visible{outline:2px solid var(--ink,#0A0A0A);outline-offset:3px}
+
+/* Editors trial dropdown: the report switcher's look. */
+#brand.site-nav .nav-dd{position:relative}
+#brand.site-nav .nav-dd > summary{cursor:pointer;list-style:none}
+#brand.site-nav .nav-dd > summary::-webkit-details-marker{display:none}
+#brand.site-nav .nav-dd > summary::after{content:" +";color:var(--muted,#6B6B6B)}
+#brand.site-nav .nav-dd[open] > summary::after{content:" −"}
+#brand.site-nav .nav-panel{position:absolute;right:0;top:calc(100% + 10px);z-index:70;width:min(460px,calc(100vw - 32px));
+  max-height:min(72vh,660px);overflow-y:auto;background:#fff;border:1px solid var(--ink,#0A0A0A);padding:6px 8px 12px;scrollbar-width:thin;
+  text-transform:none;letter-spacing:0;font-family:var(--ff,"Libre Franklin",system-ui,sans-serif)}
+#brand.site-nav .nav-group + .nav-group{margin-top:6px}
+#brand.site-nav .nav-glabel{margin:0 0 4px;font-family:var(--mono,"Roboto Mono",monospace);font-weight:600;font-size:10.5px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--muted,#6B6B6B);padding:10px 8px 8px;border-bottom:1px solid var(--faint,#E8E8E5)}
+#brand.site-nav .nav-panel ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:1px}
+#brand.site-nav .nav-panel a{display:flex;gap:10px;align-items:baseline;padding:6px 8px;color:#2A2A2A;text-decoration:none;line-height:1.35;
+  background:none;border:0;transition:color .18s ease}
+#brand.site-nav .nav-panel a:hover{color:var(--ink,#0A0A0A);background:color-mix(in srgb,var(--mark,#FFD400) 30%,transparent)}
+#brand.site-nav .nav-panel a.on{color:var(--ink,#0A0A0A);background:linear-gradient(var(--mark,#FFD400),var(--mark,#FFD400)) 0 0/3px 100% no-repeat #fff}
+#brand.site-nav .nav-code{flex:none;width:92px;font-family:var(--mono,"Roboto Mono",monospace);font-weight:600;font-size:10px;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--muted,#6B6B6B)}
+#brand.site-nav .nav-title{font-size:13.5px;font-weight:600}
+
+/* Small screens keep every link (the bench used to hide all but Contact); the panel spans the header. */
+@media (max-width:820px){
+  #brand.site-nav{gap:8px 18px}
+  #brand.site-nav nav{margin-left:0;gap:8px 16px}
+  #brand.site-nav nav > a:not(.nav-contact){display:inline-block}
+  #brand.site-nav .nav-dd{position:static}
+  #brand.site-nav .nav-panel{left:var(--px,16px);right:var(--px,16px);width:auto;top:calc(100% - 1px)}
+  #brand.site-nav .nav-code{width:72px}
+}
+@media (prefers-reduced-motion:reduce){#brand.site-nav *{transition:none}}
