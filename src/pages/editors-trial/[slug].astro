@@ -1,7 +1,7 @@
 ---
 import { getEmDashEntry } from "emdash";
 import Site from "../../layouts/Site.astro";
-import { type ReportData, docxHref, listReports, sourceHref } from "../../lib/cms";
+import { type ReportData, listReports, sourceHref } from "../../lib/cms";
 import { RENAMED_SLUGS, renderMarkdown, wordCount } from "../../lib/reports";
 import { switcherGroups } from "../../lib/switcher";
 
@@ -16,7 +16,8 @@ const d = entry.data as unknown as ReportData;
 const { html, toc } = renderMarkdown(d.body ?? "");
 const words = wordCount(d.body ?? "");
 const minutes = Math.max(1, Math.round(words / 230));
-const docx = docxHref(d.docx_path);
+// The .docx is built live from the Markdown on click (src/scripts/docx-download.ts).
+const docxName = (d.source_path ?? "").replace(/^.*\//, "").replace(/\.md$/, "") || slug;
 
 // Prev/next and the switcher show other reports, so their writes must purge this page too.
 const { rows, cacheHint: listHint } = await listReports();
@@ -61,7 +62,7 @@ const groups = switcherGroups(rows, slug!);
 				<span>·</span><span>{words.toLocaleString("en-US")} words</span>
 				<span>·</span><span>{minutes} min read</span>
 				{toc.length > 0 && <><span>·</span><span>{toc.length} sections</span></>}
-				{docx && <a href={docx} download>.docx ↓</a>}
+				<button type="button" data-docx data-slug={slug} data-name={docxName}>.docx ↓</button>
 				<a href={sourceHref(d.source_path)} rel="noopener">Markdown source →</a>
 			</p>
 		</div>
@@ -103,6 +104,7 @@ const groups = switcherGroups(rows, slug!);
 </Site>
 
 <script>
+	import "../../scripts/docx-download";
 	const bar = document.getElementById("progress");
 	const article = document.querySelector<HTMLElement>(".prose");
 	const links = [...document.querySelectorAll<HTMLAnchorElement>("#toc a[data-id]")];

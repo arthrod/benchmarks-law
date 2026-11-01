@@ -19,8 +19,8 @@ function decode(p: string): string {
  * add a way back to the hub, and name the site icon (without one the browser asks for a
  * /favicon.ico that does not exist). Idempotent.
  */
-export function patchNeuroticHtml(html: string, docx: Set<string>): string {
-	let out = html.replace(DEAD, (_all, attr: string, rawPath: string | undefined, hash = "") => attr + target(rawPath, hash, docx));
+export function patchNeuroticHtml(html: string): string {
+	let out = html.replace(DEAD, (_all, attr: string, rawPath: string | undefined, hash = "") => attr + target(rawPath, hash));
 	if (!out.includes('class="home-link"')) {
 		out = out.replace(
 			/(<nav aria-label="Site">)/,
@@ -33,7 +33,7 @@ export function patchNeuroticHtml(html: string, docx: Set<string>): string {
 	return out;
 }
 
-function target(rawPath: string | undefined, hash: string, docx: Set<string>): string {
+function target(rawPath: string | undefined, hash: string): string {
 	{
 		if (!rawPath) return REPO + hash;
 		const path = decode(rawPath).replace(/\/$/, "");
@@ -41,9 +41,10 @@ function target(rawPath: string | undefined, hash: string, docx: Set<string>): s
 			const slug = slugForPath(path);
 			if (slug) return `/editors-trial/${slug}${hash}`;
 		}
-		if (path.endsWith(".docx") && docx.has(path)) {
-			const name = path.slice(path.lastIndexOf("/") + 1);
-			return `/editors-trial/files/${encodeURIComponent(name).replace(/%28/g, "(").replace(/%29/g, ")")}${hash}`;
+		// A report's .docx is built live on its page (jubarte-wasm); no file is published.
+		if (path.endsWith(".docx")) {
+			const slug = slugForPath(path.replace(/\.docx$/, ".md"));
+			if (slug) return `/editors-trial/${slug}${hash}`;
 		}
 		if (path === "reports/extras") return "/editors-trial/#lanes";
 		return `${REPO}/blob/${BRANCH}/${rawPath}${hash}`;

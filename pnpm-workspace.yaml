@@ -13,4 +13,6 @@ minimumReleaseAge: 1440
 minimumReleaseAgeExclude:
   - emdash
   - "@emdash-cms/*"
+  # the owner's own package; 0.17.0 pinned exactly (benchmarks-law#56)
+  - jubarte-wasm
 blockExoticSubdeps: true

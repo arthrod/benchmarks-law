@@ -15,7 +15,7 @@ describe("editors_trial source links", () => {
 		expect(release.trialRef).not.toBe("benchmark-fairness-reports");
 	});
 	it("rewritten neurotic links use the published ref", () => {
-		const out = patchNeuroticHtml('<a href="https://github.com/jandira-tech/editors_trial/blob/main/build/x.py">x</a>', new Set());
+		const out = patchNeuroticHtml('<a href="https://github.com/jandira-tech/editors_trial/blob/main/build/x.py">x</a>');
 		expect(out).toContain(`/blob/${release.trialRef}/build/x.py`);
 	});
 });

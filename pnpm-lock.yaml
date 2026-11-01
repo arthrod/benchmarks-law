@@ -26,6 +26,9 @@ importers:
       github-slugger:
         specifier: ^2.0.0
         version: 2.0.0
+      jubarte-wasm:
+        specifier: 0.17.0
+        version: 0.17.0
       lenis:
         specifier: ^1.3.27
         version: 1.3.27(react@19.3.1)
@@ -45,6 +48,9 @@ importers:
       '@cloudflare/workers-types':
         specifier: ^5.20261030.1
         version: 5.20261030.1
+      fflate:
+        specifier: 0.8.3
+        version: 0.8.3
       tsx:
         specifier: ^4.23.15
         version: 4.23.15
@@ -2226,6 +2232,9 @@ packages:
     resolution: {integrity: sha512-7yAQpD2UMJzLi1Dqv7qFYnPbaPx7ZfFK6PiIxQ4PfkGPyNyl2Ugx+a/umUonmKqjhM4DnfbMvdX6otXq83soQQ==}
     engines: {node: ^12.20 || >= 14.13}
 
+  fflate@0.8.3:
+    resolution: {integrity: sha512-tbZNuJrLwGUp3zshBtdy4W+ORxZuIh8a5ilyIEQDC5rY1f3U20JMry0Ll3WBzU58EZKsEuJFXhb5gwv8CsPvgA==}
+
   finalhandler@2.1.1:
     resolution: {integrity: sha512-S8KoZgRZN+a5rNwqTxlZZePjT/4cnm0ROV70LedRHZ0p8u9fRID0hJUZQpkKLzro8LfmC8sx23bY6tVNxv8pQA==}
     engines: {node: '>= 18.0.0'}
@@ -2414,6 +2423,10 @@ packages:
 
   jsonc-parser@3.3.1:
     resolution: {integrity: sha512-HUgH65KyejrUFPvHFPbqOY0rsFip3Bo5wb4ngvdi1EpCYWUQDC5V+Y7mZws+DLkr4M//zQJoanu1SP+87Dv1oQ==}
+
+  jubarte-wasm@0.17.0:
+    resolution: {integrity: sha512-efgr6WstBPI1260JYAhAfOROTTk44+bpfUXZQqHB+tIqTt0tA/f2rEwNk2SW1Si9vRNHuKRELfWLWKniRAiGcg==}
+    engines: {node: '>=18'}
 
   kleur@4.1.5:
     resolution: {integrity: sha512-o+NO+8WrRiQEE4/7nwRJhN1HWpVmJm511pBHUxPLtp0BUISzlBplORYSmTclCnJvQq2tKu/sgl3xVpkc7ZWuQQ==}
@@ -6103,6 +6116,8 @@ snapshots:
       web-streams-polyfill: 3.3.3
     optional: true
 
+  fflate@0.8.3: {}
+
   finalhandler@2.1.1(supports-color@10.2.2):
     dependencies:
       debug: 4.4.3(supports-color@10.2.2)
@@ -6282,6 +6297,8 @@ snapshots:
   jsonc-parser@2.3.1: {}
 
   jsonc-parser@3.3.1: {}
+
+  jubarte-wasm@0.17.0: {}
 
   kleur@4.1.5: {}
 
