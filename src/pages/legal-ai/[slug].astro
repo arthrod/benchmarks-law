@@ -1,0 +1,68 @@
+---
+import Site from "../../layouts/Site.astro";
+import { STUDIES, studyBody, studyBySlug } from "../../lib/legalAi";
+import { renderMarkdown, wordCount } from "../../lib/reports";
+
+const s = studyBySlug(Astro.params.slug!);
+if (!s) return Astro.rewrite("/404");
+
+const { html, toc } = renderMarkdown(studyBody(s.body));
+const minutes = Math.max(1, Math.round(wordCount(s.body) / 230));
+const i = STUDIES.indexOf(s);
+const prev = STUDIES[i - 1];
+const next = STUDIES[i + 1];
+---
+
+<Site title={s.title} crumb={s.code} description={s.dek} progress>
+	<div class="wrap">
+		<div class="lr-head">
+			<div class="lr-top">
+				<a class="back" href="/#benches">← The benchmarks</a>
+			</div>
+			<p class="sec-label" style="margin-bottom:22px"><span class="sq"></span> {s.code} · {s.kind}</p>
+			<h1>{s.title}</h1>
+			<p class="lr-dek">{s.dek}</p>
+			<p class="lr-meta">
+				<span>{s.authors.join(", ")}</span>
+				<span>·</span><span>{s.date}</span>
+				<span>·</span><span>{s.grading}</span>
+				<span>·</span><span>{minutes} min read</span>
+				<a href={s.source} rel="noopener">Canonical source →</a>
+			</p>
+		</div>
+
+		<div class="lr-row">
+			<aside class="lr-aside" aria-label="Contents">
+				<p class="ttl">/ Contents</p>
+				<details id="toc-details">
+					<summary>Contents · {toc.length} sections</summary>
+				</details>
+				<ol class="toc" id="toc">
+					{toc.map((t) => (
+						<li>
+							<a href={`#${t.id}`} data-id={t.id}>{t.text}</a>
+							{t.children.length > 0 && (
+								<ol>
+									{t.children.map((c) => (
+										<li><a href={`#${c.id}`} data-id={c.id}>{c.text}</a></li>
+									))}
+								</ol>
+							)}
+						</li>
+					))}
+				</ol>
+			</aside>
+			<article class="prose" set:html={html} />
+		</div>
+
+		<nav class="p-nav lr-foot" aria-label="More benches">
+			{prev ? <a href={`/legal-ai/${prev.slug}`}><p class="dir">← Previous · {prev.code}</p><p class="t">{prev.title}</p></a> : <span />}
+			{next && <a class="is-next" href={`/legal-ai/${next.slug}`}><p class="dir">Next · {next.code} →</p><p class="t">{next.title}</p></a>}
+		</nav>
+	</div>
+	<div style="height:clamp(48px,6vw,88px)"></div>
+</Site>
+
+<script>
+	import "../../scripts/report-reader";
+</script>
