@@ -18,7 +18,9 @@ const words = wordCount(d.body ?? "");
 const minutes = Math.max(1, Math.round(words / 230));
 const docx = docxHref(d.docx_path);
 
-const { rows } = await listReports();
+// Prev/next and the switcher show other reports, so their writes must purge this page too.
+const { rows, cacheHint: listHint } = await listReports();
+Astro.cache.set(listHint);
 const i = rows.findIndex((r) => r.slug === slug);
 const prev = i > 0 ? rows[i - 1] : null;
 const next = i >= 0 && i < rows.length - 1 ? rows[i + 1] : null;
