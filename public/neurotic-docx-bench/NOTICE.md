@@ -15,6 +15,6 @@ This site is built on work from **docxide-pdf** by Sverre Johann Bjørke
 The "corpus sample" documents come from neurotic-docx-bench `corpus/word`; see its
 `notices/` for their sources and licences.
 
-The fonts under `_static/fonts/` are the ones jubarte.pro serves: Manrope (The Manrope
-Project Authors) and JetBrains Mono (The JetBrains Mono Project Authors), both under the
-SIL Open Font License 1.1; each licence is beside its font.
+The fonts under `_static/fonts/` are Libre Franklin (The Libre Franklin Project Authors) and
+Roboto Mono (The Roboto Mono Project Authors), both under the SIL Open Font License 1.1; the
+licence text is beside them, in `_static/fonts/OFL.txt`.
