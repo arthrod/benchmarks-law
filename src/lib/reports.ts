@@ -25,9 +25,9 @@ export const REPORT_FILES: ReportFile[] = [
 	{ path: "reports/Report B - Malformed Parts, Causes and Repair (2026).md", slug: "report-b", code: "Report B", position: 30, group: "reports" },
 	{ path: "reports/Report C - Rendering Versus Word (2026).md", slug: "report-c", code: "Report C", position: 40, group: "reports" },
 	{ path: "reports/Report D - Safety, Resource Bombs and Hostile Input (2026).md", slug: "report-d", code: "Report D", position: 50, group: "reports" },
-	{ path: "reports/Report E - Jubarte on the Hostile Packages (2026).md", slug: "report-e-jubarte", code: "Report E", position: 60, group: "reports" },
-	{ path: "reports/Report E - What Word Protects Against (2026).md", slug: "report-e-word", code: "Report E", position: 61, group: "reports" },
-	{ path: "reports/vendors.md", slug: "vendors", code: "Vendors", position: 70, group: "notes" },
+	{ path: "reports/Report E - Jubarte on the Hostile Packages (2026).md", slug: "report-e-jubarte", code: "Report E · Jubarte", position: 60, group: "reports" },
+	{ path: "reports/Report E - What Word Protects Against (2026).md", slug: "report-e-word", code: "Report E · Word", position: 61, group: "reports" },
+	{ path: "reports/vendors.md", slug: "vendor-notes", code: "Vendors", position: 70, group: "notes" },
 	{ path: "reports/rendering-openability.md", slug: "rendering-openability", code: "Note", position: 71, group: "notes" },
 	...[
 		"canvas",
@@ -102,6 +102,8 @@ export function extractDek(md: string): string {
 		if (/^([-*_])\1{2,}$/.test(b)) continue;
 		if (/^(\||```|~~~|>|!\[|<)/.test(b)) continue;
 		if (/^([-*+]|\d+\.)\s/.test(b)) continue;
+		if (/^\*\*Status:/.test(b)) continue;
+		if (/^(`?)(build|harness|out|scripts|reports)\/|^\$ /.test(b)) continue;
 		return plainInline(b.replace(/^([-*_])\1{2,}\s*\n/, ""));
 	}
 	return "";
@@ -129,7 +131,7 @@ function rewriteTarget(target: string, ctx: RewriteContext): string {
 	const slug = slugForPath(resolved);
 	if (slug) return `/editors-trial/${slug}${hash}`;
 	if (resolved.startsWith("out/") && /\.(png|jpe?g|webp|gif|svg)$/i.test(resolved)) {
-		return `/editors-trial/figures/${resolved.slice(4)}`;
+		return `/editors-trial/figures/${resolved.slice(4).split("/").map(encodeURIComponent).join("/")}`;
 	}
 	const encoded = resolved.split("/").map(encodeURIComponent).join("/");
 	return `${ctx.blobBase}${encoded}${hash}`;
@@ -170,6 +172,7 @@ export function renderMarkdown(md: string): { html: string; toc: TocItem[] } {
 			heading(this: { parser: { parseInline: (t: Tokens.Generic[]) => string } }, token: Tokens.Heading) {
 				if (token.depth === 1) return "";
 				const text = plainInline(token.text);
+				if (!text) return `<h${token.depth}>${this.parser.parseInline(token.tokens)}</h${token.depth}>\n`;
 				const id = slugger.slug(text);
 				const item: TocItem = { id, text, children: [] };
 				if (token.depth === 2) toc.push(item);
@@ -190,11 +193,23 @@ export function renderMarkdown(md: string): { html: string; toc: TocItem[] } {
 				const rel = external ? ' rel="noopener" target="_blank"' : "";
 				return `<a href="${escapeHtml(href)}"${title}${rel}>${inner}</a>`;
 			},
+			paragraph(this: { parser: { parseInline: (t: Tokens.Generic[]) => string } }, token: Tokens.Paragraph) {
+				const only = token.tokens.filter((t) => !(t.type === "text" && !t.raw.trim()));
+				if (only.length === 1 && only[0].type === "image") {
+					const img = only[0] as Tokens.Image;
+					const src = safeHref(img.href);
+					if (src !== null) {
+						const alt = escapeHtml(img.text);
+						const cap = alt ? `<figcaption aria-hidden="true">${alt}</figcaption>` : "";
+						return `<figure><img src="${escapeHtml(src)}" alt="${alt}" loading="lazy" decoding="async">${cap}</figure>\n`;
+					}
+				}
+				return `<p>${this.parser.parseInline(token.tokens)}</p>\n`;
+			},
 			image(token: Tokens.Image) {
 				const src = safeHref(token.href);
 				if (src === null) return escapeHtml(token.text);
-				const alt = escapeHtml(token.text);
-				return `<figure><img src="${escapeHtml(src)}" alt="${alt}" loading="lazy" decoding="async"><figcaption>${alt}</figcaption></figure>`;
+				return `<img src="${escapeHtml(src)}" alt="${escapeHtml(token.text)}" loading="lazy" decoding="async">`;
 			},
 		},
 	});
@@ -202,9 +217,8 @@ export function renderMarkdown(md: string): { html: string; toc: TocItem[] } {
 		hooks: {
 			postprocess(html: string) {
 				return html
-					.replace(/<table>/g, '<div class="table-wrap"><table>')
-					.replace(/<\/table>/g, "</table></div>")
-					.replace(/<p>(<figure>[\s\S]*?<\/figure>)<\/p>/g, "$1");
+					.replace(/<table>/g, '<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table>')
+					.replace(/<\/table>/g, "</table></div>");
 			},
 		},
 	});
@@ -215,7 +229,7 @@ export function renderMarkdown(md: string): { html: string; toc: TocItem[] } {
 export function wordCount(md: string): number {
 	const text = md
 		.replace(/```[\s\S]*?```/g, " ")
-		.replace(/[#|*_`>\-[\]()!:]+/g, " ")
+		.replace(/[#|*_`>[\]()!:]+/g, " ")
 		.trim();
 	if (!text) return 0;
 	return text.split(/\s+/).filter((w) => /[\p{L}\p{N}]/u.test(w)).length;

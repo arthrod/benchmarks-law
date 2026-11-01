@@ -35,7 +35,7 @@ header.site-header{position:sticky;top:0;z-index:50;background:color-mix(in srgb
 .nav-links a:hover{color:var(--ink)}
 .nav-links a.is-current{color:var(--ink)}
 .nav-links a.is-current::after{content:"";display:block;height:2px;background:var(--mark);margin-top:3px}
-@media(max-width:760px){.nav-links a:not(.nav-contact){display:none}.nav{height:60px}}
+@media(max-width:760px){.nav{height:auto;min-height:60px;flex-wrap:wrap;row-gap:6px;padding-block:12px}.nav-links{flex-wrap:wrap;gap:16px}}
 
 /* ============ HERO ============ */
 .hero{padding:calc(clamp(32px,4.5vw,60px) * var(--space-scale)) 0 calc(clamp(44px,6vw,80px) * var(--space-scale))}
@@ -70,6 +70,8 @@ h1{font-weight:var(--display-weight,400);font-size:clamp(34px,5.4vw,60px);line-h
 section{padding:calc(clamp(54px,7vw,96px) * var(--space-scale)) 0}
 .sec-label{display:flex;align-items:center;gap:12px;font-family:var(--mono);font-size:12px;letter-spacing:0.08em;
   text-transform:uppercase;color:var(--muted);margin-bottom:calc(42px * var(--space-scale))}
+h2.sec-label{font-weight:400;line-height:inherit}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 .sec-label .sq{width:9px;height:9px;background:var(--mark);display:inline-block}
 .divider{height:1px;background:var(--faint)}
 

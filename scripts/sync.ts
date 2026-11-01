@@ -28,6 +28,14 @@ function walk(dir: string): string[] {
 	});
 }
 
+/** The date of the last commit that touched the file; null when it is untracked or uncommitted-only. */
+function lastCommitDate(rel: string): string | null {
+	const dirty = spawnSync("git", ["status", "--porcelain", "--", rel], { cwd: ROOT, encoding: "utf8" });
+	if (dirty.status === 0 && dirty.stdout.trim()) return null;
+	const r = spawnSync("git", ["log", "-1", "--format=%cs", "--", rel], { cwd: ROOT, encoding: "utf8" });
+	return r.status === 0 && r.stdout.trim() ? r.stdout.trim() : null;
+}
+
 function docxFor(mdPath: string): string | null {
 	const d = mdPath.replace(/\.md$/, ".docx");
 	return existsSync(join(ROOT, d)) ? d : null;
@@ -35,6 +43,8 @@ function docxFor(mdPath: string): string | null {
 
 function assets() {
 	const figs = join(SITE, "public/editors-trial/figures");
+	rmSync(figs, { recursive: true, force: true });
+	rmSync(join(SITE, "public/editors-trial/files"), { recursive: true, force: true });
 	let n = 0;
 	for (const f of walk(join(ROOT, "out"))) {
 		if (!/\/figures\/[^/]+\.(png|jpe?g|webp)$/.test(f)) continue;
@@ -179,7 +189,7 @@ async function content() {
 			continue;
 		}
 		const md = readFileSync(abs, "utf8");
-		const updated = statSync(abs).mtime.toISOString().slice(0, 10);
+		const updated = lastCommitDate(file.path) ?? statSync(abs).mtime.toISOString().slice(0, 10);
 		const entry = buildEntry(file, md, { blobBase: BLOB, updated, docx: docxFor(file.path) });
 		upsert("reports", entry.slug, { ...entry.data }, bySlug);
 	}

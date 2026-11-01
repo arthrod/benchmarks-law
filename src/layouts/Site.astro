@@ -10,9 +10,10 @@ interface Props {
 	description?: string;
 	current?: "home" | "editors" | "neurotic" | "method";
 	progress?: boolean;
+	noindex?: boolean;
 }
 
-const { title, description, current = "home", progress = false } = Astro.props;
+const { title, description, current = "home", progress = false, noindex = false } = Astro.props;
 const settings = await getSiteSettings();
 const siteTitle = settings?.title || "benchmarks.law";
 const fullTitle = title ? `${title} · ${siteTitle}` : `${siteTitle} · DOCX tooling measured against Microsoft Word`;
@@ -27,7 +28,7 @@ const pageCtx = createPublicPageContext({
 	title: fullTitle,
 	pageTitle: title ?? siteTitle,
 	description: siteDescription,
-	canonical: Astro.url.href,
+	canonical: noindex ? undefined : new URL(Astro.url.pathname, Astro.site ?? Astro.url.origin).href,
 	siteName: siteTitle,
 });
 
@@ -48,6 +49,7 @@ const nav = [
 		<link rel="preload" href="/fonts/roboto-mono.woff2" as="font" type="font/woff2" crossorigin />
 		<title>{fullTitle}</title>
 		<meta name="description" content={siteDescription} />
+		{noindex && <meta name="robots" content="noindex,follow" />}
 		<meta name="theme-color" content="#FAFAF8" />
 		<EmDashHead page={pageCtx} />
 	</head>

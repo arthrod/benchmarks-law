@@ -3,7 +3,7 @@ import { getEmDashCollection } from "emdash";
 import GithubSlugger from "github-slugger";
 import Site from "../../layouts/Site.astro";
 import { renderMarkdown } from "../../lib/reports";
-import { SAFETY_PASS, type VendorData, bestPlacement, ordinal, rankOn, safetyVerdict } from "../../lib/vendors";
+import { SAFETY_PASS, type VendorData, bestPlacement, ordinal, rankOn, safeSiteUrl, safetyVerdict } from "../../lib/vendors";
 
 const { entries, cacheHint } = await getEmDashCollection("vendors", { limit: 100 });
 Astro.cache.set(cacheHint);
@@ -16,7 +16,7 @@ const sf = rankOn(all, "safety");
 const field = all.filter((v) => v.data.position < 200);
 const baseline = all.filter((v) => v.data.position >= 200);
 const anchor = (h: string) => new GithubSlugger().slug(h);
-const host = (u: string) => u.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "");
+const host = (u: string) => u.replace(/^https:\/\/(www\.)?/, "").replace(/\/$/, "");
 ---
 
 <Site title="The field" current="editors" description="Every open-source DOCX editor in the trial, with where each one leads: round-trip fidelity, hostile input, rendering and pagination, measured on the same documents.">
@@ -77,7 +77,7 @@ const host = (u: string) => u.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/,
 									<dt>Round trip{r && <span> · {ordinal(r.rank)}{r.tied ? "=" : ""}</span>}</dt>
 									<dd>
 										{d.roundtrip === null ? (
-											<span class="na">Not on this axis: a .NET and WASM toolchain, measured on rendering</span>
+											<span class="na">Not measured on this axis</span>
 										) : (
 											<>
 												<span class="bar"><span style={`width:${d.roundtrip}%`} /></span>
@@ -105,7 +105,7 @@ const host = (u: string) => u.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/,
 							<div class="v-links">
 								<a href={`/editors-trial/report-c#${anchor(d.render_section)}`}>How it renders <span class="arr">→</span></a>
 								{d.lane && <a href={`/editors-trial/${d.lane}`}>Lane note <span class="arr">→</span></a>}
-								<a href={d.site} rel="noopener">{host(d.site)} <span class="arr">→</span></a>
+								{safeSiteUrl(d.site) && <a href={safeSiteUrl(d.site)} rel="noopener">{host(safeSiteUrl(d.site)!)} <span class="arr">→</span></a>}
 							</div>
 							{d.about && (
 								<details class="v-about">
@@ -120,13 +120,13 @@ const host = (u: string) => u.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/,
 		</ol>
 
 		<section>
-			<p class="sec-label"><span class="sq"></span> / The baseline</p>
+			<h2 class="sec-label"><span class="sq"></span> / The baseline</h2>
 			{
 				baseline.map((v) => (
 					<article class="feature baseline">
 						<div class="body">
 							<span class="tag">Baseline · {v.data.license}</span>
-							<h3>{v.data.title}</h3>
+							<h3 class="v-base-name">{v.data.title}</h3>
 							<p><span class="mark">{v.data.leads}</span></p>
 							<p>{v.data.detail}</p>
 							<div class="links">

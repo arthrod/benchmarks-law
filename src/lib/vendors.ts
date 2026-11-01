@@ -71,3 +71,14 @@ export function safetyVerdict(grade: number | null): "pass" | "below" | "ungrade
 	if (grade === null || grade === undefined) return "ungraded";
 	return grade >= SAFETY_PASS ? "pass" : "below";
 }
+
+/** A vendor's site link, or null unless it is a well-formed https URL (CMS fields are admin-editable). */
+export function safeSiteUrl(u: string | null | undefined): string | null {
+	if (!u) return null;
+	try {
+		const url = new URL(u);
+		return url.protocol === "https:" ? url.href : null;
+	} catch {
+		return null;
+	}
+}

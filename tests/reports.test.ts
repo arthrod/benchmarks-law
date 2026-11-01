@@ -87,7 +87,7 @@ describe("rewriteLinks", () => {
 describe("renderMarkdown", () => {
 	it("renders GFM tables wrapped for horizontal scroll", () => {
 		const { html } = renderMarkdown("| a | b |\n|---|---|\n| 1 | 2 |");
-		expect(html).toContain('<div class="table-wrap"><table>');
+		expect(html).toContain('<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table>');
 	});
 	it("gives headings stable unique ids and builds an H2/H3 contents tree", () => {
 		const { html, toc } = renderMarkdown("# Title\n\n## One\n\n### Sub\n\n## One\n\ntext");
@@ -128,7 +128,7 @@ describe("buildEntry", () => {
 	const e = buildEntry(file, md, { blobBase: "https://g/", updated: "2026-10-31", docx: null });
 	it("carries the slug, code, position and series", () => {
 		expect(e.slug).toBe("report-e-word");
-		expect(e.data).toMatchObject({ code: "Report E", position: 61, series: "editors-trial" });
+		expect(e.data).toMatchObject({ code: "Report E · Word", position: 61, series: "editors-trial" });
 	});
 	it("stores rewritten markdown in the body", () => {
 		expect(e.data.body).toContain("(/editors-trial/report-d)");

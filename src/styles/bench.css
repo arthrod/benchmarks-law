@@ -100,6 +100,8 @@
 .prose pre{background:var(--ink);color:#EDEDE8;padding:18px 20px;overflow-x:auto;font-size:13.5px;line-height:1.55;max-width:100%}
 .prose pre code{background:none;padding:0;color:inherit;font-size:inherit;word-break:normal}
 .table-wrap{overflow-x:auto;border:1px solid var(--ink);background:#fff;max-width:100%;margin:1.4em 0 1.6em;-webkit-overflow-scrolling:touch}
+.table-wrap:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+.prose th:first-child,.prose td:first-child{position:sticky;left:0;background:#fff;z-index:1;box-shadow:inset -1px 0 0 var(--faint)}
 .prose table{border-collapse:collapse;width:100%;font-size:14px;line-height:1.45;font-variant-numeric:tabular-nums}
 .prose th{font-family:var(--mono);font-weight:600;font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);
   text-align:left;padding:10px 12px;border-bottom:1px solid var(--ink);background:var(--bg);white-space:nowrap;vertical-align:bottom}
@@ -142,11 +144,11 @@
 .meter dd{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0}
 .meter .bar{position:relative;flex:1 1 160px;height:10px;border:1px solid var(--ink);background:var(--bg)}
 .meter .bar > span{position:absolute;inset:0 auto 0 0;background:var(--ink)}
-.meter .bar.is-mark > span{background:var(--mark)}
-.meter .bar.has-pass::after{content:"";position:absolute;top:-4px;bottom:-4px;left:var(--pass);width:2px;background:var(--accent-green,#1F8A5B)}
+.meter .bar.is-mark > span{background:var(--mark);box-shadow:inset -2px 0 0 var(--ink)}
+.meter .bar.has-pass::after{content:"";position:absolute;top:-4px;bottom:-4px;left:var(--pass);width:2px;background:var(--ink)}
 .meter b{font-size:15px;font-weight:700;font-variant-numeric:tabular-nums;min-width:4.2ch}
 .meter em{font-style:normal;font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
-.meter em.pass{color:#fff;background:#1F8A5B;padding:2px 7px}
+.meter em.pass{color:var(--ink);background:var(--mark);padding:2px 7px}
 .meter em.below{color:var(--ink);border:1px solid var(--ink);padding:1px 6px}
 .meter .na{font-size:13px;color:var(--muted);line-height:1.45}
 .v-links{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
