@@ -22,6 +22,9 @@ import { REPORT_FILES, buildEntry, extractTitle, splitSections } from "../src/li
 import { isLocalEmDash, reportsRoot } from "../src/lib/root";
 
 const SITE = resolve(import.meta.dirname, "..");
+/** EMDASH_TOKEN and the other variables above can live in .env (git-ignored; see .env.example). The shell wins. */
+const ENV_FILE = join(SITE, ".env");
+if (existsSync(ENV_FILE)) process.loadEnvFile(ENV_FILE);
 const ROOT = reportsRoot(process.env, SITE);
 const URL_ = process.env.EMDASH_URL ?? "https://benchmarks.law";
 const BLOB = "https://github.com/arthrod/editors_trial/blob/benchmark-fairness-reports/";

@@ -111,6 +111,20 @@ describe("public/_headers", () => {
 	});
 });
 
+// The sync token lives in .env (never committed); the scripts read it themselves
+describe("sync secrets", () => {
+	it("scripts/sync.ts loads .env when it exists", () => {
+		expect(src("scripts/sync.ts")).toMatch(/existsSync\(ENV_FILE\)\) process\.loadEnvFile\(ENV_FILE\)/);
+	});
+	it(".env is ignored and .env.example names every variable without a value", () => {
+		expect(src(".gitignore")).toMatch(/^\.env$/m);
+		const ex = src(".env.example");
+		for (const k of ["EMDASH_TOKEN", "EMDASH_URL", "REPORTS_ROOT"]) expect(ex).toMatch(new RegExp(`^${k}=`, "m"));
+		expect(ex).toMatch(/^EMDASH_TOKEN=$/m);
+		expect(ex).not.toMatch(/ec_pat_[A-Za-z0-9]/);
+	});
+});
+
 describe("sync:demos", () => {
 	it("is a package script", () => {
 		expect(JSON.parse(src("package.json")).scripts["sync:demos"]).toBe("tsx scripts/sync.ts demos");
