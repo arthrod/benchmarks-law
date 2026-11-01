@@ -11,9 +11,10 @@
 import { cpSync, existsSync, rmSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { dirname, join, resolve } from "node:path";
+import { benchPage } from "../src/lib/navbar";
 import { patchNeuroticHtml } from "../src/lib/neurotic";
 import vendorsData from "../src/data/vendors.json" with { type: "json" };
-import { REPORT_FILES, buildEntry, splitSections } from "../src/lib/reports";
+import { REPORT_FILES, buildEntry, extractTitle, splitSections } from "../src/lib/reports";
 
 const SITE = resolve(import.meta.dirname, "..");
 const ROOT = resolve(process.env.REPORTS_ROOT ?? join(SITE, "../../editors_trial"));
@@ -63,10 +64,16 @@ function assets() {
 		published.add(d);
 	}
 	const neurotic = join(SITE, "public/neurotic-docx-bench");
+	// The navbar's trial dropdown lists the same reports, with the same titles, as the CMS.
+	const rows = REPORT_FILES.filter((r) => existsSync(join(ROOT, r.path))).map((r) => ({
+		slug: r.slug,
+		data: { position: r.position, code: r.code, title: extractTitle(readFileSync(join(ROOT, r.path), "utf8")) || r.slug },
+	}));
 	for (const f of walk(neurotic).filter((p) => p.endsWith(".html"))) {
-		writeFileSync(f, patchNeuroticHtml(readFileSync(f, "utf8"), published));
+		const rel = f.slice(neurotic.length + 1);
+		writeFileSync(f, benchPage(patchNeuroticHtml(readFileSync(f, "utf8"), published), rel, rows));
 	}
-	console.log(`figures ${n} · docx ${published.size} · neurotic pages patched`);
+	console.log(`figures ${n} · docx ${published.size} · neurotic pages patched · navbar on ${rows.length} reports`);
 }
 
 

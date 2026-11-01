@@ -23,19 +23,7 @@ img,svg,figure{max-width:100%}
 a:focus-visible,button:focus-visible,summary:focus-visible,select:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
 
 /* ============ HEADER ============ */
-header.site-header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 88%,transparent);
-  backdrop-filter:saturate(140%) blur(10px);border-bottom:1px solid var(--faint)}
-.nav{display:flex;align-items:center;justify-content:space-between;height:68px}
-.brand{font-family:var(--brand-font);font-weight:var(--brand-weight);font-size:13px;letter-spacing:0.06em;
-  color:var(--ink);text-decoration:none;white-space:nowrap;cursor:pointer}
-.brand .dot{color:var(--ink);opacity:.35}
-.nav-links{display:flex;align-items:center;gap:28px}
-.nav-links a{font-family:var(--mono);font-size:12px;letter-spacing:0.05em;text-transform:uppercase;
-  text-decoration:none;color:var(--muted);transition:color .18s ease;cursor:pointer}
-.nav-links a:hover{color:var(--ink)}
-.nav-links a.is-current{color:var(--ink)}
-.nav-links a.is-current::after{content:"";display:block;height:2px;background:var(--mark);margin-top:3px}
-@media(max-width:760px){.nav{height:auto;min-height:60px;flex-wrap:wrap;row-gap:6px;padding-block:12px}.nav-links{flex-wrap:wrap;gap:16px}}
+/* The navbar is shared with the static bench pages: public/nav.css, markup from src/lib/navbar.ts. */
 
 /* ============ HERO ============ */
 .hero{padding:calc(clamp(32px,4.5vw,60px) * var(--space-scale)) 0 calc(clamp(44px,6vw,80px) * var(--space-scale))}
@@ -146,6 +134,7 @@ body > footer{background:var(--ink);color:#8C8C88;border-top:1px solid #222;padd
 .page-head{padding:clamp(48px,7vw,92px) 0 clamp(28px,4vw,46px)}
 .page-head h1{max-width:16ch;margin-bottom:22px}
 .page-head p{font-size:clamp(16px,1.6vw,19px);color:#2A2A2A;max-width:52ch;line-height:1.6}
+.page-head p.eyebrow{font-size:12px;color:var(--muted);max-width:none;line-height:1.4}
 .bento{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:1fr;gap:14px}
 .card{position:relative;display:flex;flex-direction:column;text-decoration:none;color:var(--ink);
   border:1px solid var(--ink);background:#fff;overflow:hidden;min-height:230px;cursor:pointer;
