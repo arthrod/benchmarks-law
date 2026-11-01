@@ -30,6 +30,7 @@ export const REPORT_FILES: ReportFile[] = [
 	{ path: "reports/vendors.md", slug: "vendor-notes", code: "Vendors", position: 70, group: "notes" },
 	{ path: "reports/rendering-openability.md", slug: "rendering-openability", code: "Note", position: 71, group: "notes" },
 	...[
+		"apryse",
 		"canvas",
 		"docen",
 		"docsplus",
