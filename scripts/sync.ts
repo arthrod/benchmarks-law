@@ -4,9 +4,11 @@
  *   pnpm sync:assets    # figures, .docx downloads, neurotic link fixes → public/
  *   pnpm sync:content   # upsert every report into the EmDash `reports` collection
  *   pnpm sync:vendors   # upsert the field's vendors into the EmDash `vendors` collection
+ *   pnpm sync:demos     # live editor demos: bundles → public/demo-apps/, sanitized copies, src/data/demos.json
  *
  * REPORTS_ROOT  editors_trial checkout (default ../../editors_trial); every command stops if it is absent
  * EMDASH_URL    EmDash instance (default https://benchmarks.law)
+ * DEMO_APPS     folder holding one built demo per editor, <slug>/dist/ (default /tmp/demos)
  * EMDASH_TOKEN  personal access token with content:write
  */
 import { cpSync, existsSync, rmSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
@@ -15,10 +17,14 @@ import { dirname, join, resolve } from "node:path";
 import { benchPage } from "../src/lib/navbar";
 import { patchNeuroticHtml } from "../src/lib/neurotic";
 import vendorsData from "../src/data/vendors.json" with { type: "json" };
+import { type DemoEntry, type DemoManifest, buildDemoEntry } from "../src/lib/demos";
 import { REPORT_FILES, buildEntry, extractTitle, splitSections } from "../src/lib/reports";
 import { isLocalEmDash, reportsRoot } from "../src/lib/root";
 
 const SITE = resolve(import.meta.dirname, "..");
+/** EMDASH_TOKEN and the other variables above can live in .env (git-ignored; see .env.example). The shell wins. */
+const ENV_FILE = join(SITE, ".env");
+if (existsSync(ENV_FILE)) process.loadEnvFile(ENV_FILE);
 const ROOT = reportsRoot(process.env, SITE);
 const URL_ = process.env.EMDASH_URL ?? "https://benchmarks.law";
 const BLOB = "https://github.com/arthrod/editors_trial/blob/benchmark-fairness-reports/";
@@ -210,11 +216,43 @@ async function content() {
 	}
 }
 
+/**
+ * Publishes every editor whose demo is built: DEMO_APPS/<slug>/dist/ (with its SOURCE.txt) is copied to
+ * public/demo-apps/<slug>/, the sanitized copy from editors_trial (out/demo/<slug>.docx, made by
+ * build/make_demo_docs.py) is placed beside it and under /editors-trial/demo-files/, and src/data/demos.json
+ * lists what was published. An editor without a built bundle is left out, never half-published.
+ */
+function demos() {
+	const apps = resolve(process.env.DEMO_APPS ?? "/tmp/demos");
+	const made = spawnSync("python3", ["-I", join(ROOT, "build/make_demo_docs.py"), join(ROOT, "out/demo")], { stdio: "inherit" });
+	if (made.status !== 0) throw new Error("build/make_demo_docs.py failed");
+	const out: Record<string, DemoEntry> = {};
+	const files = join(SITE, "public/editors-trial/demo-files");
+	mkdirSync(files, { recursive: true });
+	for (const v of vendorsData as { slug: string; name: string; license: string }[]) {
+		const dist = join(apps, v.slug, "dist");
+		const manifestPath = join(ROOT, "out/demo", `${v.slug}.json`);
+		if (!existsSync(join(dist, "index.html")) || !existsSync(join(dist, "SOURCE.txt")) || !existsSync(manifestPath)) continue;
+		const manifest = JSON.parse(readFileSync(manifestPath, "utf8")) as DemoManifest;
+		const entry = buildDemoEntry(v.slug, manifest, readFileSync(join(dist, "SOURCE.txt"), "utf8"), v);
+		const target = join(SITE, "public/demo-apps", v.slug);
+		rmSync(target, { recursive: true, force: true });
+		cpSync(dist, target, { recursive: true, dereference: true });
+		const docx = join(ROOT, "out/demo", `${v.slug}.docx`);
+		cpSync(docx, join(target, "document.docx"));
+		cpSync(docx, join(files, `${v.slug}.docx`));
+		out[v.slug] = entry;
+	}
+	writeFileSync(join(SITE, "src/data/demos.json"), `${JSON.stringify(out, null, "\t")}\n`);
+	console.log(`demos ${Object.keys(out).length}: ${Object.keys(out).join(", ") || "none"}`);
+}
+
 const cmd = process.argv[2];
 if (cmd === "assets") assets();
 else if (cmd === "content") await content();
 else if (cmd === "vendors") vendors();
+else if (cmd === "demos") demos();
 else {
-	console.error("usage: sync.ts assets|content|vendors");
+	console.error("usage: sync.ts assets|content|vendors|demos");
 	process.exit(2);
 }

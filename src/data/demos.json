@@ -1,0 +1,282 @@
+{
+	"superdoc": {
+		"slug": "superdoc",
+		"name": "SuperDoc",
+		"license": "AGPL-3.0",
+		"repo": "https://github.com/superdoc/docx-editor",
+		"commit": "f52c959",
+		"app": "/demo-apps/superdoc/",
+		"docx": "/editors-trial/demo-files/superdoc.docx",
+		"removed": [
+			{
+				"what": "the altChunk (word/afchunk.html, an HTML part) is replaced by 2 ordinary paragraphs with the same text",
+				"why": "an altChunk asks the consumer to import foreign HTML; most browser editors drop or reject it"
+			},
+			{
+				"what": "the OLE-embedded document (word/embeddings/embedded1.docx) is replaced by the icon picture Word shows for it",
+				"why": "an embedded OLE package is an opaque binary a browser editor cannot open"
+			},
+			{
+				"what": "the enforced read-only lock (w:documentProtection w:edit=\"readOnly\" in word/settings.xml) is lifted",
+				"why": "an editor that honours the lock, as Word does, would not let a visitor type in the demo"
+			}
+		]
+	},
+	"folio": {
+		"slug": "folio",
+		"name": "Folio",
+		"license": "Apache-2.0",
+		"repo": "https://github.com/stella/folio",
+		"commit": "c83cfc4",
+		"app": "/demo-apps/folio/",
+		"docx": "/editors-trial/demo-files/folio.docx",
+		"removed": [
+			{
+				"what": "the altChunk (word/afchunk.html, an HTML part) is replaced by 2 ordinary paragraphs with the same text",
+				"why": "an altChunk asks the consumer to import foreign HTML; most browser editors drop or reject it"
+			},
+			{
+				"what": "the OLE-embedded document (word/embeddings/embedded1.docx) is replaced by the icon picture Word shows for it",
+				"why": "an embedded OLE package is an opaque binary a browser editor cannot open"
+			},
+			{
+				"what": "the enforced read-only lock (w:documentProtection w:edit=\"readOnly\" in word/settings.xml) is lifted",
+				"why": "an editor that honours the lock, as Word does, would not let a visitor type in the demo"
+			}
+		]
+	},
+	"genoffice": {
+		"slug": "genoffice",
+		"name": "GenOffice",
+		"license": "Apache-2.0",
+		"repo": "https://github.com/genspark-ai/genoffice",
+		"commit": "a538d04",
+		"app": "/demo-apps/genoffice/",
+		"docx": "/editors-trial/demo-files/genoffice.docx",
+		"removed": [
+			{
+				"what": "the altChunk (word/afchunk.html, an HTML part) is replaced by 2 ordinary paragraphs with the same text",
+				"why": "an altChunk asks the consumer to import foreign HTML; most browser editors drop or reject it"
+			},
+			{
+				"what": "the OLE-embedded document (word/embeddings/embedded1.docx) is replaced by the icon picture Word shows for it",
+				"why": "an embedded OLE package is an opaque binary a browser editor cannot open"
+			},
+			{
+				"what": "the enforced read-only lock (w:documentProtection w:edit=\"readOnly\" in word/settings.xml) is lifted",
+				"why": "an editor that honours the lock, as Word does, would not let a visitor type in the demo"
+			}
+		]
+	},
+	"eigenpal": {
+		"slug": "eigenpal",
+		"name": "eigenpal",
+		"license": "Apache-2.0 (Pro packages under the EigenPal Pro License)",
+		"repo": "https://github.com/eigenpal/docx-editor.git",
+		"commit": "c6f8f0f",
+		"app": "/demo-apps/eigenpal/",
+		"docx": "/editors-trial/demo-files/eigenpal.docx",
+		"removed": [
+			{
+				"what": "the altChunk (word/afchunk.html, an HTML part) is replaced by 2 ordinary paragraphs with the same text",
+				"why": "an altChunk asks the consumer to import foreign HTML; most browser editors drop or reject it"
+			},
+			{
+				"what": "the OLE-embedded document (word/embeddings/embedded1.docx) is replaced by the icon picture Word shows for it",
+				"why": "an embedded OLE package is an opaque binary a browser editor cannot open"
+			},
+			{
+				"what": "the enforced read-only lock (w:documentProtection w:edit=\"readOnly\" in word/settings.xml) is lifted",
+				"why": "an editor that honours the lock, as Word does, would not let a visitor type in the demo"
+			}
+		]
+	},
+	"office-open": {
+		"slug": "office-open",
+		"name": "office-open",
+		"license": "MIT",
+		"repo": "https://github.com/DemoMacro/office-open",
+		"commit": "567addf",
+		"app": "/demo-apps/office-open/",
+		"docx": "/editors-trial/demo-files/office-open.docx",
+		"removed": [
+			{
+				"what": "the altChunk (word/afchunk.html, an HTML part) is replaced by 2 ordinary paragraphs with the same text",
+				"why": "an altChunk asks the consumer to import foreign HTML; most browser editors drop or reject it"
+			},
+			{
+				"what": "the OLE-embedded document (word/embeddings/embedded1.docx) is replaced by the icon picture Word shows for it",
+				"why": "an embedded OLE package is an opaque binary a browser editor cannot open"
+			},
+			{
+				"what": "the enforced read-only lock (w:documentProtection w:edit=\"readOnly\" in word/settings.xml) is lifted",
+				"why": "an editor that honours the lock, as Word does, would not let a visitor type in the demo"
+			}
+		]
+	},
+	"docen": {
+		"slug": "docen",
+		"name": "Docen",
+		"license": "MIT",
+		"repo": "https://github.com/DemoMacro/docen",
+		"commit": "1890b15aae03c1f17f70adeea3bb5f3adb9d3aad",
+		"app": "/demo-apps/docen/",
+		"docx": "/editors-trial/demo-files/docen.docx",
+		"removed": [
+			{
+				"what": "the altChunk (word/afchunk.html, an HTML part) is replaced by 2 ordinary paragraphs with the same text",
+				"why": "an altChunk asks the consumer to import foreign HTML; most browser editors drop or reject it"
+			},
+			{
+				"what": "the OLE-embedded document (word/embeddings/embedded1.docx) is replaced by the icon picture Word shows for it",
+				"why": "an embedded OLE package is an opaque binary a browser editor cannot open"
+			},
+			{
+				"what": "the enforced read-only lock (w:documentProtection w:edit=\"readOnly\" in word/settings.xml) is lifted",
+				"why": "an editor that honours the lock, as Word does, would not let a visitor type in the demo"
+			}
+		]
+	},
+	"wordcraft": {
+		"slug": "wordcraft",
+		"name": "WordCraft",
+		"license": "MIT OR Apache-2.0",
+		"repo": "https://github.com/storytold/wordcraft",
+		"commit": "aadb077",
+		"app": "/demo-apps/wordcraft/",
+		"docx": "/editors-trial/demo-files/wordcraft.docx",
+		"removed": [
+			{
+				"what": "the altChunk (word/afchunk.html, an HTML part) is replaced by 2 ordinary paragraphs with the same text",
+				"why": "an altChunk asks the consumer to import foreign HTML; most browser editors drop or reject it"
+			},
+			{
+				"what": "the OLE-embedded document (word/embeddings/embedded1.docx) is replaced by the icon picture Word shows for it",
+				"why": "an embedded OLE package is an opaque binary a browser editor cannot open"
+			},
+			{
+				"what": "the enforced read-only lock (w:documentProtection w:edit=\"readOnly\" in word/settings.xml) is lifted",
+				"why": "an editor that honours the lock, as Word does, would not let a visitor type in the demo"
+			}
+		]
+	},
+	"fidus-writer": {
+		"slug": "fidus-writer",
+		"name": "Fidus Writer",
+		"license": "AGPL-3.0",
+		"repo": "https://git.fiduswriter.org/fiduswriter/fiduswriter-document-ts",
+		"commit": "dc0981d",
+		"app": "/demo-apps/fidus-writer/",
+		"docx": "/editors-trial/demo-files/fidus-writer.docx",
+		"removed": [
+			{
+				"what": "the altChunk (word/afchunk.html, an HTML part) is replaced by 2 ordinary paragraphs with the same text",
+				"why": "an altChunk asks the consumer to import foreign HTML; most browser editors drop or reject it"
+			},
+			{
+				"what": "the OLE-embedded document (word/embeddings/embedded1.docx) is replaced by the icon picture Word shows for it",
+				"why": "an embedded OLE package is an opaque binary a browser editor cannot open"
+			},
+			{
+				"what": "the enforced read-only lock (w:documentProtection w:edit=\"readOnly\" in word/settings.xml) is lifted",
+				"why": "an editor that honours the lock, as Word does, would not let a visitor type in the demo"
+			}
+		]
+	},
+	"plate": {
+		"slug": "plate",
+		"name": "Plate.js",
+		"license": "MIT",
+		"repo": "https://github.com/udecode/plate",
+		"commit": "08b1571f2df0c377923ace3a90f994a482decfba",
+		"app": "/demo-apps/plate/",
+		"docx": "/editors-trial/demo-files/plate.docx",
+		"removed": [
+			{
+				"what": "the altChunk (word/afchunk.html, an HTML part) is replaced by 2 ordinary paragraphs with the same text",
+				"why": "an altChunk asks the consumer to import foreign HTML; most browser editors drop or reject it"
+			},
+			{
+				"what": "the OLE-embedded document (word/embeddings/embedded1.docx) is replaced by the icon picture Word shows for it",
+				"why": "an embedded OLE package is an opaque binary a browser editor cannot open"
+			},
+			{
+				"what": "the enforced read-only lock (w:documentProtection w:edit=\"readOnly\" in word/settings.xml) is lifted",
+				"why": "an editor that honours the lock, as Word does, would not let a visitor type in the demo"
+			}
+		]
+	},
+	"docs-plus": {
+		"slug": "docs-plus",
+		"name": "docs.plus",
+		"license": "MIT",
+		"repo": "https://github.com/docs-plus/docs.plus",
+		"commit": "a9b0c69e8442702c6111c04a12319f61a995ccfc",
+		"app": "/demo-apps/docs-plus/",
+		"docx": "/editors-trial/demo-files/docs-plus.docx",
+		"removed": [
+			{
+				"what": "the altChunk (word/afchunk.html, an HTML part) is replaced by 2 ordinary paragraphs with the same text",
+				"why": "an altChunk asks the consumer to import foreign HTML; most browser editors drop or reject it"
+			},
+			{
+				"what": "the OLE-embedded document (word/embeddings/embedded1.docx) is replaced by the icon picture Word shows for it",
+				"why": "an embedded OLE package is an opaque binary a browser editor cannot open"
+			},
+			{
+				"what": "the enforced read-only lock (w:documentProtection w:edit=\"readOnly\" in word/settings.xml) is lifted",
+				"why": "an editor that honours the lock, as Word does, would not let a visitor type in the demo"
+			}
+		]
+	},
+	"canvas-editor": {
+		"slug": "canvas-editor",
+		"name": "canvas-editor",
+		"license": "MIT",
+		"repo": "https://github.com/Hufe921/canvas-editor",
+		"commit": "8b94772",
+		"app": "/demo-apps/canvas-editor/",
+		"docx": "/editors-trial/demo-files/canvas-editor.docx",
+		"removed": [
+			{
+				"what": "the altChunk (word/afchunk.html, an HTML part) is replaced by 2 ordinary paragraphs with the same text",
+				"why": "an altChunk asks the consumer to import foreign HTML; most browser editors drop or reject it"
+			},
+			{
+				"what": "the OLE-embedded document (word/embeddings/embedded1.docx) is replaced by the icon picture Word shows for it",
+				"why": "an embedded OLE package is an opaque binary a browser editor cannot open"
+			},
+			{
+				"what": "the enforced read-only lock (w:documentProtection w:edit=\"readOnly\" in word/settings.xml) is lifted",
+				"why": "an editor that honours the lock, as Word does, would not let a visitor type in the demo"
+			},
+			{
+				"what": "1 table cell(s) marked as the continuation of a vertical merge with no merge above them become ordinary cells",
+				"why": "the editor drops such a cell, the row comes up a column short and its table layout fails"
+			}
+		]
+	},
+	"docxodus": {
+		"slug": "docxodus",
+		"name": "Docxodus",
+		"license": "MIT",
+		"repo": "https://github.com/JSv4/Docxodus",
+		"commit": "ceb5cde",
+		"app": "/demo-apps/docxodus/",
+		"docx": "/editors-trial/demo-files/docxodus.docx",
+		"removed": [
+			{
+				"what": "the altChunk (word/afchunk.html, an HTML part) is replaced by 2 ordinary paragraphs with the same text",
+				"why": "an altChunk asks the consumer to import foreign HTML; most browser editors drop or reject it"
+			},
+			{
+				"what": "the OLE-embedded document (word/embeddings/embedded1.docx) is replaced by the icon picture Word shows for it",
+				"why": "an embedded OLE package is an opaque binary a browser editor cannot open"
+			},
+			{
+				"what": "the enforced read-only lock (w:documentProtection w:edit=\"readOnly\" in word/settings.xml) is lifted",
+				"why": "an editor that honours the lock, as Word does, would not let a visitor type in the demo"
+			}
+		]
+	}
+}

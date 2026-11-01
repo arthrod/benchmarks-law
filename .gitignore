@@ -43,3 +43,6 @@ npm-debug.log*
 # EmDash local state
 .emdash/
 .emdash-*.json
+
+# Live editor demo bundles: build artifacts, copied in by `pnpm sync:demos` (see README)
+public/demo-apps/

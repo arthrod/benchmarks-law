@@ -1,0 +1,10 @@
+# The live editor demos run third-party editor code on this origin. The browser enforces that
+# nothing they load or send leaves benchmarks.law, and that only this site may frame them. Inline
+# scripts are allowed: the bundles' own host pages use them, and the policy is about the network.
+# no-transform stops Cloudflare injecting its Web Analytics beacon into the demo pages (the CSP
+# would refuse it anyway, but the demos should not even try to load a third-party script).
+/demo-apps/*
+  Content-Security-Policy: default-src 'self' blob: data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' blob:; style-src 'self' 'unsafe-inline' blob: data:; img-src 'self' blob: data:; font-src 'self' blob: data:; connect-src 'self' blob: data:; worker-src 'self' blob:; frame-ancestors 'self'; base-uri 'self'; form-action 'none'
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: same-origin
+  Cache-Control: public, max-age=0, must-revalidate, no-transform

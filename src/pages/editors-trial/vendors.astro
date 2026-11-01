@@ -3,6 +3,8 @@ import { getEmDashCollection } from "emdash";
 import GithubSlugger from "github-slugger";
 import Site from "../../layouts/Site.astro";
 import { listReports } from "../../lib/cms";
+import demos from "../../data/demos.json" with { type: "json" };
+import type { DemoEntry } from "../../lib/demos";
 import { renderMarkdown } from "../../lib/reports";
 import { SAFETY_PASS, type VendorData, bestPlacement, fmtScore, ordinal, rankOn, safeSiteUrl, safetyVerdict } from "../../lib/vendors";
 
@@ -38,7 +40,7 @@ const host = (u: string) => u.replace(/^https:\/\/(www\.)?/, "").replace(/\/$/, 
 		</div>
 
 		<div class="axes">
-			<div><b>Round trip</b><span>Weighted score over 97 checks, import then export through the tool's own code. Main report.</span></div>
+			<div><b>Round trip</b><span>Weighted score over 99 checks, import then export through the tool's own code. Main report.</span></div>
 			<div><b>Hostile input</b><span>Mean grade over ten hostile packages, 1 = a named ceiling that refuses it. Report D. Pass line {SAFETY_PASS.toFixed(2)}.</span></div>
 			<div><b>Rendering</b><span>The tool's own UI or renderer, against Word's page. Report C.</span></div>
 		</div>
@@ -107,6 +109,7 @@ const host = (u: string) => u.replace(/^https:\/\/(www\.)?/, "").replace(/\/$/, 
 								</div>
 							</dl>
 							<div class="v-links">
+								{(demos as Record<string, DemoEntry>)[v.slug] && <a class="v-demo" href={`/editors-trial/demo/${v.slug}`}>Live demo <span class="arr">→</span></a>}
 								<a href={`/editors-trial/report-c#${anchor(d.render_section)}`}>How it renders <span class="arr">→</span></a>
 								{d.lane && <a href={`/editors-trial/${d.lane}`}>Lane note <span class="arr">→</span></a>}
 								{safeSiteUrl(d.site) && <a href={safeSiteUrl(d.site)} rel="noopener">{host(safeSiteUrl(d.site)!)} <span class="arr">→</span></a>}

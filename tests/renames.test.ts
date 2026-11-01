@@ -36,17 +36,19 @@ describe("the bench's editors page lists every report", () => {
 });
 
 const reportC = join(REPORTS_ROOT, "reports/Report C - Rendering Versus Word (2026).md");
-describe.skipIf(!existsSync(reportC))("vendor render sections", () => {
-	const headings = new Set(
+// Vitest runs a skipped suite's body during collection, so the file is read inside the test, never here.
+const headings = () =>
+	new Set(
 		readFileSync(reportC, "utf8")
 			.split("\n")
 			.filter((l) => l.startsWith("### "))
 			.map((l) => l.slice(4).trim()),
 	);
+describe.skipIf(!existsSync(reportC))("vendor render sections", () => {
 	it.each((vendors as { name: string; renderSection?: string }[]).filter((v) => v.renderSection).map((v) => [v.name, v.renderSection!]))(
 		"%s points at a real Report C heading",
 		(_name, section) => {
-			expect(headings.has(section)).toBe(true);
+			expect(headings().has(section)).toBe(true);
 		},
 	);
 });

@@ -21,6 +21,7 @@ export default defineConfig({
 		"/editors-trial": PUBLIC_PAGE,
 		"/editors-trial/vendors": PUBLIC_PAGE,
 		"/editors-trial/[slug]": PUBLIC_PAGE,
+		"/editors-trial/demo/[slug]": PUBLIC_PAGE,
 	},
 	image: {
 		layout: "constrained",
