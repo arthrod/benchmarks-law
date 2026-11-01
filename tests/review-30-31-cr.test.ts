@@ -1,7 +1,10 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
+import { join, resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 
 const src = (p: string) => readFileSync(new URL(`../${p}`, import.meta.url), "utf8");
+const SITE = resolve(import.meta.dirname, "..");
+const REPORTS_ROOT = resolve(process.env.REPORTS_ROOT ?? join(SITE, "../../editors_trial"));
 
 // 4434743500 (CodeRabbit, #31): the restored mobile header (z-index 60) covered the case drawer's controls
 describe("mobile case drawer", () => {
@@ -67,3 +70,40 @@ describe("redlines overlay engine", () => {
 	});
 });
 
+// The bench's "at a glance" page carried the 2026-10-30 numbers after the 2026-11-01 correction. Its
+// scorecard must equal the main report's, row for row.
+const mainReport = join(REPORTS_ROOT, "Open-Source DOCX Editors Re-verified Against Code and Measured Round-Trip (2026).md");
+describe.skipIf(!existsSync(mainReport))("editors trial at-a-glance scorecard", () => {
+	const strip = (t: string) => t.replace(/<[^>]+>/g, "").replace(/[*_]/g, "").replace(/\s+/g, " ").trim();
+	const reportRows = () => {
+		const md = readFileSync(mainReport, "utf8");
+		const at = md.indexOf("| Editor | Weighted score | Critical features |");
+		const lines = md.slice(at).split("\n");
+		const end = lines.findIndex((l) => !l.startsWith("|"));
+		return lines
+			.slice(2, end)
+			.map((l) => l.split("|").slice(1, -1).map(strip))
+			.map(([name, w, crit, text, parts, failed]) => [name.replace(" (baseline)", ""), w, crit.match(/\((\d+\/\d+)\)/)?.[1].replace("/", " / "), text, parts, failed]);
+	};
+	const pageRows = () => {
+		const html = src("public/neurotic-docx-bench/editors/index.html");
+		const body = html.slice(html.indexOf('<table class="score">'), html.indexOf("</table>"));
+		return [...body.matchAll(/<tr[^>]*>(<td[\s\S]*?)<\/tr>/g)].map((m) => {
+			const c = [...m[1].matchAll(/<td[^>]*>([\s\S]*?)<\/td>/g)].map((x) => strip(x[1]));
+			return [c[0].replace(" (baseline)", ""), c[1], c[3], c[4], c[5], c[6]];
+		});
+	};
+	it("has every row of the main report, and no other", () => {
+		const page = pageRows();
+		const report = reportRows();
+		expect(page.length).toBe(report.length);
+		for (const r of report) expect(page).toContainEqual(r);
+	});
+	it("states the corrected counts", () => {
+		const html = src("public/neurotic-docx-bench/editors/index.html");
+		expect(html).not.toMatch(/\b97 checks|Score 97\b|\b31 \/ 31\b|>31<|\b(83\.0|86\.0|20\.5)%/);
+		expect(html).toContain("99 checks");
+		expect(html).toContain("<b>3</b><span>perfect round trips</span>");
+		expect(html).toContain("corrected 2026-11-01");
+	});
+});
