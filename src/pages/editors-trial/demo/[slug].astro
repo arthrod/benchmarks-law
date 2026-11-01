@@ -1,0 +1,57 @@
+---
+import demos from "../../../data/demos.json" with { type: "json" };
+import Site from "../../../layouts/Site.astro";
+import { listReports } from "../../../lib/cms";
+import type { DemoEntry } from "../../../lib/demos";
+
+const { slug } = Astro.params;
+const demo = (demos as Record<string, DemoEntry>)[slug ?? ""];
+if (!demo) return new Response("No demo for this editor.", { status: 404 });
+
+// The navbar lists every report, so a report write must purge this page too.
+const { cacheHint } = await listReports();
+Astro.cache.set(cacheHint);
+
+const ORIGINAL = "https://github.com/arthrod/editors_trial/blob/main/fixture/complex.docx";
+const commitUrl = `${demo.repo.replace(/\/$/, "")}/tree/${demo.commit}`;
+---
+
+<Site title={`${demo.name}, live`} current="editors" description={`${demo.name} running in your browser, from the commit the editors trial measured, on a sanitized copy of the trial's fixture.`}>
+	<div class="wrap demo-head">
+		<a class="back" href="/editors-trial/vendors">← The field</a>
+		<p class="eyebrow">Editors trial<span class="sep">·</span>Live demo<span class="sep">·</span>{demo.license}</p>
+		<h1>{demo.name}, <span class="mark">live</span>.</h1>
+		<p class="demo-note">
+			This is {demo.name}'s own code, built from commit <a href={commitUrl} rel="noopener"><code>{demo.commit}</code></a>, the
+			one the trial measured. It runs entirely in your browser: nothing you open or type leaves this page. The document is a
+			sanitized copy of the trial's fixture, so it opens everywhere. The scores come from the{" "}
+			<a href={ORIGINAL} rel="noopener">unsanitized original (fixture/complex.docx)</a>.
+		</p>
+		<details class="demo-removed">
+			<summary>What the sanitized copy leaves out ({demo.removed.length})</summary>
+			<ul>{demo.removed.map((r) => <li>{r.what}. <span class="why">{r.why}.</span></li>)}</ul>
+		</details>
+		<p class="demo-links">
+			<a href={demo.app} target="_blank" rel="noopener">Open full screen <span class="arr">→</span></a>
+			<a href={demo.docx} download>Download the sanitized copy <span class="arr">→</span></a>
+			<a href={demo.repo} rel="noopener">Source ({demo.license}) <span class="arr">→</span></a>
+			<a href={`${demo.app}LICENSE`} rel="noopener">Licence text <span class="arr">→</span></a>
+		</p>
+	</div>
+	<div class="demo-frame">
+		<iframe src={demo.app} title={`${demo.name} editor, live`} loading="eager" allow="clipboard-read; clipboard-write" referrerpolicy="same-origin"></iframe>
+	</div>
+</Site>
+
+<style>
+	.demo-head { padding-top: 28px; }
+	.demo-head h1 { margin: 6px 0 12px; }
+	.demo-note { max-width: 72ch; line-height: 1.6; }
+	.demo-removed { margin: 14px 0 6px; max-width: 72ch; }
+	.demo-removed summary { cursor: pointer; font-family: var(--mono); font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; min-height: 24px; }
+	.demo-removed .why { color: var(--muted, #5a5a5a); }
+	.demo-links { display: flex; flex-wrap: wrap; gap: 8px 22px; margin: 14px 0 18px; }
+	.demo-links a { min-height: 24px; display: inline-flex; align-items: center; }
+	.demo-frame { border-top: 1px solid var(--ink, #111); border-bottom: 1px solid var(--ink, #111); }
+	.demo-frame iframe { display: block; width: 100%; height: calc(100dvh - 64px); min-height: 560px; border: 0; background: #fff; }
+</style>
