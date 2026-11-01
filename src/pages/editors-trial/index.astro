@@ -1,16 +1,19 @@
 ---
 import Site from "../../layouts/Site.astro";
 import { listReports } from "../../lib/cms";
+import vendorsData from "../../data/vendors.json" with { type: "json" };
+import { Word, fieldCounts, word } from "../../lib/vendorFacts";
+const n = fieldCounts(vendorsData);
 
 const { reports, notes, lanes, cacheHint } = await listReports();
 Astro.cache.set(cacheHint);
 ---
 
-<Site title="Editors trial" current="editors" description="Twelve open-source DOCX editors run through their own import and export on one adversarial document, scored against Microsoft Word, and then given ten hostile packages.">
+<Site title="Editors trial" current="editors" description={`${Word(n.open)} open-source DOCX editors and ${word(n.commercial)} commercial one, run through their own import and export on one adversarial document, scored against Microsoft Word, and then given ten hostile packages.`}>
 	<div class="wrap">
 		<div class="page-head">
 			<p class="eyebrow">Bench 01<span class="sep">·</span>editors_trial<span class="sep">·</span>2026</p>
-			<h1>Open-source DOCX editors, <span class="mark">re-verified</span> against code.</h1>
+			<h1>DOCX editors, <span class="mark">re-verified</span> against code.</h1>
 			<p>
 				Each editor's own code imports one purpose-built adversarial document and exports it again. The reports below take
 				that result apart by namespace, by pass-through, by malformed part, by what each editor puts on the page, and by what
@@ -20,7 +23,7 @@ Astro.cache.set(cacheHint);
 
 		<a class="feature field-cta" href="/editors-trial/vendors">
 			<div class="body">
-				<span class="tag">The field · 12 tools and a baseline</span>
+				<span class="tag">The field · {n.tools} tools and a baseline</span>
 				<h2>Every tool here leads somewhere.</h2>
 				<p>Where each editor places best, round trip and hostile input side by side, with links into the reports that measured it.</p>
 				<span class="go">See the field →</span>

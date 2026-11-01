@@ -20,6 +20,9 @@ import vendorsData from "../src/data/vendors.json" with { type: "json" };
 import { type DemoEntry, type DemoManifest, buildDemoEntry } from "../src/lib/demos";
 import { REPORT_FILES, buildEntry, extractTitle, splitSections } from "../src/lib/reports";
 import { isLocalEmDash, reportsRoot } from "../src/lib/root";
+import { trialRef } from "../src/lib/trialRef";
+import { rebuildScoreTable } from "../src/lib/scorecard";
+import { applyFacts } from "../src/lib/vendorFacts";
 
 const SITE = resolve(import.meta.dirname, "..");
 /** EMDASH_TOKEN and the other variables above can live in .env (git-ignored; see .env.example). The shell wins. */
@@ -27,7 +30,14 @@ const ENV_FILE = join(SITE, ".env");
 if (existsSync(ENV_FILE)) process.loadEnvFile(ENV_FILE);
 const ROOT = reportsRoot(process.env, SITE);
 const URL_ = process.env.EMDASH_URL ?? "https://benchmarks.law";
-const BLOB = "https://github.com/arthrod/editors_trial/blob/benchmark-fairness-reports/";
+/** Pin every source link to the commit being published (src/data/release.json, read by the pages too). */
+function writeTrialRef(): string {
+	const git = (...a: string[]) => spawnSync("git", ["-C", ROOT, ...a], { encoding: "utf8" }).stdout ?? "";
+	const ref = trialRef(git("describe", "--tags", "--exact-match", "HEAD"), git("rev-parse", "HEAD"));
+	writeFileSync(join(SITE, "src/data/release.json"), `${JSON.stringify({ trialRef: ref }, null, "\t")}\n`);
+	return ref;
+}
+const BLOB = () => `https://github.com/arthrod/editors_trial/blob/${writeTrialRef()}/`;
 
 /** Writes to a remote EmDash need a token; a local dev instance does not. */
 function requireToken() {
@@ -82,9 +92,14 @@ function assets() {
 		slug: r.slug,
 		data: { position: r.position, code: r.code, title: extractTitle(readFileSync(join(ROOT, r.path), "utf8")) || r.slug },
 	}));
+	const mainMd = readFileSync(join(ROOT, "Open-Source DOCX Editors Re-verified Against Code and Measured Round-Trip (2026).md"), "utf8");
+	const wv = join(ROOT, "out/word_verdicts.json");
+	const verdicts: Record<string, string> = existsSync(wv) ? JSON.parse(readFileSync(wv, "utf8")).verdicts : {};
 	for (const f of walk(neurotic).filter((p) => p.endsWith(".html"))) {
 		const rel = f.slice(neurotic.length + 1);
-		writeFileSync(f, benchPage(patchNeuroticHtml(readFileSync(f, "utf8"), published), rel, rows));
+		let html = patchNeuroticHtml(readFileSync(f, "utf8"), published);
+		if (rel === "editors/index.html") html = rebuildScoreTable(html, mainMd, verdicts);
+		writeFileSync(f, benchPage(html, rel, rows));
 	}
 	console.log(`figures ${n} · docx ${published.size} · neurotic pages patched · navbar on ${rows.length} reports`);
 }
@@ -178,8 +193,12 @@ function vendors() {
 	requireToken();
 	ensureSchema("vendors", "Vendors", "Vendor", VENDOR_FIELDS);
 	const about = splitSections(readFileSync(join(ROOT, "reports/vendors.md"), "utf8"));
+	// Measured figures come from the trial's facts; vendors.json is rewritten so the repo never holds a stale one.
+	const facts = JSON.parse(readFileSync(join(ROOT, "out/facts.json"), "utf8"));
+	const measured = applyFacts(vendorsData, facts);
+	writeFileSync(join(SITE, "src/data/vendors.json"), `${JSON.stringify(measured, null, "\t")}\n`);
 	const bySlug = existing("vendors");
-	for (const v of vendorsData) {
+	for (const v of measured) {
 		upsert("vendors", v.slug, {
 			title: v.name,
 			maker: v.maker,
@@ -201,6 +220,7 @@ function vendors() {
 
 async function content() {
 	requireToken();
+	const blobBase = BLOB();
 	ensureSchema("reports", "Reports", "Report", FIELDS);
 	const bySlug = existing("reports");
 	for (const file of REPORT_FILES) {
@@ -211,7 +231,7 @@ async function content() {
 		}
 		const md = readFileSync(abs, "utf8");
 		const updated = lastCommitDate(file.path) ?? statSync(abs).mtime.toLocaleDateString("en-CA");
-		const entry = buildEntry(file, md, { blobBase: BLOB, updated, docx: docxFor(file.path) });
+		const entry = buildEntry(file, md, { blobBase, updated, docx: docxFor(file.path) });
 		upsert("reports", entry.slug, { ...entry.data }, bySlug);
 	}
 }

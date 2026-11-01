@@ -1,8 +1,9 @@
+import release from "../data/release.json" with { type: "json" };
 import { slugForPath } from "./reports";
 
 const DEAD = /(href=["'])https:\/\/github\.com\/jandira-tech\/editors_trial(?:\/(?:blob|tree)\/main\/([^"'\s<>#]*))?(#[^"'\s<>]*)?/g;
 const REPO = "https://github.com/arthrod/editors_trial";
-const BRANCH = "benchmark-fairness-reports";
+const BRANCH = release.trialRef;
 
 function decode(p: string): string {
 	try {

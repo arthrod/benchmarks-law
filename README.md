@@ -32,7 +32,7 @@ The reports are written in [arthrod/editors_trial](https://github.com/arthrod/ed
 | `src/layouts/Site.astro` | The shell: the navbar shared with the bench, the footer, and EmDash's head (title, description, OG tags) |
 | `src/pages/index.astro` | Home: what is measured, the two benches, and the report index |
 | `src/pages/editors-trial/index.astro` | The editors-trial hub: the reports, notes and lane notes |
-| `src/pages/editors-trial/vendors.astro` | "The field": each editor's round-trip score, safety grade and links, from the EmDash `vendors` collection (synced from `src/data/vendors.json`) |
+| `src/pages/editors-trial/vendors.astro` | "The field": each editor's round-trip score, safety grade and links, from the EmDash `vendors` collection (synced from `src/data/vendors.json`; round trip, critical features and hostile-input grade are rewritten from editors_trial `out/facts.json` on every `sync:vendors`, never typed) |
 | `src/pages/editors-trial/[slug].astro` | One report, rendered from the CMS, with the report switcher. Old slugs redirect (below). |
 | `src/lib/reports.ts` | `REPORT_FILES` (which editors_trial file becomes which slug, code and position), `RENAMED_SLUGS`, markdown rendering and link rewriting |
 | `src/lib/cms.ts`, `positions.ts`, `switcher.ts`, `navbar.ts`, `vendors.ts`, `neurotic.ts`, `root.ts` | CMS reads, report ordering, the switcher groups, the navbar injected into the bench, score formatting, the bench page patcher, and `REPORTS_ROOT` resolution |
@@ -50,9 +50,9 @@ Reports are edited in editors_trial, never here. To publish:
 ```bash
 export REPORTS_ROOT=/path/to/editors_trial      # default ../../editors_trial; every command stops if it is missing
 export EMDASH_TOKEN=…                           # personal access token with content:write
-pnpm sync:assets     # figures, .docx downloads, bench link fixes and navbar → public/
-pnpm sync:content    # upsert every report into the EmDash `reports` collection
-pnpm sync:vendors    # upsert the field into the EmDash `vendors` collection
+pnpm sync:assets     # figures, .docx downloads, bench link fixes, navbar and the at-a-glance score table → public/
+pnpm sync:content    # upsert every report; pins source links to the trial tag or commit (src/data/release.json)
+pnpm sync:vendors    # figures from out/facts.json → src/data/vendors.json, then upsert the `vendors` collection
 pnpm run deploy      # only needed when public/ or the code changed
 ```
 
