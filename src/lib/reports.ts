@@ -25,8 +25,8 @@ export const REPORT_FILES: ReportFile[] = [
 	{ path: "reports/Report B - Malformed Parts, Causes and Repair (2026).md", slug: "report-b", code: "Report B", position: 30, group: "reports" },
 	{ path: "reports/Report C - Rendering Versus Word (2026).md", slug: "report-c", code: "Report C", position: 40, group: "reports" },
 	{ path: "reports/Report D - Safety, Resource Bombs and Hostile Input (2026).md", slug: "report-d", code: "Report D", position: 50, group: "reports" },
-	{ path: "reports/Report E - Jubarte on the Hostile Packages (2026).md", slug: "report-e-jubarte", code: "Report E · Jubarte", position: 60, group: "reports" },
-	{ path: "reports/Report E - What Word Protects Against (2026).md", slug: "report-e-word", code: "Report E · Word", position: 61, group: "reports" },
+	{ path: "reports/Report D1 - Jubarte on the Hostile Packages (2026).md", slug: "report-d1-jubarte", code: "Report D1", position: 51, group: "reports" },
+	{ path: "reports/Report D2 - What Word Protects Against (2026).md", slug: "report-d2-word", code: "Report D2", position: 52, group: "reports" },
 	{ path: "reports/vendors.md", slug: "vendor-notes", code: "Vendors", position: 70, group: "notes" },
 	{ path: "reports/rendering-openability.md", slug: "rendering-openability", code: "Note", position: 71, group: "notes" },
 	...[
@@ -51,6 +51,12 @@ export const REPORT_FILES: ReportFile[] = [
 		group: "lanes" as const,
 	})),
 ];
+
+/** Slugs that were published and then renamed; the report page answers each with a 301 to its new slug. */
+export const RENAMED_SLUGS: Record<string, string> = {
+	"report-e-jubarte": "report-d1-jubarte",
+	"report-e-word": "report-d2-word",
+};
 
 const BY_PATH = new Map(REPORT_FILES.map((f) => [f.path, f]));
 
