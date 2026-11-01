@@ -10,9 +10,9 @@ const BENCH = "public/neurotic-docx-bench";
 describe("bench pages name the site icon", () => {
 	it("patchNeuroticHtml adds the icon link once", () => {
 		const html = "<head><title>x</title></head>";
-		const once = patchNeuroticHtml(html, new Set());
+		const once = patchNeuroticHtml(html);
 		expect(once).toContain('<link rel="icon" type="image/svg+xml" href="/b-law.svg">');
-		expect(patchNeuroticHtml(once, new Set()).match(/rel="icon"/g)?.length).toBe(1);
+		expect(patchNeuroticHtml(once).match(/rel="icon"/g)?.length).toBe(1);
 	});
 	it.each(["index.html", "redlines/index.html", "home/index.html", "editors/index.html", "speed/index.html"])("%s", (p) => {
 		expect(src(`${BENCH}/${p}`).match(/<link rel="icon"[^>]*href="\/b-law\.svg"/g)?.length).toBe(1);

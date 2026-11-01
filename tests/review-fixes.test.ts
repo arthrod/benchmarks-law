@@ -18,11 +18,11 @@ describe("review fixes (#21)", () => {
 	});
 	it("keeps the fragment on neurotic report links", () => {
 		const html = '<a href="https://github.com/jandira-tech/editors_trial/blob/main/reports/Report%20D%20-%20Safety%2C%20Resource%20Bombs%20and%20Hostile%20Input%20(2026).md#tldr">D</a>';
-		expect(patchNeuroticHtml(html, new Set())).toContain('href="/editors-trial/report-d#tldr"');
+		expect(patchNeuroticHtml(html)).toContain('href="/editors-trial/report-d#tldr"');
 	});
 	it("rewrites neurotic dead links only inside href attributes", () => {
 		const html = "<p>See https://github.com/jandira-tech/editors_trial/blob/main/reports/x.md now</p>";
-		expect(patchNeuroticHtml(html, new Set())).toContain("<p>See https://github.com/jandira-tech/editors_trial/blob/main/reports/x.md now</p>");
+		expect(patchNeuroticHtml(html)).toContain("<p>See https://github.com/jandira-tech/editors_trial/blob/main/reports/x.md now</p>");
 	});
 	it("gives no empty heading ids", () => {
 		expect(renderMarkdown("## <b></b>").html).not.toContain('id=""');

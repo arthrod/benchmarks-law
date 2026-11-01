@@ -26,12 +26,6 @@ export async function listReports() {
 	return { ...parts, rows: parts.rows as ReportRow[], cacheHint };
 }
 
-export function docxHref(docxPath: string): string | null {
-	if (!docxPath) return null;
-	const name = docxPath.slice(docxPath.lastIndexOf("/") + 1);
-	return `/editors-trial/files/${encodeURIComponent(name)}`;
-}
-
 export function sourceHref(path: string): string {
 	return `https://github.com/arthrod/editors_trial/blob/${release.trialRef}/${path.split("/").map(encodeURIComponent).join("/")}`;
 }

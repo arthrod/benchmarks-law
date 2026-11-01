@@ -85,8 +85,10 @@
 .lr-head .dek{font-size:clamp(17px,1.6vw,20px);line-height:1.5;color:#2A2A2A;max-width:62ch;margin-bottom:26px;text-wrap:pretty}
 .lr-meta{font-family:var(--mono);font-weight:600;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);
   display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center}
-.lr-meta a{color:var(--ink);text-decoration:none;border:1px solid var(--ink);padding:5px 9px;transition:background .15s ease}
-.lr-meta a:hover{background:var(--mark)}
+.lr-meta a,.lr-meta button{color:var(--ink);text-decoration:none;border:1px solid var(--ink);padding:5px 9px;transition:background .15s ease}
+.lr-meta button{font:inherit;background:none;border-radius:0;cursor:pointer}
+.lr-meta a:hover,.lr-meta button:hover:not(:disabled){background:var(--mark)}
+.lr-meta button:disabled{cursor:progress;color:var(--muted)}
 .lr-row{display:grid;grid-template-columns:240px minmax(0,1fr);gap:56px;align-items:start;padding-bottom:clamp(56px,7vw,96px)}
 .lr-aside{position:sticky;top:96px;max-height:calc(100dvh - 124px);overflow-y:auto;padding-right:8px;scrollbar-width:thin}
 .lr-aside .ttl{font-family:var(--mono);font-weight:600;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);

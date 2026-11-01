@@ -1,7 +1,7 @@
 /**
  * Publishes the editors_trial reports and the neurotic_docx_bench viewer into this site.
  *
- *   pnpm sync:assets    # figures, .docx downloads, neurotic link fixes → public/
+ *   pnpm sync:assets    # figures, the .docx reference (styles for the live download), neurotic link fixes → public/
  *   pnpm sync:content   # upsert every report into the EmDash `reports` collection
  *   pnpm sync:vendors   # upsert the field's vendors into the EmDash `vendors` collection
  *   pnpm sync:demos     # live editor demos: bundles → public/demo-apps/, sanitized copies, src/data/demos.json
@@ -60,11 +60,6 @@ function lastCommitDate(rel: string): string | null {
 	return r.status === 0 && r.stdout.trim() ? r.stdout.trim() : null;
 }
 
-function docxFor(mdPath: string): string | null {
-	const d = mdPath.replace(/\.md$/, ".docx");
-	return existsSync(join(ROOT, d)) ? d : null;
-}
-
 function assets() {
 	const figs = join(SITE, "public/editors-trial/figures");
 	rmSync(figs, { recursive: true, force: true });
@@ -77,15 +72,9 @@ function assets() {
 		cpSync(f, dest);
 		n++;
 	}
-	const files = join(SITE, "public/editors-trial/files");
-	mkdirSync(files, { recursive: true });
-	const published = new Set<string>();
-	for (const r of REPORT_FILES) {
-		const d = docxFor(r.path);
-		if (!d) continue;
-		cpSync(join(ROOT, d), join(files, d.slice(d.lastIndexOf("/") + 1)));
-		published.add(d);
-	}
+	// No .docx is published: each report page builds it live with jubarte-wasm from its Markdown,
+	// taking styles and the landscape page from the trial's reference document (benchmarks-law#56).
+	cpSync(join(ROOT, "build/reference.docx"), join(SITE, "public/editors-trial/reference.docx"));
 	const neurotic = join(SITE, "public/neurotic-docx-bench");
 	// The navbar's trial dropdown lists the same reports, with the same titles, as the CMS.
 	const rows = REPORT_FILES.filter((r) => existsSync(join(ROOT, r.path))).map((r) => ({
@@ -97,11 +86,11 @@ function assets() {
 	const verdicts: Record<string, string> = existsSync(wv) ? JSON.parse(readFileSync(wv, "utf8")).verdicts : {};
 	for (const f of walk(neurotic).filter((p) => p.endsWith(".html"))) {
 		const rel = f.slice(neurotic.length + 1);
-		let html = patchNeuroticHtml(readFileSync(f, "utf8"), published);
+		let html = patchNeuroticHtml(readFileSync(f, "utf8"));
 		if (rel === "editors/index.html") html = rebuildScoreTable(html, mainMd, verdicts);
 		writeFileSync(f, benchPage(html, rel, rows));
 	}
-	console.log(`figures ${n} · docx ${published.size} · neurotic pages patched · navbar on ${rows.length} reports`);
+	console.log(`figures ${n} · reference.docx · neurotic pages patched · navbar on ${rows.length} reports`);
 }
 
 
@@ -231,7 +220,7 @@ async function content() {
 		}
 		const md = readFileSync(abs, "utf8");
 		const updated = lastCommitDate(file.path) ?? statSync(abs).mtime.toLocaleDateString("en-CA");
-		const entry = buildEntry(file, md, { blobBase, updated, docx: docxFor(file.path) });
+		const entry = buildEntry(file, md, { blobBase, updated, docx: null });
 		upsert("reports", entry.slug, { ...entry.data }, bySlug);
 	}
 }
