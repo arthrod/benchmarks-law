@@ -85,7 +85,7 @@ export function navbarHtml(o: { crumb: string; current: NavSection; path: string
 		`<header id="brand" class="site-nav">` +
 		`<a class="wm" href="/neurotic-docx-bench/home/"><span class="logo"><span class="del">CHILL</span><span class="ins">NEUROTIC</span></span><span class="dot">.</span>DOCX<span class="dot">.</span>BENCH</a>` +
 		`<span class="crumb">/ ${esc(o.crumb)}</span>` +
-		`<nav aria-label="Site">${links}${dd}<a href="${BENCH_REPO}" rel="noopener">Bench repo →</a><a class="nav-contact" href="https://arthur.law/contact" rel="noopener">Contact</a></nav>` +
+		`<button type="button" class="nav-menu" aria-expanded="false" aria-controls="site-links">Menu</button><nav id="site-links" aria-label="Site">${links}${dd}<a href="${BENCH_REPO}" rel="noopener">Bench repo →</a><a class="nav-contact" href="https://arthur.law/contact" rel="noopener">Contact</a></nav>` +
 		`</header>`
 	);
 }

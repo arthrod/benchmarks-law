@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { injectNavbar, navbarHtml, trialGroups } from "../src/lib/navbar";
 
@@ -34,6 +35,19 @@ describe("navbarHtml", () => {
 		expect(labels.slice(0, 8)).toEqual(["benchmarks.law", "Benches", "DOCX → PDF", "Redlines", "Speed", "Editors trial", "At a glance", "All reports"]);
 		expect(html).toContain('href="https://github.com/jandira-tech/neurotic_docx_bench"');
 		expect(html).toContain('class="nav-contact"');
+	});
+
+	it("has a MENU box that controls the site links, collapsed, before the nav (mobile)", () => {
+		expect(html).toMatch(/<button type="button" class="nav-menu" aria-expanded="false" aria-controls="site-links">Menu<\/button><nav id="site-links" aria-label="Site">/);
+	});
+
+	it("keeps the links visible without JavaScript: only nav.js arms the menu", () => {
+		const css = readFileSync(new URL("../public/nav.css", import.meta.url), "utf8");
+		const js = readFileSync(new URL("../public/nav.js", import.meta.url), "utf8");
+		expect(css).toMatch(/#brand\.site-nav\.has-menu:not\(\.menu-open\) nav\{display:none\}/);
+		expect(css).toMatch(/\.nav-menu\{display:none/);
+		expect(js).toContain('classList.add("has-menu")');
+		expect(js).toContain('"aria-expanded"');
 	});
 
 	it("marks the current section and the current page", () => {

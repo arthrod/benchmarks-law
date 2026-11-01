@@ -18,7 +18,11 @@
 #brand.site-nav nav > a:hover,#brand.site-nav .nav-dd > summary:hover{color:var(--ink,#0A0A0A)}
 #brand.site-nav nav > a[aria-current=page],#brand.site-nav .nav-dd.is-current > summary{color:var(--ink,#0A0A0A);border-bottom-color:var(--mark,#FFD400)}
 #brand.site-nav nav > a.nav-contact{color:var(--ink,#0A0A0A)}
-#brand.site-nav a:focus-visible,#brand.site-nav summary:focus-visible{outline:2px solid var(--ink,#0A0A0A);outline-offset:3px}
+/* MENU: a thin box that folds the links on small screens (shown by the media query below; nav.js arms it). */
+#brand.site-nav .nav-menu{display:none;margin-left:auto;padding:4px 10px;border:1px solid var(--ink,#0A0A0A);border-radius:0;background:none;cursor:pointer;
+  font-family:var(--mono,"Roboto Mono",monospace);font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--ink,#0A0A0A);line-height:1.4}
+#brand.site-nav .nav-menu:hover,#brand.site-nav .nav-menu[aria-expanded=true]{background:var(--mark,#FFD400)}
+#brand.site-nav a:focus-visible,#brand.site-nav summary:focus-visible,#brand.site-nav .nav-menu:focus-visible{outline:2px solid var(--ink,#0A0A0A);outline-offset:3px}
 
 /* Editors trial dropdown: the report switcher's look. */
 #brand.site-nav .nav-dd{position:relative}
@@ -49,5 +53,21 @@
   #brand.site-nav .nav-dd{position:static}
   #brand.site-nav .nav-panel{left:var(--px,16px);right:var(--px,16px);width:auto;top:calc(100% - 1px)}
   #brand.site-nav .nav-code{width:72px}
+  /* With nav.js: the links fold behind MENU and open as a column on the right. */
+  #brand.site-nav.has-menu{flex-wrap:nowrap}
+  #brand.site-nav.has-menu .crumb{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  #brand.site-nav.has-menu .wm{flex:none}
+  #brand.site-nav.has-menu .nav-menu{display:inline-block;flex:none}
+  #brand.site-nav.has-menu:not(.menu-open) nav{display:none}
+  /* Open, the links are an overlay under MENU, on the right: the header keeps its height. */
+  #brand.site-nav.has-menu nav{position:absolute;top:100%;right:var(--px,16px);z-index:70;width:min(320px,calc(100vw - 32px));
+    max-height:calc(100dvh - 80px);overflow-y:auto;flex-direction:column;align-items:stretch;flex-wrap:nowrap;gap:0;margin:0;
+    padding:6px 0;background:#fff;border:1px solid var(--ink,#0A0A0A);font-size:12px}
+  #brand.site-nav.has-menu nav > a,#brand.site-nav.has-menu .nav-dd > summary{display:block;padding:10px 14px;border-bottom:0}
+  #brand.site-nav.has-menu nav > a[aria-current=page],#brand.site-nav.has-menu .nav-dd.is-current > summary{
+    background:linear-gradient(var(--mark,#FFD400),var(--mark,#FFD400)) 0 0/3px 100% no-repeat}
+  #brand.site-nav.has-menu .nav-dd{display:block}
+  #brand.site-nav.has-menu .nav-panel{position:static;width:auto;margin:0 8px 6px;max-height:none;border-width:1px 0 0;padding:4px 0 0;text-align:left}
 }
+@media (max-width:440px){#brand.site-nav.has-menu .crumb{display:none}}
 @media (prefers-reduced-motion:reduce){#brand.site-nav *{transition:none}}
