@@ -15,7 +15,8 @@ function decode(p: string): string {
 /**
  * The neurotic_docx_bench drop-in links its editors-trial page to a repository that does not
  * resolve (jandira-tech/editors_trial). Point those links at the reports published on this site,
- * and add a way back to the hub. Idempotent.
+ * add a way back to the hub, and name the site icon (without one the browser asks for a
+ * /favicon.ico that does not exist). Idempotent.
  */
 export function patchNeuroticHtml(html: string, docx: Set<string>): string {
 	let out = html.replace(DEAD, (_all, attr: string, rawPath: string | undefined, hash = "") => attr + target(rawPath, hash, docx));
@@ -24,6 +25,9 @@ export function patchNeuroticHtml(html: string, docx: Set<string>): string {
 			/(<nav aria-label="Site">)/,
 			'$1<a class="home-link" href="/">benchmarks.law</a>',
 		);
+	}
+	if (!/rel=["']icon["']/.test(out)) {
+		out = out.replace(/(\n?<\/head>)/, '\n<link rel="icon" type="image/svg+xml" href="/b-law.svg">$1');
 	}
 	return out;
 }
