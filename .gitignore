@@ -36,4 +36,10 @@ Thumbs.db
 # Logs
 *.log
 npm-debug.log*
-.wrangler/
+.wrangler
+.dev.vars
+.DS_Store
+
+# EmDash local state
+.emdash/
+.emdash-*.json

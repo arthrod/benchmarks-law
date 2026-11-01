@@ -1,19 +1,24 @@
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "my-marketing-site",
+	"name": "benchmarks-law",
 	"main": "./src/worker.ts",
 	"compatibility_date": "2026-02-24",
 	"compatibility_flags": ["nodejs_compat"],
+	"routes": [{ "pattern": "benchmarks.law", "custom_domain": true }],
+	// Keep the workers.dev URL live too — the admin passkey was registered on
+	// benchmarks-law.cicero-im.workers.dev, and passkeys are bound to that origin.
+	"workers_dev": true,
 	"d1_databases": [
 		{
 			"binding": "DB",
-			"database_name": "my-marketing-site",
+			"database_name": "benchmarks-law",
+			"database_id": "d9854ec4-1666-4a08-8c97-c5dd26b3856f",
 		},
 	],
 	"r2_buckets": [
 		{
 			"binding": "MEDIA",
-			"bucket_name": "my-marketing-media",
+			"bucket_name": "benchmarks-law-media",
 		},
 	],
 	// Worker Loader for plugin sandboxing
@@ -22,4 +27,19 @@
 			"binding": "LOADER",
 		},
 	],
+	"observability": {
+		"enabled": false,
+		"head_sampling_rate": 1,
+		"logs": {
+			"enabled": true,
+			"head_sampling_rate": 1,
+			"persist": true,
+			"invocation_logs": true,
+		},
+		"traces": {
+			"enabled": true,
+			"persist": true,
+			"head_sampling_rate": 1,
+		},
+	},
 }

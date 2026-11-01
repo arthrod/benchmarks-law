@@ -1,69 +1,19 @@
 ---
-import Base from "../layouts/Base.astro";
+import Site from "../layouts/Site.astro";
+Astro.response.status = 404;
 ---
 
-<Base title="Page not found">
-	<div class="not-found">
-		<div class="not-found-code">404</div>
-		<h1>Page not found</h1>
-		<p>The page you're looking for doesn't exist or has been moved.</p>
-		<div class="not-found-actions">
-			<a href="/" class="btn btn-primary btn-lg">Go home</a>
-			<a href="/contact" class="btn btn-secondary btn-lg">Contact us</a>
+<Site title="Not found" noindex>
+	<div class="wrap">
+		<div class="page-head">
+			<p class="eyebrow">404<span class="sep">·</span>Not found</p>
+			<h1>This page is not on the bench.</h1>
+			<p>The link is wrong, retired, or never existed. The reports and the interactive benches are one click away.</p>
+			<div class="cta-row" style="margin-top:30px">
+				<a class="btn btn-primary" href="/">benchmarks.law <span class="arr">→</span></a>
+				<a class="btn btn-ghost" href="/editors-trial/">Editors trial</a>
+			</div>
 		</div>
 	</div>
-</Base>
-
-<style>
-	.not-found {
-		text-align: center;
-		padding: var(--spacing-5xl) var(--spacing-lg);
-		max-width: var(--max-width);
-		margin: 0 auto;
-	}
-
-	.not-found-code {
-		font-size: 10rem;
-		font-weight: 800;
-		line-height: 1;
-		letter-spacing: -0.05em;
-		background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
-		-webkit-background-clip: text;
-		-webkit-text-fill-color: transparent;
-		background-clip: text;
-		opacity: 0.3;
-		margin-bottom: var(--spacing-lg);
-	}
-
-	.not-found h1 {
-		font-size: var(--font-size-3xl);
-		margin-bottom: var(--spacing-md);
-	}
-
-	.not-found p {
-		font-size: var(--font-size-lg);
-		color: var(--color-muted);
-		margin-bottom: var(--spacing-2xl);
-	}
-
-	.not-found-actions {
-		display: flex;
-		gap: var(--spacing-md);
-		justify-content: center;
-		flex-wrap: wrap;
-	}
-
-	@media (max-width: 480px) {
-		.not-found-code {
-			font-size: 6rem;
-		}
-
-		.not-found-actions {
-			flex-direction: column;
-		}
-
-		.not-found-actions .btn {
-			width: 100%;
-		}
-	}
-</style>
+	<div style="height:72px"></div>
+</Site>

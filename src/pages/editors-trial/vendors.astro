@@ -1,0 +1,157 @@
+---
+import { getEmDashCollection } from "emdash";
+import GithubSlugger from "github-slugger";
+import Site from "../../layouts/Site.astro";
+import { renderMarkdown } from "../../lib/reports";
+import { SAFETY_PASS, type VendorData, bestPlacement, ordinal, rankOn, safeSiteUrl, safetyVerdict } from "../../lib/vendors";
+
+const { entries, cacheHint } = await getEmDashCollection("vendors", { limit: 100 });
+Astro.cache.set(cacheHint);
+
+const all = entries
+	.map((e) => ({ slug: e.id, data: e.data as unknown as VendorData }))
+	.sort((a, b) => a.data.position - b.data.position);
+const rt = rankOn(all, "roundtrip");
+const sf = rankOn(all, "safety");
+const field = all.filter((v) => v.data.position < 200);
+const baseline = all.filter((v) => v.data.position >= 200);
+const anchor = (h: string) => new GithubSlugger().slug(h);
+const host = (u: string) => u.replace(/^https:\/\/(www\.)?/, "").replace(/\/$/, "");
+---
+
+<Site title="The field" current="editors" description="Every open-source DOCX editor in the trial, with where each one leads: round-trip fidelity, hostile input, rendering and pagination, measured on the same documents.">
+	<div class="wrap">
+		<div class="page-head">
+			<a class="back" href="/editors-trial/">← Editors trial</a>
+			<p class="eyebrow">Editors trial<span class="sep">·</span>The field<span class="sep">·</span>{field.length} tools and a baseline</p>
+			<h1>Every tool here <span class="mark">leads somewhere</span>.</h1>
+			<p>
+				The projects below are the open-source DOCX editors that legal teams can actually build on. Each was run through its
+				own code, on the same documents, against the same reference. No single score captures a tool: the editor that keeps
+				every byte is not the one that refuses a hostile package best, and neither is the one that draws Word's page to the
+				pixel. This page leads with what each one does best, and shows both measurements beside it.
+			</p>
+		</div>
+
+		<div class="axes">
+			<div><b>Round trip</b><span>Weighted score over 97 checks, import then export through the tool's own code. Main report.</span></div>
+			<div><b>Hostile input</b><span>Mean grade over ten hostile packages, 1 = a named ceiling that refuses it. Report D. Pass line {SAFETY_PASS.toFixed(2)}.</span></div>
+			<div><b>Rendering</b><span>The tool's own UI or renderer, against Word's page. Report C.</span></div>
+		</div>
+
+		<aside class="layers">
+			<p class="sec-label" style="margin-bottom:14px"><span class="sq"></span> / On the hostile-input pass</p>
+			<p>
+				An editor is rarely the only thing between a hostile file and a firm. Upload scanning, size and entry limits on the
+				server, opening untrusted files in a sandbox or a converter, and keeping macros and external links off are all layers
+				in front of it. So the pass line here is deliberately generous: <b>{SAFETY_PASS.toFixed(2)} of 1.00</b>. It is this
+				site's line, not Report D's; the grades themselves are Report D's, unchanged, and the{" "}
+				<a href="/editors-trial/report-d">report</a> says package by package what each tool refused, cleaned or kept.
+			</p>
+		</aside>
+
+		<ol class="field">
+			{
+				field.map((v, i) => {
+					const d = v.data;
+					const best = bestPlacement(v.slug, rt, sf);
+					const r = rt.get(v.slug);
+					const s = sf.get(v.slug);
+					return (
+						<li class="vendor reveal" id={v.slug} style={`animation-delay:${Math.min(i, 6) * 0.05}s`}>
+							<div class="v-top">
+								{best && (
+									<span class="v-place">
+										{best.rank === 1 ? "1st" : ordinal(best.rank)}
+										{best.tied ? " (tied)" : ""} of {best.of} · {best.axis}
+									</span>
+								)}
+								<span class="v-lic">{d.license}</span>
+							</div>
+							<h2 class="v-name">{d.title}</h2>
+							<p class="v-maker">{d.maker} · {d.kind}</p>
+							<p class="v-leads"><span class="mark">{d.leads}</span></p>
+							<p class="v-detail">{d.detail}</p>
+							<dl class="meters">
+								<div class="meter">
+									<dt>Round trip{r && <span> · {ordinal(r.rank)}{r.tied ? "=" : ""}</span>}</dt>
+									<dd>
+										{d.roundtrip === null ? (
+											<span class="na">Not measured on this axis</span>
+										) : (
+											<>
+												<span class="bar"><span style={`width:${d.roundtrip}%`} /></span>
+												<b>{d.roundtrip.toFixed(1)}%</b>
+												{d.critical && <em>{d.critical} critical</em>}
+											</>
+										)}
+									</dd>
+								</div>
+								<div class="meter">
+									<dt>Hostile input{s && <span> · {ordinal(s.rank)}{s.tied ? "=" : ""}</span>}</dt>
+									<dd>
+										{d.safety === null ? (
+											<span class="na">Not graded</span>
+										) : (
+											<>
+												<span class="bar is-mark has-pass" style={`--pass:${SAFETY_PASS * 100}%`}><span style={`width:${d.safety * 100}%`} /></span>
+												<b>{d.safety.toFixed(2)}</b>
+												{safetyVerdict(d.safety) === "pass" ? <em class="pass">Pass</em> : <em class="below">Below the pass line</em>}
+											</>
+										)}
+									</dd>
+								</div>
+							</dl>
+							<div class="v-links">
+								<a href={`/editors-trial/report-c#${anchor(d.render_section)}`}>How it renders <span class="arr">→</span></a>
+								{d.lane && <a href={`/editors-trial/${d.lane}`}>Lane note <span class="arr">→</span></a>}
+								{safeSiteUrl(d.site) && <a href={safeSiteUrl(d.site)} rel="noopener">{host(safeSiteUrl(d.site)!)} <span class="arr">→</span></a>}
+							</div>
+							{d.about && (
+								<details class="v-about">
+									<summary>About {d.title}</summary>
+									<div class="prose" set:html={renderMarkdown(d.about).html} />
+								</details>
+							)}
+						</li>
+					);
+				})
+			}
+		</ol>
+
+		<section>
+			<h2 class="sec-label"><span class="sq"></span> / The baseline</h2>
+			{
+				baseline.map((v) => (
+					<article class="feature baseline">
+						<div class="body">
+							<span class="tag">Baseline · {v.data.license}</span>
+							<h3 class="v-base-name">{v.data.title}</h3>
+							<p><span class="mark">{v.data.leads}</span></p>
+							<p>{v.data.detail}</p>
+							<div class="links">
+								<a class="go" href={`/editors-trial/report-c#${anchor(v.data.render_section)}`}>How it renders →</a>
+								<a class="go" href={v.data.site} rel="noopener">{host(v.data.site)} →</a>
+							</div>
+						</div>
+						<dl class="meters">
+							<div class="meter">
+								<dt>Round trip · calibration floor</dt>
+								<dd><span class="bar"><span style={`width:${v.data.roundtrip}%`} /></span><b>{v.data.roundtrip?.toFixed(1)}%</b></dd>
+							</div>
+							<div class="meter">
+								<dt>Hostile input</dt>
+								<dd><span class="bar is-mark has-pass" style={`--pass:${SAFETY_PASS * 100}%`}><span style={`width:${(v.data.safety ?? 0) * 100}%`} /></span><b>{v.data.safety?.toFixed(2)}</b>{safetyVerdict(v.data.safety) === "pass" ? <em class="pass">Pass</em> : <em class="below">Below the pass line</em>}</dd>
+							</div>
+						</dl>
+					</article>
+				))
+			}
+			<p class="fineprint">
+				Scores describe the pinned versions on the published inputs, as of the reports' dates. Every number links back to the
+				report that measured it. Maintainers who want a result re-run or a statement printed beside it can open an issue on{" "}
+				<a href="https://github.com/arthrod/editors_trial/issues" rel="noopener">the trial's repository</a>.
+			</p>
+		</section>
+	</div>
+</Site>

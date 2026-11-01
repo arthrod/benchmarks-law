@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>neurotic_docx_bench: DOCX tooling measured against Microsoft Word</title>
+<meta name="description" content="Four public benches for DOCX tooling: PDF conversion, redlines, speed on 10,000 inputs and a round-trip trial of thirteen open-source editors. Every input, output and score is published. Word is the reference.">
+<meta name="theme-color" content="#FAFAF8">
+<link rel="preload" href="../_static/fonts/libre-franklin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../_static/fonts/roboto-mono.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../_static/bench.css">
+</head>
+<body class="doc">
+<header id="brand"><a class="wm" href="./index.html"><span class="logo"><span class="del">CHILL</span><span class="ins">NEUROTIC</span></span><span class="dot">.</span>DOCX<span class="dot">.</span>BENCH</a><span class="crumb">/ Benches</span><nav aria-label="Site"><a class="home-link" href="/">benchmarks.law</a><a href="./index.html" aria-current="page">Benches</a><a href="../index.html">DOCX → PDF</a><a href="../redlines/index.html">Redlines</a><a href="../speed/index.html">Speed</a><a href="../editors/index.html">Editors trial</a><a href="https://github.com/jandira-tech/neurotic_docx_bench" rel="noopener">Bench repo →</a><a class="nav-contact" href="https://arthur.law/contact" rel="noopener">Contact</a></nav></header>
+<p class="meta"><span>Reference: Microsoft Word 16.115</span><span>Scored per page</span><span>Inputs, outputs and scores published</span></p>
+<h1>DOCX tooling, measured against the one program that <span class="mk">defines the format</span>.</h1>
+<p class="lede">Word writes the file, Word opens the file, Word draws the page. Every bench here takes Word's output as the reference and scores each engine against it on the same inputs, with the same metrics, with every page you can click through yourself. Nothing is summarised that you cannot open.</p>
+<div class="ctas"><a class="cta ink" href="../index.html">Open the DOCX → PDF bench</a><a class="cta" href="../editors/index.html">Read the editors trial</a></div>
+<div class="kpis"><div><b>4</b><span>benches</span></div><div><b>10,000</b><span>planned inputs in the speed bench</span></div><div><b>13</b><span>editors in the round-trip trial</span></div><div><b>97</b><span>checks per round trip</span></div><div><b>1</b><span>reference: Word</span></div></div>
+
+<section id="benches"><h2>The benches</h2>
+<div class="cards">
+<div class="card"><span class="k">Bench 01 · interactive</span><h3><a href="../index.html">DOCX → PDF vs Microsoft Word</a></h3><p>Each engine converts the same corpus to PDF. Pages render side by side with Word's own export and are scored by pixel, ink Jaccard, drift-tolerant SSIM and text-boundary agreement. Overlay any two to see where they part.</p><span class="f"><b>9 current engines</b><span>+ 11 pinned older versions</span><span>per-page scores</span></span></div>
+<div class="card"><span class="k">Bench 02 · interactive</span><h3><a href="../redlines/index.html">Redlines vs Word compare</a></h3><p>Two versions of a document go in; a tracked-changes document comes out. Each engine's redline is rendered beside the one Word produces for the same pair and scored page by page.</p><span class="f"><b>jubarte · docxodus · SuperDoc</b><span>+ folio, stemma</span></span></div>
+<div class="card"><span class="k">Bench 03 · report</span><h3><a href="../speed/index.html">Speed on 10,000 inputs</a></h3><p>Same planned inputs, one tool at a time, one machine. Per-call medians, p95, p99, failures and timeouts, cut by pair category and base size. Raw rows are in the repository.</p><span class="f"><b>5 lanes</b><span>Apple M4 Pro</span><span>120 s timeout</span></span></div>
+<div class="card"><span class="k">Bench 04 · trial <span class="new">New</span></span><h3><a href="../editors/index.html">Open-source DOCX editors, round-trip</a></h3><p>Thirteen editors driven headlessly through their own import → export path over one 35-part adversarial document. Scored on 97 checks, re-fed to themselves for idempotence, re-opened in Word. Five companion reports.</p><span class="f"><b>13 tools</b><span>97 checks</span><span>35 parts</span><span>2026-10-29/30</span></span></div>
+</div></section>
+
+<section id="method"><h2>Why the numbers can be trusted</h2>
+<ol class="steps">
+<li><b>Word is the reference, not an opinion.</b> Every score is a distance from what Microsoft Word produced for the same input, rendered at the same DPI. Where Word refuses a file, that refusal is the result.</li>
+<li><b>Every page is published.</b> The interactive benches show the rendered pages, not a summary of them. Pick a case, pick an engine, pick a page; the number sits next to the picture it came from.</li>
+<li><b>Versions are pinned.</b> Each engine runs at a named release or commit, recorded with the result. Older versions stay in the bench so regressions are visible, not overwritten.</li>
+<li><b>Four metrics, none of them chosen to flatter.</b> Pixel agreement, ink Jaccard, drift-tolerant SSIM and text-boundary match disagree with each other by design: an engine has to be right about placement, shape and line breaking at once.</li>
+<li><b>The conflict of interest is on every page.</b> The bench is maintained by the author of jubarte, one of the engines compared. The method is public so the comparison does not depend on trusting the maintainer.</li>
+<li><b>Limitations are written down first.</b> One corpus is one corpus; a bench that passes is not a certification. The repository's <a href="https://github.com/jandira-tech/neurotic_docx_bench#limitations" rel="noopener">limitations</a> section is part of the results.</li>
+</ol></section>
+
+<section id="metrics"><h2>How a page is scored</h2>
+<div class="tbl"><table><thead><tr><th>Metric</th><th>What it measures</th><th>What it punishes</th></tr></thead><tbody>
+<tr><td>Pixel</td><td>Recorded bench pixel score, 0–100. Conversion failures count zero.</td><td>Anything visibly different, anywhere on the page.</td></tr>
+<tr><td>Jaccard (J)</td><td>Ink in both pages ÷ ink in either, at 150 DPI, luma below 200 counts as ink.</td><td>Placement. A one-line vertical shift sends it toward zero.</td></tr>
+<tr><td>SSIM</td><td>Structural similarity on 8×8 luma windows, each allowed ±8 px of vertical search. Only inked windows count.</td><td>Shape and texture, while forgiving small drift.</td></tr>
+<tr><td>Text boundary (TB)</td><td>Share of extracted text lines whose first and last word match the reference line at the same position.</td><td>Line breaking and pagination, independent of fonts and pixels.</td></tr>
+</tbody></table></div></section>
+
+<section id="about"><h2>About</h2>
+<p>neurotic_docx_bench started as a private test rig for <a href="https://jubarte.pro/" rel="noopener">jubarte</a>, a DOCX redline and conversion engine, and became public when the same rig turned out to be the only way to compare engines honestly: same inputs, same reference, same metrics, every page visible. It is maintained by <a href="https://arthur.law/" rel="noopener">Arthur Souza Rodrigues</a>, a lawyer who builds document tooling for legal work, where a lost tracked change or a shifted page is not a cosmetic bug.</p>
+<p>The corpus, scorer, harnesses and raw results live in the <a href="https://github.com/jandira-tech/neurotic_docx_bench" rel="noopener">bench repository</a>. Engines are added when they can be driven headlessly on the same inputs; nothing is excluded for scoring badly, and the maintainer's own engine stays in the table whatever it scores.</p></section>
+
+<section id="contact"><h2>Contact</h2>
+<p>Found an engine that should be here, a case that is scored wrong, or a result you can reproduce differently? Open an issue in the repository; that is where corrections are tracked and where the response is public. For anything else, write to <a href="mailto:contact@arthur.law">contact@arthur.law</a> or book an intro call at <a href="https://arthur.law/contact" rel="noopener">arthur.law/contact</a>. Replies within one business day, NY / SP hours.</p>
+<div class="ctas"><a class="cta ink" href="https://arthur.law/contact" rel="noopener">Contact →</a><a class="cta" href="https://github.com/jandira-tech/neurotic_docx_bench/issues" rel="noopener">Open an issue</a></div></section>
+
+<footer class="site"><span class="mono">neurotic_docx_bench · © MMXXVI</span><span>Maintained by <a href="https://arthur.law/" rel="noopener">Arthur Souza Rodrigues</a>, author of jubarte, one of the engines compared.</span><a href="../NOTICE.md">Notice &amp; licences</a><a href="https://github.com/jandira-tech/neurotic_docx_bench/blob/main/RESULTS.md" rel="noopener">Results →</a><a href="./index.html#about">About</a><a href="https://arthur.law/contact" rel="noopener">Contact</a><span>Attorney advertising.</span></footer>
+</body>
+</html>

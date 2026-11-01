@@ -1,49 +1,129 @@
 ---
-import { getEmDashEntry } from "emdash";
-import Base from "../layouts/Base.astro";
-import MarketingBlocks from "../components/MarketingBlocks.astro";
+import Site from "../layouts/Site.astro";
+import { listReports } from "../lib/cms";
 
-const { entry: page, cacheHint } = await getEmDashEntry("pages", "home");
-
-if (Astro.cache?.enabled) Astro.cache.set(cacheHint);
-
-const pageTitle = page?.data.title;
-const pageContent = page?.data.content;
+const { reports, cacheHint } = await listReports();
+Astro.cache.set(cacheHint);
+const R2 = "https://pub-92c80eda1059428394970066c8500eda.r2.dev/gh-pages-tree/redlines/redlines/with_comments_tracking/aec80553e5/reference/page_001.webp";
 ---
 
-<Base
-	title={pageTitle !== "Home" ? pageTitle : undefined}
-	description="Build products people actually want. The all-in-one platform for modern teams."
->
-	{
-		pageContent ? (
-			<MarketingBlocks value={pageContent} />
-		) : (
-			<div class="empty-state">
-				<h1>Welcome to Acme</h1>
-				<p>Edit the home page content in the admin to get started.</p>
-				<a href="/_emdash/admin" class="btn btn-primary">
-					Open Admin
-				</a>
+<Site current="home">
+	<section class="hero">
+		<div class="wrap">
+			<div class="hero-grid">
+				<p class="eyebrow reveal">Open benchmarks<span class="sep">·</span>DOCX tooling<span class="sep">·</span>MMXXVI</p>
+				<h1 class="reveal d1">DOCX tools, measured against <span class="mark">Microsoft Word</span>.</h1>
+				<p class="lede reveal d2">
+					Contracts and briefs pass through editors and converters that each claim to handle Word files. benchmarks.law runs
+					those tools on the same documents, checks what comes out against what Word does, and publishes every input,
+					output and log, so a result can be opened and checked rather than taken on trust.
+				</p>
+				<div class="cta-row reveal d3">
+					<a class="btn btn-primary" href="/editors-trial/">Read the editors trial <span class="arr">→</span></a>
+					<a class="btn btn-ghost" href="/neurotic-docx-bench/">Open the DOCX → PDF bench</a>
+				</div>
 			</div>
-		)
-	}
-</Base>
+			<dl class="stats reveal d4">
+				<div class="stat"><b>12</b><span>editors run through their own import and export</span></div>
+				<div class="stat"><b>10</b><span>hostile packages opened in a sandbox</span></div>
+				<div class="stat"><b>4</b><span>benches, inputs and outputs published</span></div>
+				<div class="stat"><b>1</b><span>reference: Microsoft Word</span></div>
+			</dl>
+		</div>
+	</section>
 
-<style>
-	.empty-state {
-		text-align: center;
-		padding: var(--spacing-5xl) var(--spacing-lg);
-		max-width: var(--max-width);
-		margin: 0 auto;
-	}
+	<div class="divider"></div>
 
-	.empty-state h1 {
-		margin-bottom: var(--spacing-md);
-	}
+	<section id="benches">
+		<div class="wrap">
+			<h2 class="sec-label"><span class="sq"></span> / The benchmarks</h2>
 
-	.empty-state p {
-		color: var(--color-muted);
-		margin-bottom: var(--spacing-xl);
-	}
-</style>
+			<article class="feature">
+				<div class="shot is-figure">
+					<img src="/editors-trial/figures/ui/figures/fig_ui_folio_p3.png" alt="Word's rendering of corpus page 3 beside Folio's own editor showing the same constructs" width="1538" height="1018" loading="eager" />
+				</div>
+				<div class="body">
+					<span class="tag">Bench 01 · Round trip · 2026</span>
+					<h3>Open-source DOCX editors, measured by round trip</h3>
+					<p>
+						Each editor's own code imports a purpose-built adversarial document and exports it again. The output is scored
+						construct by construct and opened in Word. A separate set of ten hostile packages tests what each editor
+						refuses. Eight reports so far.
+					</p>
+					<div class="links">
+						<a class="go" href="/editors-trial/round-trip">Main report →</a>
+						<a class="go" href="/editors-trial/vendors">The field →</a>
+						<a class="go" href="/editors-trial/">All reports →</a>
+						<a class="go" href="/editors-trial/report-d">Hostile input →</a>
+					</div>
+				</div>
+			</article>
+
+			<article class="feature">
+				<div class="shot is-figure">
+					<img src={R2} alt="Word's redline of a document pair, with insertions, deletions and highlight, the reference every redline engine is scored against" width="850" height="1100" class="crop-top" loading="lazy" />
+				</div>
+				<div class="body">
+					<span class="tag">Bench 02 · neurotic_docx_bench · interactive</span>
+					<h3>DOCX → PDF and redlines, page by page against Word</h3>
+					<p>
+						Every engine converts the same corpus to PDF, or produces a tracked-changes document from the same pair, and each
+						page is rendered beside Word's and scored by pixel, ink overlap, drift-tolerant SSIM and text boundaries. Click any
+						case; overlay any two.
+					</p>
+					<div class="links">
+						<a class="go" href="/neurotic-docx-bench/">DOCX → PDF →</a>
+						<a class="go" href="/neurotic-docx-bench/redlines/">Redlines →</a>
+						<a class="go" href="/neurotic-docx-bench/speed/">Speed →</a>
+						<a class="go" href="/neurotic-docx-bench/home/">About the bench →</a>
+					</div>
+				</div>
+			</article>
+		</div>
+	</section>
+
+	<div class="divider"></div>
+
+	<section id="reports">
+		<div class="wrap">
+			<h2 class="sec-label"><span class="sq"></span> / Reports · editors trial</h2>
+			<div class="r-list">
+				{
+					reports.map((r) => (
+						<a class="r-row" href={`/editors-trial/${r.slug}`}>
+							<span class="code">{r.data.code}</span>
+							<h3>{r.data.title}</h3>
+							<span class="when">{r.data.notice ? <span class="notice">Interim</span> : r.data.updated}</span>
+							<p>{r.data.dek}</p>
+						</a>
+					))
+				}
+			</div>
+		</div>
+	</section>
+
+	<div class="divider"></div>
+
+	<section id="method">
+		<div class="wrap">
+			<h2 class="sec-label"><span class="sq"></span> / Method</h2>
+			<div class="principles">
+				<div>
+					<span class="offer"><span class="num">01</span></span>
+					<h3>The tool's own path.</h3>
+					<p>Each tool is driven through the import and export its own project documents. No harness rewrites its output, and a step that fails before the tool runs is recorded as not run, not as a result.</p>
+				</div>
+				<div>
+					<span class="offer"><span class="num">02</span></span>
+					<h3>Word is the reference.</h3>
+					<p>Word opens every output and draws the page that renderings are scored against; on the DOCX → PDF bench Word's own export is the oracle. A file Word refuses to open is reported as refused, not repaired and re-scored.</p>
+				</div>
+				<div>
+					<span class="offer"><span class="num">03</span></span>
+					<h3>Everything is published.</h3>
+					<p>Inputs, outputs, page images, scores and the full logs sit beside every table. The maintainer also writes Jubarte, one of the measured tools; its rows are marked and follow the same rules.</p>
+				</div>
+			</div>
+		</div>
+	</section>
+</Site>
