@@ -14,7 +14,7 @@ By [Anna Guo](https://www.linkedin.com/in/anna-guo-255ba7b0/) & [Arthur Souza Ro
   - Asked about indemnities "LinkedIn" owes under a contract where LinkedIn owes none, four of six described the supplier's indemnities as LinkedIn's (Task 6).
   - Asked for the governing law of 11 contracts, no tool got all 11 (Task 16).
 - **Some failures are invented facts.** On a liability clause whose cap is redacted, Copilot answered "$1,000,000" and "12 months" (Task 10). Neither figure is in the contract. [DATA]
-- **Copilot's low score is partly not reasoning.** It took one file per query and refused one file outright as too large. [STUDY]
+- **Copilot's low score is partly not reasoning.** It took one file per query, and it refused two files outright, one of them as too large. [STUDY]
 
 ## Results
 
@@ -120,7 +120,7 @@ Narrow questions with the answer in one document went well. Task 1 asked for the
 ### What was done
 
 1. **In-house counsel in the United States, the United Kingdom, Singapore and China submitted real tasks.** Each task had a question in the lawyer's own words, one or more source documents (contracts, privacy policies, terms, regulations), and the elements a correct answer must contain.
-2. **18 tasks were chosen to vary on purpose.** They differ in scope (open or narrow), clarity, document quality, one or many documents, and whether the answer is there once, several times, partly, not at all, or twice with a contradiction. They also differ in whether the answer needs interpretation.
+2. **18 tasks were chosen to vary on purpose.** They differ in scope (open or narrow), clarity, document quality, and one or many documents. They also differ in whether the answer is there once, several times, partly, not at all, or twice with a contradiction. And some answers need interpretation.
 3. **Each of six tools answered each task once**, with no follow-up prompt: 108 answers. Each tool was used as a lawyer would get it in early 2025:
    - GC AI and Oliver on free trials,
    - NotebookLM, Copilot and DeepSeek-V3 in their free web versions,
@@ -145,7 +145,7 @@ Narrow questions with the answer in one document went well. Task 1 asked for the
 ## What this means for in-house counsel
 
 - **Pick the tool by the work, not the label.** A tool that answers from your own documents was the most accurate here. A legal tool gave the most usable answer.
-- **Narrow the question.** Name the clause, the party and the document. Open questions and leading questions are where every tool failed.
+- **Narrow the question.** Name the clause, the party and the document. Open questions and leading questions are where most tools failed: four of six on each.
 - **Ask about absence directly.** "Does this contract define X?" is safer than "What is the definition of X?"
 - **Check what was read.** When a tool says the document "does not state" something, check that it opened the document at all.
 - **Verify every figure.** In this study, the wrong numbers were the confident ones.
@@ -162,6 +162,6 @@ This is an adapted version of Phase 1 of the legalbenchmarks.ai series, co-autho
 
 This study is where benchmarks.law began. benchmarks.law keeps its rule that people, not models, grade, and goes further: tools are tested without vendor consent, and a result stays published once it is run.
 
-**Team.** Gabriel Saunders, Marc Astbury, Hui Xin Tan, Mariette Clardy, Mathias Bock, Patrick Gong, Rachel Chew, Rodney Yap, Tan Xuan Ming, Uri Barak and Wei Yee Tan reviewed outputs and shaped the method, many as volunteers. The advisors were Chris Holland, Jason Tamara Widjaja and Jordan Dea-Mattson. The authors are practising lawyers, and no vendor, firm or buyer paid them. GC AI and Vecflow supported an independent review.
+**Team.** The reviewers were Gabriel Saunders, Marc Astbury, Hui Xin Tan, Mariette Clardy, Mathias Bock, Patrick Gong, Rachel Chew, Rodney Yap, Tan Xuan Ming, Uri Barak and Wei Yee Tan. They reviewed outputs and shaped the method, many as volunteers. The advisors were Chris Holland, Jason Tamara Widjaja and Jordan Dea-Mattson. The authors are practising lawyers, and no vendor, firm or buyer paid them. GC AI and Vecflow supported an independent review.
 
 **Cite the original (APA).** Guo, A., & Rodrigues, A. (2025). *Putting AI to the Test in Real-World Legal Work: An AI evaluation report for in-house counsel.* legalbenchmarks.ai. https://www.legalbenchmarks.ai/research/phase-1-research
