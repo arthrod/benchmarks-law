@@ -20,10 +20,10 @@ interface Props {
 const { title, description, current = "home", crumb, progress = false, noindex = false } = Astro.props;
 const settings = await getSiteSettings();
 const siteTitle = settings?.title || "benchmarks.law";
-const fullTitle = title ? `${title} · ${siteTitle}` : `${siteTitle} · DOCX tooling measured against Microsoft Word`;
+const fullTitle = title ? `${title} · ${siteTitle}` : `${siteTitle} · DOCX tools and legal AI, measured`;
 const siteDescription =
 	description ||
-	"Open benchmarks of DOCX editors and converters for lawyers: every tool run on the same documents, scored against Microsoft Word, with every input, output and log published.";
+	"Open benchmarks for lawyers: DOCX editors and converters scored against Microsoft Word, with every input, output and log published, and legal AI tools tested against in-house lawyers.";
 
 const pageCtx = createPublicPageContext({
 	Astro,
