@@ -1,17 +1,11 @@
 /**
  * Bench 03 and Bench 04: the two legal-AI studies the maintainer co-authored
  * at legalbenchmarks.ai, published in the report-reader layout
- * (benchmarks-law#60). The text lives in src/data/legal-ai/*.md.
+ * (benchmarks-law#60), rewritten in the trial's report style (#62). The text lives in src/data/legal-ai/*.md.
  */
 import contractDrafting from "../data/legal-ai/contract-drafting.md?raw";
 import infoExtraction from "../data/legal-ai/info-extraction.md?raw";
 import { extractTitle } from "./reports";
-
-export interface StudyFigure {
-	/** The figure as the study prints it; the body must contain it verbatim. */
-	value: string;
-	label: string;
-}
 
 export interface Study {
 	slug: string;
@@ -25,7 +19,8 @@ export interface Study {
 	license: string;
 	grading: string;
 	source: string;
-	figures: StudyFigure[];
+	/** The chart drawn on the homepage card (a key of CHARTS). */
+	cardChart: string;
 	body: string;
 }
 
@@ -38,34 +33,26 @@ export const STUDIES: Study[] = [
 		slug: "info-extraction",
 		code: "Bench 03",
 		kind: "Legal AI · info extraction · 2025",
-		dek: "Six AI assistants, legal and general-purpose, answer eighteen extraction questions that in-house counsel asked of their own documents. Every output was graded blind by two to four lawyers; no model graded anything.",
+		dek: "On 18 real in-house extraction tasks, the most accurate of six AI assistants was not a legal tool, and the two legal tools gave the most useful answers. Lawyers graded all 108 answers blind; no model graded anything.",
 		date: "Early 2025",
 		authors: ["Anna Guo", "Arthur Souza Rodrigues"],
 		license: "CC BY 4.0",
 		grading: "Human-judged · 2–4 lawyers",
 		source: "https://www.legalbenchmarks.ai/research/phase-1-research",
-		figures: [
-			{ value: "108", label: "outputs graded by lawyers" },
-			{ value: "38.9%", label: "lowest accuracy (Copilot)" },
-			{ value: "6", label: "failure modes" },
-		],
+		cardChart: "p1-accuracy",
 		body: infoExtraction,
 	}),
 	study({
 		slug: "contract-drafting",
 		code: "Bench 04",
 		kind: "Legal AI · contract drafting · 2025",
-		dek: "Thirteen AI tools and a baseline of in-house lawyers draft the same thirty contract tasks. The drafts are scored for reliability, usefulness and workflow support, over 450 outputs.",
+		dek: "On 30 real drafting tasks, nine of thirteen AI tools were at least as reliable as experienced in-house lawyers, and legal AI drafted no better than general AI. 450 outputs, 72 survey responses, 12 interviews.",
 		date: "September 2025",
 		authors: ["Anna Guo", "Arthur Souza Rodrigues", "Mohamed Al Mamari", "Sakshi Udeshi", "Marc Astbury"],
 		license: "Free for professional use",
 		grading: "Mixed · LLM jury + human review",
 		source: "https://www.legalbenchmarks.ai/research/phase-2-research",
-		figures: [
-			{ value: "56.7%", label: "humans reliable" },
-			{ value: "73.3%", label: "top AI tool reliable" },
-			{ value: "12 min 43 sec", label: "human time per task" },
-		],
+		cardChart: "p2-reliability",
 		body: contractDrafting,
 	}),
 ];

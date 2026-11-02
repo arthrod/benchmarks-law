@@ -1,12 +1,13 @@
 ---
 import Site from "../../layouts/Site.astro";
 import { STUDIES, studyBody, studyBySlug } from "../../lib/legalAi";
-import { renderMarkdown, wordCount } from "../../lib/reports";
+import { renderStudy } from "../../lib/legalAiCharts";
+import { wordCount } from "../../lib/reports";
 
 const s = studyBySlug(Astro.params.slug!);
 if (!s) return Astro.rewrite("/404");
 
-const { html, toc } = renderMarkdown(studyBody(s.body));
+const { html, toc } = renderStudy(studyBody(s.body));
 const minutes = Math.max(1, Math.round(wordCount(s.body) / 230));
 const i = STUDIES.indexOf(s);
 const prev = STUDIES[i - 1];

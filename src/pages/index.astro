@@ -2,6 +2,7 @@
 import Site from "../layouts/Site.astro";
 import { listReports } from "../lib/cms";
 import { STUDIES } from "../lib/legalAi";
+import { CHARTS, chartHtml } from "../lib/legalAiCharts";
 
 const { reports, cacheHint } = await listReports();
 Astro.cache.set(cacheHint);
@@ -27,7 +28,7 @@ const R2 = "https://pub-92c80eda1059428394970066c8500eda.r2.dev/gh-pages-tree/re
 			<ul class="stats reveal d4">
 				<li class="stat"><b>12</b><span>editors run through their own import and export</span></li>
 				<li class="stat"><b>10</b><span>hostile packages opened in a sandbox</span></li>
-				<li class="stat"><b>4</b><span>benches, inputs and outputs published</span></li>
+				<li class="stat"><b>4</b><span>benches: two run here, two co-authored legal-AI studies</span></li>
 				<li class="stat"><b>1</b><span>reference: Microsoft Word</span></li>
 			</ul>
 		</div>
@@ -83,10 +84,9 @@ const R2 = "https://pub-92c80eda1059428394970066c8500eda.r2.dev/gh-pages-tree/re
 			{
 				STUDIES.map((s) => (
 					<article class="feature">
-						<div class="shot is-figures">
-							{s.figures.map((f) => (
-								<div><b>{f.value}</b><span>{f.label}</span></div>
-							))}
+						<div class="shot is-chart">
+							<p class="chart-ttl">{CHARTS[s.cardChart].title}</p>
+							<Fragment set:html={chartHtml(CHARTS[s.cardChart], { compact: true })} />
 						</div>
 						<div class="body">
 							<span class="tag">{s.code} · {s.kind}</span>
