@@ -1,6 +1,6 @@
 # Benchmarking Humans & AI in Contract Drafting
 
-Thirteen AI tools and a group of in-house lawyers drafted the same 30 real contract tasks. Every draft was scored for reliability and usefulness, and every platform for workflow support. 450 outputs, 72 survey responses and 12 interviews.
+Thirteen published AI tools and a group of in-house lawyers drafted the same 30 real contract tasks. Every draft was scored for reliability and usefulness, and every named platform for workflow support. 450 outputs, 72 survey responses and 12 interviews.
 
 By [Anna Guo](https://www.linkedin.com/in/anna-guo-255ba7b0/), [Arthur Souza Rodrigues](https://www.linkedin.com/in/arthrod/), [Mohamed Al Mamari](https://www.linkedin.com/in/mhmalmamari/), [Sakshi Udeshi](https://www.linkedin.com/in/sakshiudeshi/) & [Marc Astbury](https://www.linkedin.com/in/marc-astbury/) · legalbenchmarks.ai · Phase 2, September 2025
 
@@ -59,7 +59,7 @@ From the source dataset. Most general assistants scored 4 of 10, Qwen 2, because
 | Usefulness, of 9 | 7.53 | 7.28 (study: 7.25) |
 | Time per task | 12 min 43 sec | under 1 minute |
 
-**What the lawyers did better.** They read intent without conceding what the client did not have to concede, and they used commercial judgment. They also handled mixed inputs. One task gave a template, a term sheet and an email thread with a screenshot of the company's details, and only the lawyer got the parties' details complete and right. On Task 37, a licence clause from the licensee's side, Mistral conceded "as is" language that favours the licensor. [STUDY]
+**What the lawyers did better.** They read intent without conceding what the client did not have to concede, and they used commercial judgment. They also handled mixed inputs. One task gave a template, a term sheet and an email thread with a screenshot of the company's details, and only the lawyer got the parties' details complete and right. On Task 37 (the study numbers tasks from a larger pool), a licence clause from the licensee's side, Mistral conceded "as is" language that favours the licensor. [STUDY]
 
 **What the AI did better.** Speed and consistency on routine drafting, and fewer drafts that were too short. Several lawyers' drafts were "way too brief". [STUDY]
 
