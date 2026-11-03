@@ -1,0 +1,4 @@
+# The bench home landing was folded into the leaderboard when the copied viewer was
+# replaced by the pages built from the pinned ndb release (plan 5).
+/neurotic-docx-bench/home /neurotic-docx-bench/ 301
+/neurotic-docx-bench/home/* /neurotic-docx-bench/ 301

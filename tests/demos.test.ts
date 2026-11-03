@@ -99,7 +99,9 @@ describe("demo page and vendor links", () => {
 // Nothing a demo loads may leave benchmarks.law: the browser enforces it through the CSP
 describe("public/_headers", () => {
 	const h = src("public/_headers");
-	const block = h.slice(h.indexOf("/demo-apps/*"));
+	const at = h.indexOf("/demo-apps/*");
+	const next = h.indexOf("\n/", at);
+	const block = h.slice(at, next < 0 ? undefined : next);
 	it("gives every demo a CSP that only allows this origin", () => {
 		expect(block).toMatch(/Content-Security-Policy: [^\n]*default-src 'self'/);
 		expect(block).toMatch(/connect-src 'self' blob: data:/);

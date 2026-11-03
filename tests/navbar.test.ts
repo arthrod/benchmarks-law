@@ -86,8 +86,7 @@ describe("benchPage", async () => {
 
 	it("keeps the page's own crumb and marks its section, on every bench page", () => {
 		const cases: [string, string, string][] = [
-			["home/index.html", "Benches", '/neurotic-docx-bench/home/" aria-current="page"'],
-			["index.html", "DOCX → PDF vs Microsoft Word", '/neurotic-docx-bench/" aria-current="page"'],
+			["cases/index.html", "DOCX → PDF vs Microsoft Word", '/neurotic-docx-bench/cases/" aria-current="page"'],
 			["redlines/index.html", "Redlines vs Microsoft Word", '/neurotic-docx-bench/redlines/" aria-current="page"'],
 			["speed/index.html", "Speed on 10,000 inputs", '/neurotic-docx-bench/speed/" aria-current="page"'],
 			["editors/index.html", "Editors trial", 'nav-dd is-current'],

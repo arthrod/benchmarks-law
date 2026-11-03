@@ -29,8 +29,8 @@ const BENCH_REPO = "https://github.com/jandira-tech/neurotic_docx_bench";
 
 const LINKS: { key: NavSection; href: string; label: string; cls?: string }[] = [
 	{ key: "site", href: "/", label: "benchmarks.law", cls: "home-link" },
-	{ key: "benches", href: "/neurotic-docx-bench/home/", label: "Benches" },
-	{ key: "pdf", href: "/neurotic-docx-bench/", label: "DOCX → PDF" },
+	{ key: "benches", href: "/neurotic-docx-bench/", label: "Benches" },
+	{ key: "pdf", href: "/neurotic-docx-bench/cases/", label: "DOCX → PDF" },
 	{ key: "redlines", href: "/neurotic-docx-bench/redlines/", label: "Redlines" },
 	{ key: "speed", href: "/neurotic-docx-bench/speed/", label: "Speed" },
 ];
@@ -83,7 +83,7 @@ export function navbarHtml(o: { crumb: string; current: NavSection; path: string
 	const dd = `<details class="nav-dd${o.current === "editors" ? " is-current" : ""}"><summary>Editors trial</summary><div class="nav-panel">${panel}</div></details>`;
 	return (
 		`<header id="brand" class="site-nav">` +
-		`<a class="wm" href="/neurotic-docx-bench/home/"><span class="logo"><span class="del">CHILL</span><span class="ins">NEUROTIC</span></span><span class="dot">.</span>DOCX<span class="dot">.</span>BENCH</a>` +
+		`<a class="wm" href="/neurotic-docx-bench/"><span class="logo"><span class="del">CHILL</span><span class="ins">NEUROTIC</span></span><span class="dot">.</span>DOCX<span class="dot">.</span>BENCH</a>` +
 		`<span class="crumb">/ ${esc(o.crumb)}</span>` +
 		`<button type="button" class="nav-menu" aria-expanded="false" aria-controls="site-links">Menu</button><nav id="site-links" aria-label="Site">${links}${dd}<a href="${BENCH_REPO}" rel="noopener">Bench repo →</a><a class="nav-contact" href="https://arthur.law/contact" rel="noopener">Contact</a></nav>` +
 		`</header>`
@@ -100,8 +100,8 @@ export function injectNavbar(html: string, nav: string): string {
 }
 
 const BENCH_SECTIONS: Record<string, NavSection> = {
-	"home/index.html": "benches",
-	"index.html": "pdf",
+	"index.html": "benches",
+	"cases/index.html": "pdf",
 	"redlines/index.html": "redlines",
 	"speed/index.html": "speed",
 	"editors/index.html": "editors",
