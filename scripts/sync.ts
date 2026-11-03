@@ -21,7 +21,6 @@ import { type DemoEntry, type DemoManifest, buildDemoEntry } from "../src/lib/de
 import { REPORT_FILES, buildEntry, extractTitle, splitSections } from "../src/lib/reports";
 import { isLocalEmDash, fullCheckout, reportsRoot } from "../src/lib/root";
 import { trialRef } from "../src/lib/trialRef";
-import { rebuildScoreTable } from "../src/lib/scorecard";
 import { applyFacts } from "../src/lib/vendorFacts";
 
 const SITE = resolve(import.meta.dirname, "..");
@@ -89,14 +88,11 @@ function assets() {
 		slug: r.slug,
 		data: { position: r.position, code: r.code, title: extractTitle(readFileSync(join(ROOT, r.path), "utf8")) || r.slug },
 	}));
-	const mainMd = readFileSync(join(ROOT, "Open-Source DOCX Editors Re-verified Against Code and Measured Round-Trip (2026).md"), "utf8");
-	const wv = join(ROOT, "out/word_verdicts.json");
-	const verdicts: Record<string, string> = existsSync(wv) ? JSON.parse(readFileSync(wv, "utf8")).verdicts : {};
 	for (const f of walk(neurotic).filter((p) => p.endsWith(".html"))) {
 		const rel = f.slice(neurotic.length + 1);
-		let html = patchNeuroticHtml(readFileSync(f, "utf8"));
-		if (rel === "editors/index.html") html = rebuildScoreTable(html, mainMd, verdicts);
-		writeFileSync(f, benchPage(html, rel, rows));
+		// The editors scorecard is no longer patched here: pnpm bench:pages generates it from the
+		// pinned release's out/facts.json, so this loop only fixes the copied viewer's links.
+		writeFileSync(f, benchPage(patchNeuroticHtml(readFileSync(f, "utf8")), rel, rows));
 	}
 	console.log(`figures ${n} · reference.docx · neurotic pages patched · navbar on ${rows.length} reports`);
 }

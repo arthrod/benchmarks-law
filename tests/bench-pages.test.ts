@@ -8,6 +8,7 @@ import { type Row, leaderboardHtml } from "../src/lib/bench-pages";
 const SITE = resolve(import.meta.dirname, "..");
 /** The pinned ndb release (bench.lock → `bench fetch`); absent before the first fetch. */
 const PINNED = join(SITE, ".bench/ndb/results/scores.json");
+const PINNED_ET = join(SITE, ".bench/editors_trial/out/facts.json");
 const scores: Scores | null = existsSync(PINNED)
 	? parseScores(JSON.parse(readFileSync(PINNED, "utf8")))
 	: null;
@@ -28,6 +29,21 @@ const fixture: Scores = {
 	home_groups: [],
 	method: [],
 };
+
+describe.skipIf(!existsSync(PINNED_ET))("the editors scorecard page", () => {
+	const page = editorsPage(JSON.parse(readFileSync(PINNED_ET, "utf8")), []);
+
+	it("wears the site navbar in place of its own header and marks its section", () => {
+		expect(page).toContain('<header id="brand" class="site-nav">');
+		expect(page).toContain('href="/neurotic-docx-bench/editors/" aria-current="page"');
+		expect(page).toContain('<span class="crumb">/ Editors trial</span>');
+	});
+	it("takes its figures from the pinned et facts", () => {
+		expect(page).toContain('<table class="score">');
+		expect(page).toContain("SuperDoc V2");
+		expect(page).toMatch(/LibreOffice \(baseline\)/);
+	});
+});
 
 describe.skipIf(!scores)("the leaderboard page from the pinned scores", () => {
 	const page = leaderboardHtml(scores as Scores, []);
@@ -85,7 +101,7 @@ describe("the leaderboard page wears the site", () => {
 // ---- the case browsers and the speed page, from the same bundle (plan 5 rev 2) ------------
 
 import { createHash } from "node:crypto";
-import { casesPage, redlinesPage, speedPage } from "../src/lib/bench-pages";
+import { casesPage, editorsPage, redlinesPage, speedPage } from "../src/lib/bench-pages";
 
 describe("the viewer pages from the pinned bundle", () => {
 	const rows: Row[] = [];
@@ -204,6 +220,7 @@ describe.skipIf(!existsSync(join(SITE, ".bench/ndb/results/release/cases/index.j
 			writeBenchPages(SITE, relative(SITE, out));
 			for (const rel of [
 				"index.html",
+				"editors/index.html",
 				"tokens.css",
 				"arthur-law.css",
 				"cases.css",

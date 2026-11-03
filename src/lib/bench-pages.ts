@@ -16,6 +16,7 @@ import { dirname, join, relative, resolve } from "node:path";
 import { buildLeaderboardPage, renderCasesPage, renderSpeedPage, type Scores } from "@jandira-tech/bench-viewer";
 import { benchPage, navbarHtml } from "./navbar";
 import { reportRows } from "./reports";
+import { scorecardHtml, type Facts } from "./scorecard";
 
 /** Where the pinned ndb release lands (.bench/ndb/, from `bench fetch`). */
 export const NDB = "ndb";
@@ -28,6 +29,14 @@ export function pinnedScores(site: string): Scores {
 	if (!existsSync(path))
 		throw new Error(`${path} is missing — run \`bench fetch --repo ${site}\` before building`);
 	return JSON.parse(readFileSync(path, "utf8")) as Scores;
+}
+
+/** The out/facts.json of the pinned editors_trial release: every figure the scorecard prints. */
+export function pinnedFacts(site: string): Facts {
+	const path = join(site, ".bench", ET, "out/facts.json");
+	if (!existsSync(path))
+		throw new Error(`${path} is missing — run \`bench fetch --repo ${site}\` before building`);
+	return JSON.parse(readFileSync(path, "utf8")) as Facts;
 }
 
 /** The navbar rows every bench page shares: the reports the pinned et bundle carries. */
@@ -110,6 +119,11 @@ export function speedPage(rows: ReturnType<typeof benchRows>): string {
 	);
 }
 
+/** The editors-trial scorecard at /neurotic-docx-bench/editors/, from the pinned et facts. */
+export function editorsPage(facts: Facts, rows: ReturnType<typeof benchRows>): string {
+	return benchPage(withSiteIcon(scorecardHtml(facts)), "editors/index.html", rows);
+}
+
 /** The files the leaderboard needs beside it (the stylesheets its markup links). */
 const LEADERBOARD_ASSETS = ["tokens.css", "arthur-law.css", "cases.css"];
 
@@ -159,6 +173,7 @@ export function writeBenchPages(site: string, dir = join("public", "neurotic-doc
 		["cases/index.html", casesPage(rows)],
 		["redlines/index.html", redlinesPage(rows)],
 		["speed/index.html", speedPage(rows)],
+		["editors/index.html", editorsPage(pinnedFacts(site), rows)],
 	];
 	const assets: [string, () => void][] = [
 		...LEADERBOARD_ASSETS.map((css) => [css, () => copyFileSync(join(packageDir(), "themes", css), join(out, css))] as [string, () => void]),
