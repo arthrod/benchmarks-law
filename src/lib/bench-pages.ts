@@ -10,13 +10,13 @@
  * that) with the site navbar inserted above it, the way every bench page here wears it.
  */
 import { spawnSync } from "node:child_process";
-import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, rmdirSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { appendFileSync, copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, rmdirSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { dirname, join, relative, resolve } from "node:path";
 import { buildLeaderboardPage, renderCasesPage, renderSpeedPage, type Scores } from "@jandira-tech/bench-viewer";
 import { benchPage, injectNavbar, navbarHtml } from "./navbar";
 import { reportRows } from "./reports";
-import { scorecardHtml, type Facts } from "./scorecard";
+import { defectClassesIn, scorecardHtml, type Facts, type Release } from "./scorecard";
 
 /** Where the pinned ndb release lands (.bench/ndb/, from `bench fetch`). */
 export const NDB = "ndb";
@@ -37,6 +37,23 @@ export function pinnedFacts(site: string): Facts {
 	if (!existsSync(path))
 		throw new Error(`${path} is missing — run \`bench fetch --repo ${site}\` before building`);
 	return JSON.parse(readFileSync(path, "utf8")) as Facts;
+}
+
+/** The out/release.json of the pinned editors_trial release: the dates the scorecard prints. */
+export function pinnedRelease(site: string): Release {
+	const path = join(site, ".bench", ET, "out/release.json");
+	if (!existsSync(path))
+		throw new Error(`${path} is missing — run \`bench fetch --repo ${site}\` before building`);
+	return JSON.parse(readFileSync(path, "utf8")) as Release;
+}
+
+/** The bundle's Report B markdown: its per-defect matrix counts the classes Word refuses. */
+export function pinnedReportB(site: string): string {
+	const dir = join(site, ".bench", ET, "reports");
+	const hit = existsSync(dir) ? readdirSync(dir).find((n) => /^Report B .*\.md$/.test(n)) : undefined;
+	if (!hit)
+		throw new Error(`${dir} carries no Report B markdown — the defect classes cannot be counted`);
+	return readFileSync(join(dir, hit), "utf8");
 }
 
 /** The navbar rows every bench page shares: the reports the pinned et bundle carries. */
@@ -121,13 +138,32 @@ export function speedPage(rows: ReturnType<typeof benchRows>): string {
 	);
 }
 
-/** The editors-trial scorecard at /neurotic-docx-bench/editors/, from the pinned et facts. */
-export function editorsPage(facts: Facts, rows: ReturnType<typeof benchRows>): string {
-	return benchPage(withSiteIcon(scorecardHtml(facts)), "editors/index.html", rows);
+/** The editors-trial scorecard at /neurotic-docx-bench/editors/, from the pinned et facts,
+ * the bundle's Report B (the defect classes) and the release's own dates. */
+export function editorsPage(
+	facts: Facts,
+	rows: ReturnType<typeof benchRows>,
+	extra: { defectClasses: number; release: Release },
+): string {
+	return benchPage(withSiteIcon(scorecardHtml(facts, extra)), "editors/index.html", rows);
 }
 
 /** The files the leaderboard needs beside it (the stylesheets its markup links). */
-const LEADERBOARD_ASSETS = ["tokens.css", "arthur-law.css", "cases.css"];
+const LEADERBOARD_ASSETS = ["tokens.css", "arthur-law.css"];
+
+/** The site scoping appended to the generated cases.css (the speed page's stylesheet). The
+ * theme constrains body.doc itself — the injected site navbar included — to a 1200px column,
+ * which both narrows the navbar and makes it wrap; the navbar is full-bleed and sticky
+ * (nav.css), so the constraint moves to the page's own landmarks, the way the copied bench
+ * pages scoped it. Only the speed page is body.doc: the case browsers are body.viewer, the
+ * leaderboard links no cases.css at all. */
+export const SITE_DOC_SCOPE = `/* ---- benchmarks-law: the navbar and the footer span the viewport; the page keeps its column ---- */
+body.doc{max-width:none;margin:0;padding:0}
+body.doc > #brand{margin-bottom:28px}
+body.doc > :not(#brand):not(#main):not(footer.site){max-width:1200px;margin-left:auto;margin-right:auto;padding-left:24px;padding-right:24px}
+body.doc > #main{max-width:1200px;margin-left:auto;margin-right:auto}
+body.doc footer.site{margin-top:48px;padding-left:24px;padding-right:24px}
+`;
 
 /** The compiled modules the viewer pages import, from the bench-viewer package's dist. */
 const MODULES = ["cases.js", "esc.js", "speed.js"];
@@ -175,10 +211,23 @@ export function writeBenchPages(site: string, dir = join("public", "neurotic-doc
 		["cases/index.html", casesPage(rows)],
 		["redlines/index.html", redlinesPage(rows)],
 		["speed/index.html", speedPage(rows)],
-		["editors/index.html", editorsPage(pinnedFacts(site), rows)],
+		[
+			"editors/index.html",
+			editorsPage(pinnedFacts(site), rows, {
+				defectClasses: defectClassesIn(pinnedReportB(site)),
+				release: pinnedRelease(site),
+			}),
+		],
 	];
 	const assets: [string, () => void][] = [
 		...LEADERBOARD_ASSETS.map((css) => [css, () => copyFileSync(join(packageDir(), "themes", css), join(out, css))] as [string, () => void]),
+		[
+			"cases.css",
+			() => {
+				copyFileSync(join(packageDir(), "themes", "cases.css"), join(out, "cases.css"));
+				appendFileSync(join(out, "cases.css"), SITE_DOC_SCOPE);
+			},
+		],
 		...MODULES.map((js) => [`js/${js}`, () => copyFileSync(join(packageDir(), "dist", js), join(out, "js", js))] as [string, () => void]),
 		...releaseFiles(site).map(
 			(rel) =>

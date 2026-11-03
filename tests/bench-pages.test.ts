@@ -3,7 +3,8 @@ import { tmpdir } from "node:os";
 import { join, relative, resolve } from "node:path";
 import { afterAll, describe, expect, it } from "vitest";
 import { parseScores, type Scores } from "@jandira-tech/bench-viewer";
-import { type Row, leaderboardHtml } from "../src/lib/bench-pages";
+import { type Row, leaderboardHtml, pinnedRelease, pinnedReportB, SITE_DOC_SCOPE } from "../src/lib/bench-pages";
+import { defectClassesIn } from "../src/lib/scorecard";
 
 const SITE = resolve(import.meta.dirname, "..");
 /** The pinned ndb release (bench.lock → `bench fetch`); absent before the first fetch. */
@@ -31,7 +32,8 @@ const fixture: Scores = {
 };
 
 describe.skipIf(!existsSync(PINNED_ET))("the editors scorecard page", () => {
-	const page = editorsPage(JSON.parse(readFileSync(PINNED_ET, "utf8")), []);
+	const ctx = { defectClasses: defectClassesIn(pinnedReportB(SITE)), release: pinnedRelease(SITE) };
+	const page = editorsPage(JSON.parse(readFileSync(PINNED_ET, "utf8")), [], ctx);
 
 	it("wears the site navbar in place of its own header and marks its section", () => {
 		expect(page).toContain('<header id="brand" class="site-nav">');
@@ -42,6 +44,21 @@ describe.skipIf(!existsSync(PINNED_ET))("the editors scorecard page", () => {
 		expect(page).toContain('<table class="score">');
 		expect(page).toContain("SuperDoc V2");
 		expect(page).toMatch(/LibreOffice \(baseline\)/);
+	});
+	it("keeps everything the old page showed: the correction notice, the edition line, six tiles", () => {
+		const facts = JSON.parse(readFileSync(PINNED_ET, "utf8")) as Record<string, number | string | boolean>;
+		expect(page).toContain(`<b>Corrected ${pinnedRelease(SITE).date}.</b> Three checks failed rewrites`);
+		expect(page).toContain(
+			`eigenpal moves from 98.5% to ${Number(facts["rt.eigenpal.weighted"]).toFixed(1)}%.`,
+		);
+		expect(page).toContain("Edition 2 · 2026-10-30, corrected");
+		expect(page).toContain(`<span>Word ${facts["word.version"]} as validator</span>`);
+		expect(page).toMatch(/<b>13<\/b><span>tools measured/);
+		expect(page).toMatch(/<b>99<\/b><span>checks/);
+		expect(page).toMatch(/<b>35<\/b><span>package parts/);
+		expect(page).toMatch(/<b>29<\/b><span>critical features/);
+		expect(page).toMatch(/<b>12<\/b><span>defect classes Word refuses/);
+		expect(page).toMatch(/<b>3<\/b><span>perfect round trips/);
 	});
 });
 
@@ -138,6 +155,19 @@ describe("the viewer pages from the pinned bundle", () => {
 	it("the speed page fetches the bundle's speed.json", () => {
 		expect(speed).toContain('"../release/speed.json"');
 		expect(speed).toContain('from "../js/speed.js"');
+	});
+	it("the navbar sits above the page and outside its column: the stylesheet un-constrains body.doc", () => {
+		// The theme centres body.doc (navbar included) in a 1200px column; the site scoping
+		// appended to the generated cases.css frees the navbar and re-scopes the column onto
+		// the page's own landmarks, the way the copied bench pages did.
+		expect(speed.indexOf('<header id="brand"')).toBeLessThan(speed.indexOf('<main id="main">'));
+		expect(speed).toContain('href="../cases.css"');
+		expect(SITE_DOC_SCOPE).toMatch(/body\.doc\{max-width:none;margin:0;padding:0\}/);
+		expect(SITE_DOC_SCOPE).toMatch(/body\.doc > #main\{[^}]*max-width:1200px/);
+		expect(SITE_DOC_SCOPE).toMatch(
+			/body\.doc > :not\(#brand\):not\(#main\):not\(footer\.site\)\{[^}]*max-width:1200px/,
+		);
+		expect(SITE_DOC_SCOPE).not.toMatch(/body\.doc[^{]*#brand[^{]*max-width/);
 	});
 	it("cross-links stay inside this site: cases → redlines, speed, the leaderboard", () => {
 		expect(cases).toContain('../redlines/index.html');
@@ -240,6 +270,11 @@ describe.skipIf(!existsSync(join(SITE, ".bench/ndb/results/release/cases/index.j
 			for (const rel of ["js/cases.js", "js/esc.js", "js/speed.js"]) {
 				expect(existsSync(join(out, rel)), rel).toBe(true);
 			}
+		});
+		it("appends the site scoping to the generated cases.css, after the theme", () => {
+			const css = readFileSync(join(out, "cases.css"), "utf8");
+			expect(css.indexOf("body.doc")).toBeGreaterThan(-1); // the theme's own rule is still there
+			expect(css.trimEnd().endsWith(SITE_DOC_SCOPE.trimEnd())).toBe(true);
 		});
 	},
 );

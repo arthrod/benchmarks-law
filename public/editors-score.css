@@ -24,6 +24,10 @@ a:hover,a:focus-visible{background-size:100% .55em}
 small{font-weight:400;color:var(--muted);font-size:11px}
 
 body.doc{font-size:15px;line-height:1.6;color:var(--ink-prose)}
+/* The breadcrumb row joins the page's column (main#main) instead of sitting flush at the viewport
+   edge — the rule the copied bench pages carried for every body.doc child that is not the navbar,
+   the main landmark or the footer. */
+body.doc > nav.crumbs{max-width:var(--page-max);margin-left:auto;margin-right:auto;padding-left:var(--px);padding-right:var(--px)}
 body.doc main#main{max-width:var(--page-max);margin-left:auto;margin-right:auto}
 body.doc main#main > *{max-width:var(--page-max);margin-left:auto;margin-right:auto;padding-left:var(--px);padding-right:var(--px)}
 body.doc nav.crumbs{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
