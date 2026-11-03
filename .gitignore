@@ -46,3 +46,6 @@ npm-debug.log*
 
 # Live editor demo bundles: build artifacts, copied in by `pnpm sync:demos` (see README)
 public/demo-apps/
+
+# The pinned producer releases `bench fetch` materialises (bench.lock); verified bytes, never edited.
+.bench/

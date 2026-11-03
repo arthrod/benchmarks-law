@@ -72,6 +72,26 @@ pnpm run typecheck      # astro check
 pnpm run deploy         # astro build && wrangler deploy (direct to production; there is no CI step)
 ```
 
+## Bench data pins (bench.lock)
+
+The ndb and editors_trial figures this site prints come from the producers' tagged releases, pinned
+in [`bench.lock`](./bench.lock) (`ndb=ndb-vX.Y.Z` / `editors_trial=et-vX.Y.Z`, each with the sha256 of
+its manifest). `bench fetch` materialises the pins under `.bench/<producer>/` (git-ignored) and
+verifies every byte against the manifest, so a moved tag on Hugging Face changes nothing.
+
+```bash
+bench bump ndb --repo .            # pin the producer's latest release (reads its ledger)
+bench bump editors_trial --repo .
+bench fetch --repo .               # download + verify the pins into .bench/ (needs the HF token for et)
+bench fetch --check --repo .       # offline: re-hash .bench/ against the lock (the pre-commit and deploy gate)
+```
+
+A fresh clone needs no sibling checkouts: `pnpm install && bench fetch && pnpm build` (the et
+bundle is private, so fetch needs a Hugging Face token that can read it). `REPORTS_ROOT` still
+overrides the editors_trial source for the heavy `sync:*` commands, which read files the release
+bundle does not carry (figures, the reference document, demo manifests); they refuse to run from
+the bundle instead of publishing half.
+
 ## Lighthouse
 
 Production, 2026-11-01. Lighthouse latest, headless Chrome; mobile uses the default throttled preset and desktop uses `--preset=desktop`. Scores are performance / accessibility / best practices / SEO. The two viewers were measured after `edc5021`, every other page after `03bc390` (the later commits do not change what those pages render).

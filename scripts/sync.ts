@@ -19,7 +19,7 @@ import { patchNeuroticHtml } from "../src/lib/neurotic";
 import vendorsData from "../src/data/vendors.json" with { type: "json" };
 import { type DemoEntry, type DemoManifest, buildDemoEntry } from "../src/lib/demos";
 import { REPORT_FILES, buildEntry, extractTitle, splitSections } from "../src/lib/reports";
-import { isLocalEmDash, reportsRoot } from "../src/lib/root";
+import { isLocalEmDash, fullCheckout, reportsRoot } from "../src/lib/root";
 import { trialRef } from "../src/lib/trialRef";
 import { rebuildScoreTable } from "../src/lib/scorecard";
 import { applyFacts } from "../src/lib/vendorFacts";
@@ -33,9 +33,14 @@ const URL_ = process.env.EMDASH_URL ?? "https://benchmarks.law";
 /** Pin every source link to the commit being published (src/data/release.json, read by the pages too). */
 function writeTrialRef(): string {
 	const git = (...a: string[]) => spawnSync("git", ["-C", ROOT, ...a], { encoding: "utf8" }).stdout ?? "";
-	const ref = trialRef(git("describe", "--tags", "--exact-match", "HEAD"), git("rev-parse", "HEAD"));
-	writeFileSync(join(SITE, "src/data/release.json"), `${JSON.stringify({ trialRef: ref }, null, "\t")}\n`);
-	return ref;
+	const tag = git("describe", "--tags", "--exact-match", "HEAD");
+	const sha = git("rev-parse", "HEAD");
+	// The fetched release bundle is not a git checkout: without a ref the report pages would link at
+	// .../blob//, so a bundle-rooted run stops here and names the fix.
+	if (!tag && !sha)
+		throw new Error(`${ROOT} carries no git ref — set REPORTS_ROOT to an editors_trial checkout`);
+	writeFileSync(join(SITE, "src/data/release.json"), `${JSON.stringify({ trialRef: trialRef(tag, sha) }, null, "\t")}\n`);
+	return trialRef(tag, sha);
 }
 const BLOB = () => `https://github.com/arthrod/editors_trial/blob/${writeTrialRef()}/`;
 
@@ -61,6 +66,9 @@ function lastCommitDate(rel: string): string | null {
 }
 
 function assets() {
+	// Figures, the reference document and the scorecard inputs come from the checkout, not the
+	// bundle; refuse before the first rmSync below would empty the published folders.
+	fullCheckout(ROOT);
 	const figs = join(SITE, "public/editors-trial/figures");
 	rmSync(figs, { recursive: true, force: true });
 	rmSync(join(SITE, "public/editors-trial/files"), { recursive: true, force: true });
@@ -232,6 +240,8 @@ async function content() {
  * lists what was published. An editor without a built bundle is left out, never half-published.
  */
 function demos() {
+	// make_demo_docs.py and the demo manifests live in the checkout, not the bundle.
+	fullCheckout(ROOT);
 	const apps = resolve(process.env.DEMO_APPS ?? "/tmp/demos");
 	const made = spawnSync("python3", ["-I", join(ROOT, "build/make_demo_docs.py"), join(ROOT, "out/demo")], { stdio: "inherit" });
 	if (made.status !== 0) throw new Error("build/make_demo_docs.py failed");
