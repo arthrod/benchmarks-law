@@ -1,7 +1,8 @@
 /**
- * Publishes the editors_trial reports and the neurotic_docx_bench viewer into this site.
+ * Publishes the editors_trial reports into this site (the bench pages under /neurotic-docx-bench/
+ * are generated from the pinned releases by pnpm bench:pages, not by this script).
  *
- *   pnpm sync:assets    # figures, the .docx reference (styles for the live download), neurotic link fixes → public/
+ *   pnpm sync:assets    # figures and the .docx reference (styles for the live download) → public/
  *   pnpm sync:content   # upsert every report into the EmDash `reports` collection
  *   pnpm sync:vendors   # upsert the field's vendors into the EmDash `vendors` collection
  *   pnpm sync:demos     # live editor demos: bundles → public/demo-apps/, sanitized copies, src/data/demos.json
@@ -14,11 +15,9 @@
 import { cpSync, existsSync, rmSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { dirname, join, resolve } from "node:path";
-import { benchPage } from "../src/lib/navbar";
-import { patchNeuroticHtml } from "../src/lib/neurotic";
 import vendorsData from "../src/data/vendors.json" with { type: "json" };
 import { type DemoEntry, type DemoManifest, buildDemoEntry } from "../src/lib/demos";
-import { REPORT_FILES, buildEntry, extractTitle, splitSections } from "../src/lib/reports";
+import { REPORT_FILES, buildEntry, splitSections } from "../src/lib/reports";
 import { isLocalEmDash, fullCheckout, reportsRoot } from "../src/lib/root";
 import { trialRef } from "../src/lib/trialRef";
 import { applyFacts } from "../src/lib/vendorFacts";
@@ -82,19 +81,7 @@ function assets() {
 	// No .docx is published: each report page builds it live with jubarte-wasm from its Markdown,
 	// taking styles and the landscape page from the trial's reference document (benchmarks-law#56).
 	cpSync(join(ROOT, "build/reference.docx"), join(SITE, "public/editors-trial/reference.docx"));
-	const neurotic = join(SITE, "public/neurotic-docx-bench");
-	// The navbar's trial dropdown lists the same reports, with the same titles, as the CMS.
-	const rows = REPORT_FILES.filter((r) => existsSync(join(ROOT, r.path))).map((r) => ({
-		slug: r.slug,
-		data: { position: r.position, code: r.code, title: extractTitle(readFileSync(join(ROOT, r.path), "utf8")) || r.slug },
-	}));
-	for (const f of walk(neurotic).filter((p) => p.endsWith(".html"))) {
-		const rel = f.slice(neurotic.length + 1);
-		// The editors scorecard is no longer patched here: pnpm bench:pages generates it from the
-		// pinned release's out/facts.json, so this loop only fixes the copied viewer's links.
-		writeFileSync(f, benchPage(patchNeuroticHtml(readFileSync(f, "utf8")), rel, rows));
-	}
-	console.log(`figures ${n} · reference.docx · neurotic pages patched · navbar on ${rows.length} reports`);
+	console.log(`figures ${n} · reference.docx`);
 }
 
 

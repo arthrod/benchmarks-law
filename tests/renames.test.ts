@@ -22,18 +22,28 @@ describe("Report E became Reports D1 and D2", () => {
 	});
 });
 
-describe("the bench's editors page lists every report", () => {
-	const html = readFileSync(join(SITE, "public/neurotic-docx-bench/editors/index.html"), "utf8");
-	it.each(REPORT_FILES.filter((f) => f.group === "reports" && f.slug !== "round-trip").map((f) => [f.code, f.slug]))(
-		"%s links to /editors-trial/%s",
-		(_code, slug) => {
-			expect(html).toContain(`href="/editors-trial/${slug}"`);
-		},
-	);
-	it("has no link to a renamed slug", () => {
-		for (const from of Object.keys(RENAMED_SLUGS)) expect(html).not.toContain(`/editors-trial/${from}"`);
-	});
-});
+describe.skipIf(!existsSync(join(SITE, ".bench/editors_trial/reports")))(
+	"the bench's editors page lists every report",
+	async () => {
+		const { benchRows, editorsPage, pinnedFacts, pinnedRelease, pinnedReportB } = await import(
+			"../src/lib/bench-pages"
+		);
+		const { defectClassesIn } = await import("../src/lib/scorecard");
+		const html = editorsPage(pinnedFacts(SITE), benchRows(SITE), {
+			defectClasses: defectClassesIn(pinnedReportB(SITE)),
+			release: pinnedRelease(SITE),
+		});
+		it.each(REPORT_FILES.filter((f) => f.group === "reports" && f.slug !== "round-trip").map((f) => [f.code, f.slug]))(
+			"%s links to /editors-trial/%s",
+			(_code, slug) => {
+				expect(html).toContain(`href="/editors-trial/${slug}"`);
+			},
+		);
+		it("has no link to a renamed slug", () => {
+			for (const from of Object.keys(RENAMED_SLUGS)) expect(html).not.toContain(`/editors-trial/${from}"`);
+		});
+	},
+);
 
 const reportC = join(REPORTS_ROOT, "reports/Report C - Rendering Versus Word (2026).md");
 // Vitest runs a skipped suite's body during collection, so the file is read inside the test, never here.

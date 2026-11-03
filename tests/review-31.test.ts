@@ -75,19 +75,9 @@ describe("reportsRoot rejects what is not an editors_trial checkout", () => {
 	});
 });
 
-// 4434736484 (CodeAnt): the desktop noside grid must not apply on the mobile viewer
-describe("noside on the mobile viewer", () => {
-	const css = src("public/neurotic-docx-bench/_static/bench.css");
-	it("every noside layout rule excludes body.mobile", () => {
-		const rules = css.match(/^[^{\n]*\.noside[^{]*\{[^}]*(grid-template-columns|grid-column|display:none)[^}]*\}/gm) ?? [];
-		expect(rules.length).toBe(3);
-		for (const r of rules) expect(r).toContain(":not(.mobile)");
-	});
-});
-
 // 4434736488 (CodeAnt): the OFL must name the fonts' copyright holders
 describe("OFL.txt", () => {
-	it.each(["public/neurotic-docx-bench/_static/fonts/OFL.txt", "public/fonts/OFL.txt"])("%s has no template placeholders", (p) => {
+	it.each(["public/fonts/OFL.txt"])("%s has no template placeholders", (p) => {
 		const s = src(p);
 		expect(s).not.toMatch(/<dates>|<Copyright Holder>|<Reserved Font Name>/);
 		expect(s).toContain("Copyright 2020 The Libre Franklin Project Authors");
