@@ -120,7 +120,7 @@ Re-run with `pnpm dlx lighthouse@latest <url> --only-categories=performance,acce
 
 ## Deployment
 
-`pnpm run deploy` builds and runs `wrangler deploy` to the Worker `benchmarks-law`, bound to **benchmarks.law** (`routes` with `custom_domain: true` in `wrangler.jsonc`). EmDash puts only `/_emdash/admin` behind first-run setup; the public pages render without it.
+`pnpm run deploy` re-hashes `.bench/` against `bench.lock` (`bench fetch --check`), builds and runs `wrangler deploy` to the Worker `benchmarks-law`, bound to **benchmarks.law** (`routes` with `custom_domain: true` in `wrangler.jsonc`). Nothing deploys from a stale or tampered pin. `bench deploy blaw` (bench-ops, `deploy = "pnpm run deploy"` in `repos.toml`) is the same gate from the workspace root. EmDash puts only `/_emdash/admin` behind first-run setup; the public pages render without it.
 
 ## License
 

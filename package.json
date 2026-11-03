@@ -12,7 +12,7 @@
 		"dev": "astro dev",
 		"build": "pnpm run bench:pages && astro build",
 		"preview": "astro preview",
-		"deploy": "astro build && wrangler deploy",
+		"deploy": "bench fetch --check --repo . && pnpm run build && wrangler deploy",
 		"typecheck": "astro check",
 		"test": "vitest run",
 		"sync:assets": "tsx scripts/sync.ts assets",

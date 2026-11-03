@@ -238,3 +238,15 @@ describe.skipIf(!existsSync(join(SITE, ".bench/ndb/results/release/cases/index.j
 		});
 	},
 );
+
+// ---- the deploy gate (plan 5 rev 2: bench deploy blaw = bench fetch --check, then pnpm run deploy) ----
+
+describe("pnpm run deploy", () => {
+	it("verifies the fetched pins before it builds or deploys anything", () => {
+		const pkg = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8")) as {
+			scripts: Record<string, string>;
+		};
+		expect(pkg.scripts.deploy).toMatch(/^bench fetch --check --repo \. && /);
+		expect(pkg.scripts.deploy).toContain("wrangler deploy");
+	});
+});
