@@ -14,7 +14,7 @@ import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, rmdirSy
 import { createRequire } from "node:module";
 import { dirname, join, relative, resolve } from "node:path";
 import { buildLeaderboardPage, renderCasesPage, renderSpeedPage, type Scores } from "@jandira-tech/bench-viewer";
-import { benchPage, navbarHtml } from "./navbar";
+import { benchPage, injectNavbar, navbarHtml } from "./navbar";
 import { reportRows } from "./reports";
 import { scorecardHtml, type Facts } from "./scorecard";
 
@@ -52,7 +52,9 @@ export function benchRows(site: string): Row[] {
 /** The leaderboard page: bench-viewer's arthur-law page with the site navbar above it. */
 export function leaderboardHtml(scores: Scores, rows: ReturnType<typeof benchRows>): string {
 	const nav = navbarHtml({ crumb: "Scores", current: "benches", path: "/neurotic-docx-bench/", rows });
-	return withSiteIcon(buildLeaderboardPage(scores).replace("<body>", () => `<body>\n${nav}`));
+	// injectNavbar swaps the placeholder for the navbar and links /nav.css + /nav.js in the head.
+	const page = buildLeaderboardPage(scores).replace("<body>", () => '<body>\n<header id="brand"></header>');
+	return withSiteIcon(injectNavbar(page, nav));
 }
 
 // ---- the case browsers and the speed page, from the same bundle -------------------------------------------

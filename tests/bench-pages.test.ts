@@ -87,6 +87,11 @@ describe("the leaderboard page wears the site", () => {
 		expect(page).toContain('<header id="brand" class="site-nav">');
 		expect(page.indexOf('<header id="brand"')).toBeLessThan(page.indexOf('<main class="wrap">'));
 	});
+	it("links the navbar's stylesheet and script once, so the navbar is styled", () => {
+		expect(page.match(/href="\/nav\.css"/g)).toHaveLength(1);
+		expect(page.match(/src="\/nav\.js"/g)).toHaveLength(1);
+		expect(page.indexOf('href="/nav.css"')).toBeLessThan(page.indexOf("</head>"));
+	});
 	it("lists the trial dropdown's rows", () => {
 		const rows: Row[] = [{ slug: "report-a", data: { position: 10, code: "Report A", title: "Serialization" } }];
 		expect(leaderboardHtml(fixture, rows)).toContain("Serialization");
