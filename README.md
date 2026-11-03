@@ -69,6 +69,7 @@ pnpm install
 pnpm exec emdash dev    # local dev server (migrations, seed, types) → http://localhost:4321, admin at /_emdash/admin
 pnpm test               # vitest
 pnpm run typecheck      # astro check
+pnpm run bench:pages    # verify the pins offline, then build /neurotic-docx-bench/ from .bench/ (runs in build)
 pnpm run deploy         # astro build && wrangler deploy (direct to production; there is no CI step)
 ```
 

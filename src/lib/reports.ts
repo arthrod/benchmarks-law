@@ -1,4 +1,6 @@
 import GithubSlugger from "github-slugger";
+import { existsSync, readFileSync } from "node:fs";
+import { join } from "node:path";
 import { Marked, type Tokens } from "marked";
 
 export interface TocItem {
@@ -324,4 +326,18 @@ export function splitSections(md: string): Map<string, string> {
 	const parts = md.split(/^##\s+(.+?)\s*$/m);
 	for (let i = 1; i < parts.length; i += 2) out.set(parts[i].trim(), (parts[i + 1] ?? "").trim());
 	return out;
+}
+
+/** The navbar/report-switcher row for every report an editors_trial source holds (checkout or bundle). */
+export function reportRows(
+	root: string,
+): { slug: string; data: { position: number; code: string; title: string } }[] {
+	return REPORT_FILES.filter((r) => existsSync(join(root, r.path))).map((r) => ({
+		slug: r.slug,
+		data: {
+			position: r.position,
+			code: r.code,
+			title: extractTitle(readFileSync(join(root, r.path), "utf8")) || r.slug,
+		},
+	}));
 }

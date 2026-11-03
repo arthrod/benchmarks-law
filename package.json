@@ -1,45 +1,47 @@
 {
-  "name": "benchmarks-law",
-  "version": "0.0.3",
-  "private": true,
-  "license": "Apache-2.0",
-  "type": "module",
-  "emdash": {
-    "label": "Marketing",
-    "seed": "seed/seed.json"
-  },
-  "scripts": {
-    "dev": "astro dev",
-    "build": "astro build",
-    "preview": "astro preview",
-    "deploy": "astro build && wrangler deploy",
-    "typecheck": "astro check",
-    "test": "vitest run",
-    "sync:assets": "tsx scripts/sync.ts assets",
-    "sync:content": "tsx scripts/sync.ts content",
-    "sync:vendors": "tsx scripts/sync.ts vendors",
-    "sync:demos": "tsx scripts/sync.ts demos"
-  },
-  "dependencies": {
-    "@astrojs/cloudflare": "^14.4.3",
-    "@astrojs/react": "^7.1.2",
-    "@emdash-cms/cloudflare": "^1.4.0",
-    "astro": "^7.4.4",
-    "emdash": "^1.4.0",
-    "github-slugger": "^2.0.0",
-    "jubarte-wasm": "0.17.0",
-    "lenis": "^1.3.27",
-    "marked": "^18.1.2",
-    "react": "19.3.1",
-    "react-dom": "19.3.1"
-  },
-  "devDependencies": {
-    "@astrojs/check": "^0.9.12",
-    "@cloudflare/workers-types": "^5.20261030.1",
-    "fflate": "0.8.3",
-    "tsx": "^4.23.15",
-    "typescript": "^6.0.3",
-    "vitest": "^5.0.5",
-    "wrangler": "^4.156.0"
-  }
+	"name": "benchmarks-law",
+	"version": "0.0.3",
+	"private": true,
+	"license": "Apache-2.0",
+	"type": "module",
+	"emdash": {
+		"label": "Marketing",
+		"seed": "seed/seed.json"
+	},
+	"scripts": {
+		"dev": "astro dev",
+		"build": "pnpm run bench:pages && astro build",
+		"preview": "astro preview",
+		"deploy": "astro build && wrangler deploy",
+		"typecheck": "astro check",
+		"test": "vitest run",
+		"sync:assets": "tsx scripts/sync.ts assets",
+		"sync:content": "tsx scripts/sync.ts content",
+		"sync:vendors": "tsx scripts/sync.ts vendors",
+		"sync:demos": "tsx scripts/sync.ts demos",
+		"bench:pages": "bench fetch --check --repo . && tsx scripts/bench-pages.ts"
+	},
+	"dependencies": {
+		"@astrojs/cloudflare": "^14.4.3",
+		"@astrojs/react": "^7.1.2",
+		"@emdash-cms/cloudflare": "^1.4.0",
+		"@jandira-tech/bench-viewer": "github:jandira-tech/neurotic_docx_bench#99499ba2d4a5e0a4ff499fcdd86cf971743aebc3&path:packages/bench-viewer",
+		"astro": "^7.4.4",
+		"emdash": "^1.4.0",
+		"github-slugger": "^2.0.0",
+		"jubarte-wasm": "0.17.0",
+		"lenis": "^1.3.27",
+		"marked": "^18.1.2",
+		"react": "19.3.1",
+		"react-dom": "19.3.1"
+	},
+	"devDependencies": {
+		"@astrojs/check": "^0.9.12",
+		"@cloudflare/workers-types": "^5.20261030.1",
+		"fflate": "0.8.3",
+		"tsx": "^4.23.15",
+		"typescript": "^6.0.3",
+		"vitest": "^5.0.5",
+		"wrangler": "^4.156.0"
+	}
 }
