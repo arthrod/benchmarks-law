@@ -10,7 +10,7 @@ import "../styles/bench.css";
 interface Props {
 	title?: string;
 	description?: string;
-	current?: "home" | "editors";
+	current?: "home" | "editors" | "about";
 	/** Shown after the wordmark: "/ {crumb}". Defaults to the title. */
 	crumb?: string;
 	progress?: boolean;
@@ -39,7 +39,7 @@ const pageCtx = createPublicPageContext({
 const { rows } = await listReports();
 const navbar = navbarHtml({
 	crumb: crumb ?? title ?? "benchmarks.law",
-	current: current === "editors" ? "editors" : "site",
+	current: current === "editors" ? "editors" : current === "about" ? "about" : "site",
 	path: Astro.url.pathname,
 	rows,
 });

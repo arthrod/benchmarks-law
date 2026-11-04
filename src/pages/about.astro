@@ -1,0 +1,88 @@
+---
+// About benchmarks.law: who keeps the bench, how to contribute, where to reach him.
+// Contact details are the ones arthur.law/contact publishes.
+import Site from "../layouts/Site.astro";
+---
+
+<Site
+	title="About"
+	current="about"
+	description="Who keeps benchmarks.law, how to add a tool, send a document or challenge a score, and where to reach Arthur Souza Rodrigues."
+>
+	<div class="wrap">
+		<div class="page-head">
+			<p class="eyebrow">About<span class="sep">·</span>benchmarks.law</p>
+			<h1>Open benchmarks for legal documents. Come build them.</h1>
+			<p>
+				benchmarks.law measures how faithfully DOCX tools reproduce Microsoft Word, and how legal AI tools hold up
+				against in-house lawyers. Every input, output, score and log is published, so any number here can be checked,
+				reproduced or challenged.
+			</p>
+		</div>
+	</div>
+
+	<section id="who">
+		<div class="wrap">
+			<h2 class="sec-label"><span class="sq"></span> / Who keeps it</h2>
+			<div class="about-body">
+				<p>
+					I'm Arthur Souza Rodrigues, a lawyer working between New York and São Paulo on contracts, legal operations and
+					legal AI. I started the bench because lawyers live in Word, and the tools that promise to handle Word
+					documents are rarely measured against Word itself.
+				</p>
+				<p>
+					Full disclosure: I also write jubarte, one of the engines compared here. That is why the scorer is lifted
+					verbatim from an independent benchmark, every vendor runs on the same fixed document sets, and the leaderboard
+					marks no tool as ours.
+				</p>
+			</div>
+		</div>
+	</section>
+
+	<section id="contribute">
+		<div class="wrap">
+			<h2 class="sec-label"><span class="sq"></span> / Contribute</h2>
+			<div class="hl-grid">
+				<div class="work-item">
+					<span class="tag">Tools</span>
+					<h3>Add a tool</h3>
+					<p>If it converts DOCX to PDF or compares two documents without a GUI, it can be benchmarked. Open an issue with how to run it.</p>
+					<a class="go" href="https://github.com/jandira-tech/neurotic_docx_bench/issues" rel="noopener">Open an issue →</a>
+				</div>
+				<div class="work-item">
+					<span class="tag">Documents</span>
+					<h3>Send a document that breaks things</h3>
+					<p>The fixtures are real documents. One that trips Word, an engine or the scorer is worth more than a hundred that don't.</p>
+					<a class="go" href="https://github.com/jandira-tech/neurotic_docx_bench/issues" rel="noopener">Report it →</a>
+				</div>
+				<div class="work-item">
+					<span class="tag">Scores</span>
+					<h3>Challenge a score</h3>
+					<p>Think a number is wrong, or the method is unfair to a tool? Link the case and say why. Corrections land in the changelog.</p>
+					<a class="go" href="https://github.com/jandira-tech/neurotic_docx_bench" rel="noopener">Read the method →</a>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section class="contact" id="reach">
+		<div class="wrap">
+			<h2 class="sec-label"><span class="sq"></span> / Get in touch</h2>
+			<h2>Using these numbers, building a tool, or just curious? Say hello.</h2>
+			<p>
+				Add me on LinkedIn, follow the work on GitHub and Hugging Face, or write directly. For consulting and legal
+				work, the contact page has the details and a booking link.
+			</p>
+			<div class="cta-row">
+				<a class="btn btn-primary" href="https://www.linkedin.com/in/arthrod" rel="noopener">Connect on LinkedIn <span class="arr">→</span></a>
+				<a class="btn btn-ghost" href="https://arthur.law/contact" rel="noopener">Contact page</a>
+			</div>
+			<dl class="facts">
+				<div class="fact"><dt>Email</dt><dd><a href="mailto:contact@arthur.law">contact@arthur.law</a></dd></div>
+				<div class="fact"><dt>Based</dt><dd>New York · São Paulo</dd></div>
+				<div class="fact"><dt>GitHub</dt><dd><a href="https://github.com/arthrod" rel="noopener">github.com/arthrod</a></dd></div>
+				<div class="fact"><dt>Hugging Face</dt><dd><a href="https://huggingface.co/arthrod" rel="noopener">huggingface.co/arthrod</a></dd></div>
+			</dl>
+		</div>
+	</section>
+</Site>
