@@ -165,6 +165,19 @@ body.doc > #main{max-width:1200px;margin-left:auto;margin-right:auto}
 body.doc footer.site{margin-top:48px;padding-left:24px;padding-right:24px}
 `;
 
+/** The arthur.law skin for the case browsers and the speed page (ndb#153): bench-viewer's
+ * :root layer, appended after the theme so its palette and type win, with the site's own
+ * @font-face rules (the theme declares Manrope and JetBrains Mono under _static/, which this
+ * site does not serve; Libre Franklin and Roboto Mono live in public/fonts/). */
+export function arthurLawCasesSkin(): string {
+	return (
+		"\n/* ---- benchmarks-law: arthur-law-cases.css (bench-viewer) and the site's fonts ---- */\n" +
+		`@font-face{font-family:'Libre Franklin';font-style:normal;font-weight:100 900;font-display:swap;src:url("/fonts/libre-franklin.woff2") format('woff2');}\n` +
+		`@font-face{font-family:'Roboto Mono';font-style:normal;font-weight:100 700;font-display:swap;src:url("/fonts/roboto-mono.woff2") format('woff2');}\n` +
+		readFileSync(join(packageDir(), "themes", "arthur-law-cases.css"), "utf8")
+	);
+}
+
 /** The compiled modules the viewer pages import, from the bench-viewer package's dist. */
 const MODULES = ["cases.js", "esc.js", "speed.js"];
 
@@ -225,6 +238,7 @@ export function writeBenchPages(site: string, dir = join("public", "neurotic-doc
 			"cases.css",
 			() => {
 				copyFileSync(join(packageDir(), "themes", "cases.css"), join(out, "cases.css"));
+				appendFileSync(join(out, "cases.css"), arthurLawCasesSkin());
 				appendFileSync(join(out, "cases.css"), SITE_DOC_SCOPE);
 			},
 		],

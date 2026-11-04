@@ -276,6 +276,16 @@ describe.skipIf(!existsSync(join(SITE, ".bench/ndb/results/release/cases/index.j
 			expect(css.indexOf("body.doc")).toBeGreaterThan(-1); // the theme's own rule is still there
 			expect(css.trimEnd().endsWith(SITE_DOC_SCOPE.trimEnd())).toBe(true);
 		});
+		it("wears the arthur.law skin over the theme, with the site's own fonts (ndb#153)", () => {
+			const css = readFileSync(join(out, "cases.css"), "utf8");
+			const theme = css.indexOf("--blue: #1e5580");
+			const skin = css.indexOf("arthur-law-cases.css");
+			expect(theme).toBeGreaterThan(-1);
+			expect(skin).toBeGreaterThan(theme); // later in the file, so its :root wins
+			expect(css.indexOf(SITE_DOC_SCOPE.trim())).toBeGreaterThan(skin);
+			expect(css).toContain('src:url("/fonts/libre-franklin.woff2")');
+			expect(css).toContain('src:url("/fonts/roboto-mono.woff2")');
+		});
 	},
 );
 
