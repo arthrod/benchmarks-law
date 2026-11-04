@@ -13,7 +13,7 @@ import { spawnSync } from "node:child_process";
 import { appendFileSync, copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, rmdirSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { dirname, join, relative, resolve } from "node:path";
-import { buildLeaderboardPage, renderCasesPage, renderSpeedPage, type Scores } from "@jandira-tech/bench-viewer";
+import { buildLeaderboardPage, parseScores, renderCasesPage, renderSpeedPage, type Scores } from "@jandira-tech/bench-viewer";
 import { benchPage, injectNavbar, navbarHtml } from "./navbar";
 import { reportRows } from "./reports";
 import { defectClassesIn, scorecardHtml, type Facts, type Release } from "./scorecard";
@@ -28,7 +28,7 @@ export function pinnedScores(site: string): Scores {
 	const path = join(site, ".bench", NDB, "results/scores.json");
 	if (!existsSync(path))
 		throw new Error(`${path} is missing — run \`bench fetch --repo ${site}\` before building`);
-	return JSON.parse(readFileSync(path, "utf8")) as Scores;
+	return parseScores(JSON.parse(readFileSync(path, "utf8")));
 }
 
 /** The out/facts.json of the pinned editors_trial release: every figure the scorecard prints. */
@@ -235,7 +235,48 @@ export function trackedUnder(site: string, dir: string): Set<string> {
  * skipping paths git still tracks there, and removing generated files an older pin left behind.
  * Returns the paths it wrote, relative to `dir`.
  */
+/** The pages that load the bundle's images; each needs the bundle's image origin in img-src. */
+export const IMAGE_PAGES = [
+	"/neurotic-docx-bench/cases/*",
+	"/neurotic-docx-bench/redlines/*",
+	"/neurotic-docx-bench/speed/*",
+] as const;
+
+/** The IMAGE_PAGES whose Content-Security-Policy in `headers` (public/_headers) does not list the
+ * origin of `assetsBase` as an img-src source, a page with no CSP block included. */
+export function cspGaps(headers: string, assetsBase: string): string[] {
+	const origin = new URL(assetsBase).origin;
+	const lines = headers.split("\n");
+	return IMAGE_PAGES.filter((path) => {
+		const at = lines.findIndex((l) => l.trim() === path && !/^\s/.test(l));
+		if (at < 0) return true;
+		const block: string[] = [];
+		for (const l of lines.slice(at + 1)) {
+			if (!/^\s/.test(l)) break;
+			block.push(l);
+		}
+		const csp = block.find((l) => l.trim().startsWith("Content-Security-Policy:")) ?? "";
+		const img = csp.split(";").find((d) => d.trim().startsWith("img-src")) ?? "";
+		return !img.trim().split(/\s+/).slice(1).includes(origin);
+	});
+}
+
+/** Refuse to build when the bundle's images would be blocked: `bench deploy` runs no tests, so a
+ * release that moves its assets_base must fail here, not on the live site. */
+function assertCspAllowsBundle(site: string): void {
+	const index = join(site, ".bench", NDB, "results/release/cases/index.json");
+	if (!existsSync(index)) return;
+	const { assets_base } = JSON.parse(readFileSync(index, "utf8")) as { assets_base?: string };
+	if (!assets_base) return;
+	const gaps = cspGaps(readFileSync(join(site, "public/_headers"), "utf8"), assets_base);
+	if (gaps.length)
+		throw new Error(
+			`public/_headers: img-src of ${gaps.join(", ")} does not allow ${new URL(assets_base).origin}, the bundle's assets_base — add it before building`,
+		);
+}
+
 export function writeBenchPages(site: string, dir = join("public", "neurotic-docx-bench")): string[] {
+	assertCspAllowsBundle(site);
 	const out = join(site, dir);
 	const tracked = trackedUnder(site, dir);
 	const rows = benchRows(site);

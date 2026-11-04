@@ -329,3 +329,68 @@ describe("old case links on /neurotic-docx-bench/", async () => {
 		expect(head).toContain("location.replace");
 	});
 });
+
+// ---- review of #73 ---------------------------------------------------------------------------
+
+describe("pinnedScores validates the pinned scores.json (CodeRabbit, #73)", () => {
+	it("refuses a file that is not a scores document, naming the bad field", async () => {
+		const { mkdirSync, writeFileSync } = await import("node:fs");
+		const { pinnedScores } = await import("../src/lib/bench-pages");
+		const site = mkdtempSync(join(tmpdir(), "blaw-scores-"));
+		try {
+			mkdirSync(join(site, ".bench/ndb/results"), { recursive: true });
+			writeFileSync(join(site, ".bench/ndb/results/scores.json"), JSON.stringify({ tables: "nope" }));
+			expect(() => pinnedScores(site)).toThrow(/^scores: /);
+		} finally {
+			rmSync(site, { recursive: true, force: true });
+		}
+	});
+});
+
+describe("cspGaps: the image origin the bundle names is allowed by every browser's CSP (CodeAnt, #73)", () => {
+	const block = (path: string, img: string) =>
+		`${path}\n  Content-Security-Policy: default-src 'self'; img-src ${img}; object-src 'none'\n  X-Content-Type-Options: nosniff\n`;
+	const all = (img: string) =>
+		["/neurotic-docx-bench/cases/*", "/neurotic-docx-bench/redlines/*", "/neurotic-docx-bench/speed/*"]
+			.map((p) => block(p, img))
+			.join("");
+	it("finds none when img-src lists the bundle's origin", async () => {
+		const { cspGaps } = await import("../src/lib/bench-pages");
+		expect(cspGaps(all("'self' https://pub-a.r2.dev"), "https://pub-a.r2.dev/x/")).toEqual([]);
+	});
+	it("names every page whose img-src lacks it, as after a release moves its assets", async () => {
+		const { cspGaps } = await import("../src/lib/bench-pages");
+		expect(cspGaps(all("'self' https://pub-a.r2.dev"), "https://pub-b.r2.dev/")).toEqual([
+			"/neurotic-docx-bench/cases/*",
+			"/neurotic-docx-bench/redlines/*",
+			"/neurotic-docx-bench/speed/*",
+		]);
+	});
+	it("does not take a longer host for the origin (no prefix match)", async () => {
+		const { cspGaps } = await import("../src/lib/bench-pages");
+		expect(cspGaps(all("'self' https://pub-a.r2.dev.evil.test"), "https://pub-a.r2.dev/")).toHaveLength(3);
+	});
+	it("names a page with no CSP block at all", async () => {
+		const { cspGaps } = await import("../src/lib/bench-pages");
+		expect(cspGaps(block("/neurotic-docx-bench/cases/*", "'self' https://pub-a.r2.dev"), "https://pub-a.r2.dev/")).toEqual([
+			"/neurotic-docx-bench/redlines/*",
+			"/neurotic-docx-bench/speed/*",
+		]);
+	});
+	it("holds for the committed _headers and the pinned bundle", async () => {
+		const index = join(SITE, ".bench/ndb/results/release/cases/index.json");
+		if (!existsSync(index)) return;
+		const { cspGaps } = await import("../src/lib/bench-pages");
+		const base = (JSON.parse(readFileSync(index, "utf8")) as { assets_base: string }).assets_base;
+		expect(cspGaps(readFileSync(join(SITE, "public/_headers"), "utf8"), base)).toEqual([]);
+	});
+});
+
+describe("the homepage's DOCX → PDF links open the conversion case browser (Gitar, #73)", () => {
+	const home = readFileSync(join(SITE, "src/pages/index.astro"), "utf8");
+	it("links the hero button and the bench card's PDF link to /neurotic-docx-bench/cases/", () => {
+		expect(home).toContain('<a class="btn btn-ghost" href="/neurotic-docx-bench/cases/">Open the DOCX → PDF bench</a>');
+		expect(home).toContain('<a class="go" href="/neurotic-docx-bench/cases/">DOCX → PDF →</a>');
+		expect(home).toContain('<a class="go" href="/neurotic-docx-bench/">About the bench →</a>');
+	});
+});
