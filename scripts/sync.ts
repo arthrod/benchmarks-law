@@ -1,7 +1,8 @@
 /**
- * Publishes the editors_trial reports and the neurotic_docx_bench viewer into this site.
+ * Publishes the editors_trial reports into this site (the bench pages under /neurotic-docx-bench/
+ * are generated from the pinned releases by pnpm bench:pages, not by this script).
  *
- *   pnpm sync:assets    # figures, the .docx reference (styles for the live download), neurotic link fixes → public/
+ *   pnpm sync:assets    # figures and the .docx reference (styles for the live download) → public/
  *   pnpm sync:content   # upsert every report into the EmDash `reports` collection
  *   pnpm sync:vendors   # upsert the field's vendors into the EmDash `vendors` collection
  *   pnpm sync:demos     # live editor demos: bundles → public/demo-apps/, sanitized copies, src/data/demos.json
@@ -14,14 +15,10 @@
 import { cpSync, existsSync, rmSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { dirname, join, resolve } from "node:path";
-import { benchPage } from "../src/lib/navbar";
-import { patchNeuroticHtml } from "../src/lib/neurotic";
 import vendorsData from "../src/data/vendors.json" with { type: "json" };
 import { type DemoEntry, type DemoManifest, buildDemoEntry } from "../src/lib/demos";
-import { REPORT_FILES, buildEntry, extractTitle, splitSections } from "../src/lib/reports";
-import { isLocalEmDash, reportsRoot } from "../src/lib/root";
-import { trialRef } from "../src/lib/trialRef";
-import { rebuildScoreTable } from "../src/lib/scorecard";
+import { REPORT_FILES, buildEntry, splitSections } from "../src/lib/reports";
+import { checkoutRef, isLocalEmDash, fullCheckout, reportsRoot } from "../src/lib/root";
 import { applyFacts } from "../src/lib/vendorFacts";
 
 const SITE = resolve(import.meta.dirname, "..");
@@ -32,8 +29,10 @@ const ROOT = reportsRoot(process.env, SITE);
 const URL_ = process.env.EMDASH_URL ?? "https://benchmarks.law";
 /** Pin every source link to the commit being published (src/data/release.json, read by the pages too). */
 function writeTrialRef(): string {
-	const git = (...a: string[]) => spawnSync("git", ["-C", ROOT, ...a], { encoding: "utf8" }).stdout ?? "";
-	const ref = trialRef(git("describe", "--tags", "--exact-match", "HEAD"), git("rev-parse", "HEAD"));
+	// checkoutRef refuses a ROOT that is not its own repository (the fetched bundle is not a git
+	// checkout, and git -C would report this site's HEAD), so the report pages never link .../blob//
+	// or to a commit editors_trial does not have.
+	const ref = checkoutRef(ROOT);
 	writeFileSync(join(SITE, "src/data/release.json"), `${JSON.stringify({ trialRef: ref }, null, "\t")}\n`);
 	return ref;
 }
@@ -61,6 +60,9 @@ function lastCommitDate(rel: string): string | null {
 }
 
 function assets() {
+	// Figures, the reference document and the scorecard inputs come from the checkout, not the
+	// bundle; refuse before the first rmSync below would empty the published folders.
+	fullCheckout(ROOT);
 	const figs = join(SITE, "public/editors-trial/figures");
 	rmSync(figs, { recursive: true, force: true });
 	rmSync(join(SITE, "public/editors-trial/files"), { recursive: true, force: true });
@@ -75,22 +77,7 @@ function assets() {
 	// No .docx is published: each report page builds it live with jubarte-wasm from its Markdown,
 	// taking styles and the landscape page from the trial's reference document (benchmarks-law#56).
 	cpSync(join(ROOT, "build/reference.docx"), join(SITE, "public/editors-trial/reference.docx"));
-	const neurotic = join(SITE, "public/neurotic-docx-bench");
-	// The navbar's trial dropdown lists the same reports, with the same titles, as the CMS.
-	const rows = REPORT_FILES.filter((r) => existsSync(join(ROOT, r.path))).map((r) => ({
-		slug: r.slug,
-		data: { position: r.position, code: r.code, title: extractTitle(readFileSync(join(ROOT, r.path), "utf8")) || r.slug },
-	}));
-	const mainMd = readFileSync(join(ROOT, "Open-Source DOCX Editors Re-verified Against Code and Measured Round-Trip (2026).md"), "utf8");
-	const wv = join(ROOT, "out/word_verdicts.json");
-	const verdicts: Record<string, string> = existsSync(wv) ? JSON.parse(readFileSync(wv, "utf8")).verdicts : {};
-	for (const f of walk(neurotic).filter((p) => p.endsWith(".html"))) {
-		const rel = f.slice(neurotic.length + 1);
-		let html = patchNeuroticHtml(readFileSync(f, "utf8"));
-		if (rel === "editors/index.html") html = rebuildScoreTable(html, mainMd, verdicts);
-		writeFileSync(f, benchPage(html, rel, rows));
-	}
-	console.log(`figures ${n} · reference.docx · neurotic pages patched · navbar on ${rows.length} reports`);
+	console.log(`figures ${n} · reference.docx`);
 }
 
 
@@ -232,6 +219,8 @@ async function content() {
  * lists what was published. An editor without a built bundle is left out, never half-published.
  */
 function demos() {
+	// make_demo_docs.py and the demo manifests live in the checkout, not the bundle.
+	fullCheckout(ROOT);
 	const apps = resolve(process.env.DEMO_APPS ?? "/tmp/demos");
 	const made = spawnSync("python3", ["-I", join(ROOT, "build/make_demo_docs.py"), join(ROOT, "out/demo")], { stdio: "inherit" });
 	if (made.status !== 0) throw new Error("build/make_demo_docs.py failed");

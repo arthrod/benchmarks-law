@@ -8,3 +8,22 @@
   X-Content-Type-Options: nosniff
   Referrer-Policy: same-origin
   Cache-Control: public, max-age=0, must-revalidate, no-transform
+# The bench viewer pages built from the pinned ndb release (pnpm bench:pages) are static
+# assets with one inline module script each: the CSP pins those scripts by their sha256
+# (recomputed and asserted by tests/bench-pages.test.ts; a bench-viewer bump moves them),
+# allows scripts and styles only from this site (the shared navbar's /nav.js, /nav.css),
+# and lets page images come from this site and the bench's R2 serving cache listed by the
+# release's cases index. The data the pages fetch (release/cases/*.json, release/speed.json)
+# is same-origin by construction.
+/neurotic-docx-bench/cases/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-7/uX8cbz+kM679gJnytv5k7HJ5njah622cd22KWeVMo='; style-src 'self'; img-src 'self' https://pub-92c80eda1059428394970066c8500eda.r2.dev; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'self'
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: same-origin
+/neurotic-docx-bench/redlines/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-xPNkdXQeznecTW8m7FvGggyhJTFUAG/y07UgIydRn2Y='; style-src 'self'; img-src 'self' https://pub-92c80eda1059428394970066c8500eda.r2.dev; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'self'
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: same-origin
+/neurotic-docx-bench/speed/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-c87bTvC1YNiAm8u/bpNliYjG8EUZ9rTCfaCLbFFq2JA='; style-src 'self'; img-src 'self' https://pub-92c80eda1059428394970066c8500eda.r2.dev; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'self'
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: same-origin

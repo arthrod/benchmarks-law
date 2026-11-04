@@ -1,0 +1,396 @@
+import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join, relative, resolve } from "node:path";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { parseScores, type Scores } from "@jandira-tech/bench-viewer";
+import { type Row, leaderboardHtml, pinnedRelease, pinnedReportB, SITE_DOC_SCOPE } from "../src/lib/bench-pages";
+import { defectClassesIn } from "../src/lib/scorecard";
+
+const SITE = resolve(import.meta.dirname, "..");
+/** The pinned ndb release (bench.lock → `bench fetch`); absent before the first fetch. */
+const PINNED = join(SITE, ".bench/ndb/results/scores.json");
+const PINNED_ET = join(SITE, ".bench/editors_trial/out/facts.json");
+const scores: Scores | null = existsSync(PINNED)
+	? parseScores(JSON.parse(readFileSync(PINNED, "utf8")))
+	: null;
+
+/** A one-table shape, for the rules that do not need the real release. */
+const fixture: Scores = {
+	version: "0.0.0-test",
+	generated: "2026-01-01",
+	repo: "https://github.com/jandira-tech/neurotic_docx_bench",
+	viewer: "https://jandira-tech.github.io/neurotic_docx_bench/",
+	provenance: { docsets: ["deadbeef"] },
+	headlines: [{ label: "ours vs theirs", value: "99.99", vs: "theirs 1.00", sub: "the headline text" }],
+	tables: [
+		{ id: "full-table", title: "Full corpus", meta: "n=10", desc: "d", rows: [] },
+		{ id: "conversion-sample", title: "Sample", meta: "n=1", desc: "d", rows: [] },
+	],
+	states: [],
+	home_groups: [],
+	method: [],
+};
+
+// Vitest runs a skipped suite's body during collection: every pinned read below sits in a
+// beforeAll or a test, so a fresh clone (no .bench/) collects and skips instead of throwing.
+describe.skipIf(!existsSync(PINNED_ET))("the editors scorecard page", () => {
+	let page = "";
+	beforeAll(() => {
+		const ctx = { defectClasses: defectClassesIn(pinnedReportB(SITE)), release: pinnedRelease(SITE) };
+		page = editorsPage(JSON.parse(readFileSync(PINNED_ET, "utf8")), [], ctx);
+	});
+
+	it("wears the site navbar in place of its own header and marks its section", () => {
+		expect(page).toContain('<header id="brand" class="site-nav">');
+		expect(page).toContain('href="/neurotic-docx-bench/editors/" aria-current="page"');
+		expect(page).toContain('<span class="crumb">/ Editors trial</span>');
+	});
+	it("takes its figures from the pinned et facts", () => {
+		expect(page).toContain('<table class="score">');
+		expect(page).toContain("SuperDoc V2");
+		expect(page).toMatch(/LibreOffice \(baseline\)/);
+	});
+	it("keeps everything the old page showed: the correction notice, the edition line, six tiles", () => {
+		const facts = JSON.parse(readFileSync(PINNED_ET, "utf8")) as Record<string, number | string | boolean>;
+		expect(page).toContain(`<b>Corrected ${pinnedRelease(SITE).date}.</b> Three checks failed rewrites`);
+		expect(page).toContain(
+			`eigenpal moves from 98.5% to ${Number(facts["rt.eigenpal.weighted"]).toFixed(1)}%.`,
+		);
+		expect(page).toContain("Edition 2 · 2026-10-30, corrected");
+		expect(page).toContain(`<span>Word ${facts["word.version"]} as validator</span>`);
+		expect(page).toMatch(/<b>13<\/b><span>tools measured/);
+		expect(page).toMatch(/<b>99<\/b><span>checks/);
+		expect(page).toMatch(/<b>35<\/b><span>package parts/);
+		expect(page).toMatch(/<b>29<\/b><span>critical features/);
+		expect(page).toMatch(/<b>12<\/b><span>defect classes Word refuses/);
+		expect(page).toMatch(/<b>3<\/b><span>perfect round trips/);
+	});
+});
+
+describe.skipIf(!scores)("the leaderboard page from the pinned scores", () => {
+	let page = "";
+	beforeAll(() => {
+		page = leaderboardHtml(scores as Scores, []);
+	});
+
+	it("renders no headline text (plan 5 rev 3)", () => {
+		for (const h of (scores as Scores).headlines) {
+			expect(page).not.toContain(h.label);
+			expect(page).not.toContain(h.vs);
+			expect(page).not.toContain(h.sub);
+		}
+		expect(page).not.toContain('class="cell-pad headline"');
+		expect(page).not.toContain('class="headline-v"');
+	});
+	it("marks no row as ours and carries no affiliation mark", () => {
+		expect(page).not.toContain("†");
+		expect(page).not.toMatch(/class="[^"]*\bours\b/);
+	});
+	it("contains every table id in scores.json", () => {
+		for (const t of (scores as Scores).tables) expect(page).toContain(`id="${t.id}"`);
+	});
+	it("puts the full-corpus tables before the 600-document samples", () => {
+		const full = (scores as Scores).tables.filter((t) => !t.id.endsWith("-sample"));
+		const samples = (scores as Scores).tables.filter((t) => t.id.endsWith("-sample"));
+		expect(full.length).toBeGreaterThan(0);
+		expect(samples.length).toBeGreaterThan(0);
+		const headingAt = page.indexOf('id="lb-samples"');
+		expect(headingAt).toBeGreaterThan(-1);
+		for (const t of full) expect(page.indexOf(`id="${t.id}"`)).toBeLessThan(headingAt);
+		for (const t of samples) expect(page.indexOf(`id="${t.id}"`)).toBeGreaterThan(headingAt);
+	});
+	it("keeps the corpus states, the provenance and the version badge", () => {
+		expect(page).toContain("By corpus state");
+		expect(page).toContain((scores as Scores).provenance.docsets[0] ?? "");
+		expect(page).toContain(`bench ${(scores as Scores).version}`);
+	});
+});
+
+describe("the leaderboard page wears the site", () => {
+	const page = leaderboardHtml(fixture, []);
+	it("carries the shared navbar above the page's own header", () => {
+		expect(page).toContain('<header id="brand" class="site-nav">');
+		expect(page.indexOf('<header id="brand"')).toBeLessThan(page.indexOf('<main class="wrap">'));
+	});
+	it("links the navbar's stylesheet and script once, so the navbar is styled", () => {
+		expect(page.match(/href="\/nav\.css"/g)).toHaveLength(1);
+		expect(page.match(/src="\/nav\.js"/g)).toHaveLength(1);
+		expect(page.indexOf('href="/nav.css"')).toBeLessThan(page.indexOf("</head>"));
+	});
+	it("lists the trial dropdown's rows", () => {
+		const rows: Row[] = [{ slug: "report-a", data: { position: 10, code: "Report A", title: "Serialization" } }];
+		expect(leaderboardHtml(fixture, rows)).toContain("Serialization");
+	});
+	it("still keeps the bench-viewer page intact around the injection", () => {
+		expect(page).toContain('<link rel="stylesheet" href="./tokens.css">');
+		expect(page).toContain("<!doctype html>");
+		expect(page.trim().endsWith("</html>")).toBe(true);
+	});
+});
+
+// ---- the case browsers and the speed page, from the same bundle (plan 5 rev 2) ------------
+
+import { createHash } from "node:crypto";
+import { casesPage, editorsPage, redlinesPage, speedPage } from "../src/lib/bench-pages";
+
+describe("the viewer pages from the pinned bundle", () => {
+	const rows: Row[] = [];
+	const cases = casesPage(rows);
+	const redlines = redlinesPage(rows);
+	const speed = speedPage(rows);
+
+	it.each([
+		["cases", cases],
+		["redlines", redlines],
+		["speed", speed],
+	])("%s wears the site navbar in place of the viewer's own header", (_n, page) => {
+		expect(page).toContain('<header id="brand" class="site-nav">');
+		expect(page).not.toMatch(/<header id="brand">(?!<a class="wm" href="\/neurotic-docx-bench\/)/);
+	});
+	it.each([
+		["cases", cases, "/neurotic-docx-bench/cases/"],
+		["redlines", redlines, "/neurotic-docx-bench/redlines/"],
+		["speed", speed, "/neurotic-docx-bench/speed/"],
+	])("%s marks its own section", (_n, page, href) => {
+		expect(page).toContain(`href="${href}" aria-current="page"`);
+	});
+	it("the case browsers fetch the bundle's index and shards, not a copied data.json", () => {
+		expect(cases).toContain('"../release/cases/index.json"');
+		expect(redlines).toContain('"../release/cases/index.json"');
+		expect(cases).toContain('from "../js/cases.js"');
+		expect(cases).toContain('href="../cases.css"');
+	});
+	it("the speed page fetches the bundle's speed.json", () => {
+		expect(speed).toContain('"../release/speed.json"');
+		expect(speed).toContain('from "../js/speed.js"');
+	});
+	it("the navbar sits above the page and outside its column: the stylesheet un-constrains body.doc", () => {
+		// The theme centres body.doc (navbar included) in a 1200px column; the site scoping
+		// appended to the generated cases.css frees the navbar and re-scopes the column onto
+		// the page's own landmarks, the way the copied bench pages did.
+		expect(speed.indexOf('<header id="brand"')).toBeLessThan(speed.indexOf('<main id="main">'));
+		expect(speed).toContain('href="../cases.css"');
+		expect(SITE_DOC_SCOPE).toMatch(/body\.doc\{max-width:none;margin:0;padding:0\}/);
+		expect(SITE_DOC_SCOPE).toMatch(/body\.doc > #main\{[^}]*max-width:1200px/);
+		expect(SITE_DOC_SCOPE).toMatch(
+			/body\.doc > :not\(#brand\):not\(#main\):not\(footer\.site\)\{[^}]*max-width:1200px/,
+		);
+		expect(SITE_DOC_SCOPE).not.toMatch(/body\.doc[^{]*#brand[^{]*max-width/);
+	});
+	it("cross-links stay inside this site: cases → redlines, speed, the leaderboard", () => {
+		expect(cases).toContain('../redlines/index.html');
+		expect(cases).toContain('../speed/index.html');
+		expect(cases).toContain('href="../index.html"');
+	});
+	it("every generated page names the site icon (no /favicon.ico 404)", () => {
+		for (const page of [cases, redlines, speed]) {
+			expect(page.match(/<link rel="icon"[^>]*href="\/b-law\.svg"/g)?.length).toBe(1);
+		}
+	});
+});
+
+// ---- the CSP: inline scripts pinned by sha256, images only from the site and the bench's R2 ----
+
+/** One _headers block: the header lines that follow the `path` pattern line. */
+function headers(path: string): string[] {
+	const lines = readFileSync(new URL("../public/_headers", import.meta.url), "utf8").split("\n");
+	const at = lines.findIndex((l) => l.trim() === path && !l.startsWith(" ") && !l.startsWith("#"));
+	if (at < 0) throw new Error(`public/_headers has no block for ${path}`);
+	const block: string[] = [];
+	for (const line of lines.slice(at + 1)) {
+		if (line.trim() && !line.startsWith("  ")) break;
+		if (line.trim()) block.push(line.trim());
+	}
+	return block;
+}
+
+/** The base64 sha256 CSP hash of a page's inline <script> blocks. */
+function inlineScriptHashes(page: string): string[] {
+	return [...page.matchAll(/<script type="module">([\s\S]*?)<\/script>/g)].map((m) =>
+		createHash("sha256").update(m[1], "utf8").digest("base64"),
+	);
+}
+
+describe.skipIf(!scores)("the CSP of the inline-script pages", () => {
+	const rows: Row[] = [];
+	const pages: [string, () => string][] = [
+		["/neurotic-docx-bench/cases/*", () => casesPage(rows)],
+		["/neurotic-docx-bench/redlines/*", () => redlinesPage(rows)],
+		["/neurotic-docx-bench/speed/*", () => speedPage(rows)],
+	];
+	it.each(pages)("%s allows its inline scripts by sha256 only", (path, build) => {
+		const page = build();
+		const csp = headers(path).find((l) => l.includes("Content-Security-Policy")) ?? "";
+		for (const hash of inlineScriptHashes(page)) expect(csp).toContain(`'sha256-${hash}'`);
+		expect(csp).not.toContain("'unsafe-inline'");
+		expect(csp).not.toContain("'unsafe-eval'");
+	});
+	it("images come from this site and the bench's R2 origin, as the bundle lists it", () => {
+		const index = JSON.parse(
+			readFileSync(join(SITE, ".bench/ndb/results/release/cases/index.json"), "utf8"),
+		) as { assets_base: string };
+		const origin = new URL(index.assets_base).origin;
+		for (const [path] of pages) {
+			const csp = headers(path).find((l) => l.includes("Content-Security-Policy")) ?? "";
+			expect(csp).toContain("img-src 'self'");
+			expect(csp).toContain(origin);
+		}
+	});
+});
+
+// ---- the old links ------------------------------------------------------------------------
+
+describe("the old URLs", () => {
+	it("redirect the deleted bench home to the leaderboard", () => {
+		const text = readFileSync(new URL("../public/_redirects", import.meta.url), "utf8");
+		expect(text).toMatch(/^\/neurotic-docx-bench\/home\s+\/neurotic-docx-bench\/\s+301$/m);
+		expect(text).toMatch(/^\/neurotic-docx-bench\/home\/\*\s+\/neurotic-docx-bench\/\s+301$/m);
+	});
+});
+
+// ---- the whole tree, written ----------------------------------------------------------------
+
+describe.skipIf(!existsSync(join(SITE, ".bench/ndb/results/release/cases/index.json")))(
+	"writeBenchPages writes the whole viewer from the bundle",
+	async () => {
+		const { writeBenchPages } = await import("../src/lib/bench-pages");
+		const out = mkdtempSync(join(tmpdir(), "blaw-pages-"));
+		afterAll(() => rmSync(out, { recursive: true, force: true }));
+		let index: { groups: { path: string }[] } = { groups: [] };
+		beforeAll(() => {
+			index = JSON.parse(readFileSync(join(SITE, ".bench/ndb/results/release/cases/index.json"), "utf8"));
+		});
+
+		it("writes the leaderboard, the browsers, the speed page and the files they fetch", () => {
+			writeBenchPages(SITE, relative(SITE, out));
+			for (const rel of [
+				"index.html",
+				"editors/index.html",
+				"tokens.css",
+				"arthur-law.css",
+				"cases.css",
+				"cases/index.html",
+				"redlines/index.html",
+				"speed/index.html",
+				"release/speed.json",
+				...index.groups.map((g) => `release/${g.path}`),
+			]) {
+				expect(existsSync(join(out, rel)), rel).toBe(true);
+			}
+			for (const rel of ["js/cases.js", "js/esc.js", "js/speed.js"]) {
+				expect(existsSync(join(out, rel)), rel).toBe(true);
+			}
+		});
+		it("appends the site scoping to the generated cases.css, after the theme", () => {
+			const css = readFileSync(join(out, "cases.css"), "utf8");
+			expect(css.indexOf("body.doc")).toBeGreaterThan(-1); // the theme's own rule is still there
+			expect(css.trimEnd().endsWith(SITE_DOC_SCOPE.trimEnd())).toBe(true);
+		});
+		it("wears the arthur.law skin over the theme, with the site's own fonts (ndb#153)", () => {
+			const css = readFileSync(join(out, "cases.css"), "utf8");
+			const theme = css.indexOf("--blue: #1e5580");
+			const skin = css.indexOf("arthur-law-cases.css");
+			expect(theme).toBeGreaterThan(-1);
+			expect(skin).toBeGreaterThan(theme); // later in the file, so its :root wins
+			expect(css.indexOf(SITE_DOC_SCOPE.trim())).toBeGreaterThan(skin);
+			expect(css).toContain('src:url("/fonts/libre-franklin.woff2")');
+			expect(css).toContain('src:url("/fonts/roboto-mono.woff2")');
+		});
+	},
+);
+
+// ---- the deploy gate (plan 5 rev 2: bench deploy blaw = bench fetch --check, then pnpm run deploy) ----
+
+describe("pnpm run deploy", () => {
+	it("verifies the fetched pins before it builds or deploys anything", () => {
+		const pkg = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8")) as {
+			scripts: Record<string, string>;
+		};
+		expect(pkg.scripts.deploy).toMatch(/^bench fetch --check --repo \. && /);
+		expect(pkg.scripts.deploy).toContain("wrangler deploy");
+	});
+});
+
+// ---- old links (plan 5 acceptance: the old URL still opens the case browser) ---------------
+
+describe("old case links on /neurotic-docx-bench/", async () => {
+	const { oldCaseLink, leaderboardHtml: page } = await import("../src/lib/bench-pages");
+	it("sends a group/case hash to the case browser, unchanged", () => {
+		expect(oldCaseLink("#corpus%2Fclean%2F959f4d9de2")).toBe("cases/#corpus%2Fclean%2F959f4d9de2");
+		expect(oldCaseLink("#cases/case17")).toBe("cases/#cases/case17");
+	});
+	it("leaves the leaderboard's own anchors and an empty hash alone", () => {
+		for (const hash of ["", "#", "#conversion-sample", "#lb-samples", "#%E0%A4%A"]) expect(oldCaseLink(hash), hash).toBeNull();
+	});
+	it.skipIf(!scores)("runs in the leaderboard's head, before anything renders", () => {
+		const html = page(scores as Scores, []);
+		const head = html.slice(0, html.indexOf("</head>"));
+		expect(head).toContain("oldCaseLink");
+		expect(head).toContain("location.replace");
+	});
+});
+
+// ---- review of #73 ---------------------------------------------------------------------------
+
+describe("pinnedScores validates the pinned scores.json (CodeRabbit, #73)", () => {
+	it("refuses a file that is not a scores document, naming the bad field", async () => {
+		const { mkdirSync, writeFileSync } = await import("node:fs");
+		const { pinnedScores } = await import("../src/lib/bench-pages");
+		const site = mkdtempSync(join(tmpdir(), "blaw-scores-"));
+		try {
+			mkdirSync(join(site, ".bench/ndb/results"), { recursive: true });
+			writeFileSync(join(site, ".bench/ndb/results/scores.json"), JSON.stringify({ tables: "nope" }));
+			expect(() => pinnedScores(site)).toThrow(/^scores: /);
+		} finally {
+			rmSync(site, { recursive: true, force: true });
+		}
+	});
+});
+
+describe("cspGaps: the image origin the bundle names is allowed by every browser's CSP (CodeAnt, #73)", () => {
+	const block = (path: string, img: string) =>
+		`${path}\n  Content-Security-Policy: default-src 'self'; img-src ${img}; object-src 'none'\n  X-Content-Type-Options: nosniff\n`;
+	const all = (img: string) =>
+		["/neurotic-docx-bench/cases/*", "/neurotic-docx-bench/redlines/*", "/neurotic-docx-bench/speed/*"]
+			.map((p) => block(p, img))
+			.join("");
+	it("finds none when img-src lists the bundle's origin", async () => {
+		const { cspGaps } = await import("../src/lib/bench-pages");
+		expect(cspGaps(all("'self' https://pub-a.r2.dev"), "https://pub-a.r2.dev/x/")).toEqual([]);
+	});
+	it("names every page whose img-src lacks it, as after a release moves its assets", async () => {
+		const { cspGaps } = await import("../src/lib/bench-pages");
+		expect(cspGaps(all("'self' https://pub-a.r2.dev"), "https://pub-b.r2.dev/")).toEqual([
+			"/neurotic-docx-bench/cases/*",
+			"/neurotic-docx-bench/redlines/*",
+			"/neurotic-docx-bench/speed/*",
+		]);
+	});
+	it("does not take a longer host for the origin (no prefix match)", async () => {
+		const { cspGaps } = await import("../src/lib/bench-pages");
+		expect(cspGaps(all("'self' https://pub-a.r2.dev.evil.test"), "https://pub-a.r2.dev/")).toHaveLength(3);
+	});
+	it("names a page with no CSP block at all", async () => {
+		const { cspGaps } = await import("../src/lib/bench-pages");
+		expect(cspGaps(block("/neurotic-docx-bench/cases/*", "'self' https://pub-a.r2.dev"), "https://pub-a.r2.dev/")).toEqual([
+			"/neurotic-docx-bench/redlines/*",
+			"/neurotic-docx-bench/speed/*",
+		]);
+	});
+	it("holds for the committed _headers and the pinned bundle", async () => {
+		const index = join(SITE, ".bench/ndb/results/release/cases/index.json");
+		if (!existsSync(index)) return;
+		const { cspGaps } = await import("../src/lib/bench-pages");
+		const base = (JSON.parse(readFileSync(index, "utf8")) as { assets_base: string }).assets_base;
+		expect(cspGaps(readFileSync(join(SITE, "public/_headers"), "utf8"), base)).toEqual([]);
+	});
+});
+
+describe("the homepage's DOCX → PDF links open the conversion case browser (Gitar, #73)", () => {
+	const home = readFileSync(join(SITE, "src/pages/index.astro"), "utf8");
+	it("links the hero button and the bench card's PDF link to /neurotic-docx-bench/cases/", () => {
+		expect(home).toContain('<a class="btn btn-ghost" href="/neurotic-docx-bench/cases/">Open the DOCX → PDF bench</a>');
+		expect(home).toContain('<a class="go" href="/neurotic-docx-bench/cases/">DOCX → PDF →</a>');
+		expect(home).toContain('<a class="go" href="/neurotic-docx-bench/">About the bench →</a>');
+	});
+});

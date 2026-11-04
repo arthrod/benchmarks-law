@@ -17,6 +17,9 @@ importers:
       '@emdash-cms/cloudflare':
         specifier: ^1.4.0
         version: 1.4.0(a2f8b2a75a35ab06c86a431c80b0f03f)
+      '@jandira-tech/bench-viewer':
+        specifier: github:jandira-tech/neurotic_docx_bench#8030d032dc4df616d1189ae0d7a85d3c129bf24c&path:packages/bench-viewer
+        version: https://codeload.github.com/jandira-tech/neurotic_docx_bench/tar.gz/8030d032dc4df616d1189ae0d7a85d3c129bf24c#path:packages/bench-viewer
       astro:
         specifier: ^7.4.4
         version: 7.4.4(@types/node@26.6.6)(esbuild@0.28.2)(tsx@4.23.15)(yaml@2.9.1)
@@ -956,6 +959,10 @@ packages:
     engines: {node: '>=20.9.0'}
     cpu: [x64]
     os: [win32]
+
+  '@jandira-tech/bench-viewer@https://codeload.github.com/jandira-tech/neurotic_docx_bench/tar.gz/8030d032dc4df616d1189ae0d7a85d3c129bf24c#path:packages/bench-viewer':
+    resolution: {gitHosted: true, integrity: sha512-Ie1WykcluIhXL1igsNqVq2gpG0jLphh14x/d3a1eg8pyWmNYSOf+t8HRy5rMIPavxIF3j9k4HZZxtoabfe8SqQ==, path: packages/bench-viewer, tarball: https://codeload.github.com/jandira-tech/neurotic_docx_bench/tar.gz/8030d032dc4df616d1189ae0d7a85d3c129bf24c}
+    version: 0.1.0
 
   '@jridgewell/resolve-uri@3.1.2':
     resolution: {integrity: sha512-bRISgCIjP20/tbWSPWMEi54QVPRZExkuD9lJL+UIxUKtwVJA8wW1Trb1jMs1RFXo1CBTNZ/5hpC9QvmKWdopKw==}
@@ -4705,6 +4712,8 @@ snapshots:
 
   '@img/sharp-win32-x64@0.35.5':
     optional: true
+
+  '@jandira-tech/bench-viewer@https://codeload.github.com/jandira-tech/neurotic_docx_bench/tar.gz/8030d032dc4df616d1189ae0d7a85d3c129bf24c#path:packages/bench-viewer': {}
 
   '@jridgewell/resolve-uri@3.1.2': {}
 
