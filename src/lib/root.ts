@@ -1,5 +1,7 @@
-import { existsSync, statSync } from "node:fs";
+import { spawnSync } from "node:child_process";
+import { existsSync, realpathSync, statSync } from "node:fs";
 import { join, resolve } from "node:path";
+import { trialRef } from "./trialRef";
 
 /**
  * The editors_trial source the site reads: REPORTS_ROOT (a full checkout, for the heavy sync
@@ -25,7 +27,8 @@ export function reportsRoot(env: { REPORTS_ROOT?: string }, site: string): strin
  * instead of wiping public/editors-trial/figures and copying nothing back.
  */
 export function fullCheckout(root: string): void {
-	if (!existsSync(join(root, "build/reference.docx")))
+	const ref = join(root, "build/reference.docx");
+	if (!existsSync(ref) || !statSync(ref).isFile())
 		throw new Error(
 			`${root} has no build/reference.docx — set REPORTS_ROOT to an editors_trial checkout for this command`,
 		);
@@ -39,4 +42,21 @@ export function isLocalEmDash(url: string): boolean {
 	} catch {
 		return false;
 	}
+}
+
+/**
+ * The ref of the editors_trial checkout at `root`: its exact tag, else its commit. `git -C` walks
+ * up to the nearest repository, so a folder that is not its own repository (the fetched bundle
+ * under this site's .bench/) would report this site's HEAD and the report pages would link to a
+ * commit editors_trial does not have. Only a root that is the top of its own work tree counts.
+ */
+export function checkoutRef(root: string): string {
+	const git = (...a: string[]) =>
+		(spawnSync("git", ["-C", root, ...a], { encoding: "utf8" }).stdout ?? "").trim();
+	const top = git("rev-parse", "--show-toplevel");
+	if (!top || realpathSync(top) !== realpathSync(root))
+		throw new Error(`${root} is not a git checkout of its own — set REPORTS_ROOT to an editors_trial checkout`);
+	const ref = trialRef(git("describe", "--tags", "--exact-match", "HEAD"), git("rev-parse", "HEAD"));
+	if (!ref) throw new Error(`${root} carries no git ref — set REPORTS_ROOT to an editors_trial checkout`);
+	return ref;
 }

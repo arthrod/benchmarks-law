@@ -18,8 +18,7 @@ import { dirname, join, resolve } from "node:path";
 import vendorsData from "../src/data/vendors.json" with { type: "json" };
 import { type DemoEntry, type DemoManifest, buildDemoEntry } from "../src/lib/demos";
 import { REPORT_FILES, buildEntry, splitSections } from "../src/lib/reports";
-import { isLocalEmDash, fullCheckout, reportsRoot } from "../src/lib/root";
-import { trialRef } from "../src/lib/trialRef";
+import { checkoutRef, isLocalEmDash, fullCheckout, reportsRoot } from "../src/lib/root";
 import { applyFacts } from "../src/lib/vendorFacts";
 
 const SITE = resolve(import.meta.dirname, "..");
@@ -30,15 +29,12 @@ const ROOT = reportsRoot(process.env, SITE);
 const URL_ = process.env.EMDASH_URL ?? "https://benchmarks.law";
 /** Pin every source link to the commit being published (src/data/release.json, read by the pages too). */
 function writeTrialRef(): string {
-	const git = (...a: string[]) => spawnSync("git", ["-C", ROOT, ...a], { encoding: "utf8" }).stdout ?? "";
-	const tag = git("describe", "--tags", "--exact-match", "HEAD");
-	const sha = git("rev-parse", "HEAD");
-	// The fetched release bundle is not a git checkout: without a ref the report pages would link at
-	// .../blob//, so a bundle-rooted run stops here and names the fix.
-	if (!tag && !sha)
-		throw new Error(`${ROOT} carries no git ref — set REPORTS_ROOT to an editors_trial checkout`);
-	writeFileSync(join(SITE, "src/data/release.json"), `${JSON.stringify({ trialRef: trialRef(tag, sha) }, null, "\t")}\n`);
-	return trialRef(tag, sha);
+	// checkoutRef refuses a ROOT that is not its own repository (the fetched bundle is not a git
+	// checkout, and git -C would report this site's HEAD), so the report pages never link .../blob//
+	// or to a commit editors_trial does not have.
+	const ref = checkoutRef(ROOT);
+	writeFileSync(join(SITE, "src/data/release.json"), `${JSON.stringify({ trialRef: ref }, null, "\t")}\n`);
+	return ref;
 }
 const BLOB = () => `https://github.com/arthrod/editors_trial/blob/${writeTrialRef()}/`;
 
