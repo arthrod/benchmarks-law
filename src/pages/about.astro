@@ -67,7 +67,7 @@ import Site from "../layouts/Site.astro";
 
 	<section class="contact" id="reach">
 		<div class="wrap">
-			<h2 class="sec-label"><span class="sq"></span> / Get in touch</h2>
+			<p class="sec-label"><span class="sq"></span> / Get in touch</p>
 			<h2>Using these numbers, building a tool, or just curious? Say hello.</h2>
 			<p>
 				Add me on LinkedIn, follow the work on GitHub and Hugging Face, or write directly. For consulting and legal
@@ -86,3 +86,24 @@ import Site from "../layouts/Site.astro";
 		</div>
 	</section>
 </Site>
+
+<style>
+	/* The site's ghost button is ink on paper; on the dark band it is paper on ink. */
+	.contact :global(.btn-ghost) {
+		color: var(--bg);
+		border-color: var(--bg);
+	}
+	.contact :global(.btn-ghost:hover) {
+		color: var(--mark-text);
+		border-color: var(--mark);
+	}
+	.contact :global(.fact dt) {
+		color: #9a9a96;
+	}
+	.contact :global(.fact a) {
+		color: var(--bg);
+	}
+	.contact :global(.fact a:hover) {
+		color: var(--mark-on-dark);
+	}
+</style>
