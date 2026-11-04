@@ -170,6 +170,10 @@ ${body}
 </tbody></table></div>`;
 }
 
+const WORDS = ["Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen", "Twenty"];
+/** A count that opens a sentence, spelled out up to twenty, as the old page wrote it. */
+const spelled = (n: number): string => WORDS[n] ?? String(n);
+
 /** The whole page (before the site navbar is injected). */
 export function scorecardHtml(facts: Facts, opts: ScorecardPage): string {
 	const tools = opts.tools ?? TOOLS;
@@ -177,35 +181,40 @@ export function scorecardHtml(facts: Facts, opts: ScorecardPage): string {
 	if (!opts.release.date)
 		throw new Error("out/release.json has no date — the corrected date cannot be printed");
 	const corrected = opts.release.date;
+	const editors = spelled(num(facts, "count.editors"));
+	const checks = num(facts, "checks.total");
+	const parts = num(facts, "fixture.parts");
+	const critical = num(facts, "checks.critical");
+	const word = esc(str(facts, "word.version"));
 	return `<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>neurotic_docx_bench: Open-source DOCX editors, round-trip trial (2026)</title>
-<meta name="description" content="Thirteen open-source DOCX editors driven through their own import → export path over one 35-part adversarial document, scored on 99 checks, re-fed for idempotence and re-opened in Microsoft Word. Results, reports and vendors.">
+<meta name="description" content="${editors} open-source DOCX editors driven through their own import → export path over one ${parts}-part adversarial document, scored on ${checks} checks, re-fed for idempotence and re-opened in Microsoft Word. Results, reports and vendors.">
 <link rel="stylesheet" href="../../editors-score.css">
 </head>
 <body class="doc">
 <header id="brand"><span class="crumb">/ Editors trial</span></header>
 <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Benches</a> &middot; Editors trial</nav>
 <main id="main">
-<p class="meta"><span>${EDITION}, corrected ${esc(corrected)}</span><span>Word ${esc(str(facts, "word.version"))} as validator</span><span>Every repo cloned at a pinned commit</span></p>
-<h1>Thirteen DOCX editors, one <span class="mk">hostile</span> document, 99 checks.</h1>
-<p class="lede">Every editor's code was downloaded, its own import → export path was run headlessly over a purpose-built 35-part adversarial DOCX, and the output was diffed against the input at part, element, attribute and text level. Then the output was fed back through the same editor, re-opened in LibreOffice, and opened in Microsoft Word. No claim below rests on a README.</p>
+<p class="meta"><span>${EDITION}, corrected ${esc(corrected)}</span><span>Word ${word} as validator</span><span>Every repo cloned at a pinned commit</span></p>
+<h1>${editors} DOCX editors, one <span class="mk">hostile</span> document, ${checks} checks.</h1>
+<p class="lede">Every editor's code was downloaded, its own import → export path was run headlessly over a purpose-built ${parts}-part adversarial DOCX, and the output was diffed against the input at part, element, attribute and text level. Then the output was fed back through the same editor, re-opened in LibreOffice, and opened in Microsoft Word. No claim below rests on a README.</p>
 <p class="note"><b>Corrected ${esc(corrected)}.</b> Three checks failed rewrites that Word itself makes on save: a text box's fallback copy rewritten from its DrawingML, simple fields saved as complex fields, and an embedded HTML chunk imported into the body. eigenpal's team traced the first one. The scorer was fixed and every editor rescored; eigenpal moves from ${EIGENPAL_BEFORE} to ${num(facts, "rt.eigenpal.weighted").toFixed(1)}%. <a href="/editors-trial/round-trip" rel="noopener">The correction</a> is in the main report.</p>
 <div class="ctas"><a class="cta ink" href="/editors-trial/round-trip" rel="noopener">Read the main report</a><a class="cta" href="https://github.com/arthrod/editors_trial" rel="noopener">Corpus, harnesses &amp; scorer on GitHub</a></div>
 <div class="kpis">${kpis(facts, opts.defectClasses)
 		.map(([v, l]) => `<div><b>${esc(v)}</b><span>${esc(l)}</span></div>`)
 		.join("")}</div>
 <section id="scorecard"><h2>Round-trip scorecard</h2>
-<p>Weighted score across the 99 checks; critical features are the 29 constructs a legal or publishing workflow cannot lose. "Second pass" feeds each output back through the same editor and scores it against its own first pass. "Word opens" is the raw first-pass output opened in Word 16.115, before any repair. LibreOffice is the calibration floor, not a candidate. Every figure on this page is generated from the editors_trial release's own <code>out/facts.json</code>, verified against its manifest; the method, the corpus and every finding are in <a href="/editors-trial/round-trip" rel="noopener">the main report</a>, the field and its context on <a href="/editors-trial/" rel="noopener">the trial hub</a> and <a href="/editors-trial/vendors" rel="noopener">the vendors page</a>.</p>
+<p>Weighted score across the ${checks} checks; critical features are the ${critical} constructs a legal or publishing workflow cannot lose. "Second pass" feeds each output back through the same editor and scores it against its own first pass. "Word opens" is the raw first-pass output opened in Word ${word}, before any repair. LibreOffice is the calibration floor, not a candidate. Every score and count in the table, the tiles and the text above is generated from the editors_trial release's own <code>out/facts.json</code>, verified against its manifest; the findings below are the main report's, and the method, the corpus and every finding are in <a href="/editors-trial/round-trip" rel="noopener">the main report</a>, the field and its context on <a href="/editors-trial/" rel="noopener">the trial hub</a> and <a href="/editors-trial/vendors" rel="noopener">the vendors page</a>.</p>
 ${table(rows)}
 <p class="note"><b>Read the floor first.</b> LibreOffice, converting headlessly, scores ${num(facts, "rt.lo_baseline.weighted").toFixed(1)}%. An open-source editor that cannot beat LibreOffice on a Word-authored document is not a fidelity tool, whatever its star count says.</p></section>
 <section id="findings"><h2>What the trial found</h2>
 <ol class="steps">
-<li><b>Three tools lose nothing.</b> SuperDoc V2, Docxodus and eigenpal pass all 99 checks, keep all 35 parts, and reproduce their own output byte for byte on a second pass. Docxodus gets there with 25 parts untouched and 10 re-serialised, none changed, none dropped.</li>
-<li><b>Four outputs cannot be opened by Word.</b> Folio, office-open, Docen and Fidus Writer produce files Word 16.115 refuses. Three of them fail a static check: Fidus Writer has eleven schema violations, and office-open and Docen leave five dangling relationship ids each, so the chart never draws. Folio passes every static check and Word still refuses it.</li>
+<li><b>Three tools lose nothing.</b> SuperDoc V2, Docxodus and eigenpal pass all ${checks} checks, keep all ${parts} parts, and reproduce their own output byte for byte on a second pass. Docxodus gets there with 25 parts untouched and 10 re-serialised, none changed, none dropped.</li>
+<li><b>Four outputs cannot be opened by Word.</b> Folio, office-open, Docen and Fidus Writer produce files Word ${word} refuses. Three of them fail a static check: Fidus Writer has eleven schema violations, and office-open and Docen leave five dangling relationship ids each, so the chart never draws. Folio passes every static check and Word still refuses it.</li>
 <li><b>Two editors corrupt their own output.</b> office-open and Docen are not idempotent: re-importing their first pass yields <code>word/document.xml</code> with an unbound <code>a:</code> prefix. The file looks fine, opens in LibreOffice, and breaks only when fed back in.</li>
 <li><b>Two editors say what they lost.</b> SuperDoc names a diagnostic code for each drawing family it fails closed on. Plate.js scores last but emits 38 typed diagnostics and, under its default <code>lossPolicy: 'reject'</code>, refuses a document it cannot carry losslessly. It is also the only editor that refuses the malformed corpus instead of reproducing the damage.</li>
 <li><b>Nobody repairs anything.</b> Handed a corpus carrying all twelve defect classes, every editor either reproduced the damage or dropped the part that carried it. Docxodus ships a repair funnel, and it repairs a different set of defects.</li>

@@ -162,7 +162,7 @@ describe("the scorecard page", () => {
 	const page = scorecardHtml(facts, { defectClasses: 12, release: RELEASE, tools: FIELD });
 
 	it("keeps the trial's framing and links to the reports on this site", () => {
-		expect(page).toContain("Thirteen DOCX editors, one");
+		expect(page).toContain("Five DOCX editors, one"); // the fixture's count.editors
 		expect(page).toContain('href="/editors-trial/round-trip"');
 		expect(page).toContain('href="/editors-trial/"');
 	});
@@ -265,6 +265,37 @@ describe("the KPI strip: six tiles, every figure a key or the bundle's own count
 	});
 });
 
+describe("the prose takes its counts from facts keys too (Gitar, #73)", () => {
+	const grown = scorecardHtml(
+		{
+			...facts,
+			"count.editors": 14,
+			"checks.total": 120,
+			"fixture.parts": 40,
+			"checks.critical": 31,
+			"word.version": "16.200",
+		},
+		{ defectClasses: 12, release: RELEASE, tools: FIELD },
+	);
+	it("prints the edition's own counts in the description, headline, lede and method", () => {
+		expect(grown).toContain('content="Fourteen open-source DOCX editors driven through their own import → export path over one 40-part adversarial document, scored on 120 checks');
+		expect(grown).toContain("<h1>Fourteen DOCX editors, one <span class=\"mk\">hostile</span> document, 120 checks.</h1>");
+		expect(grown).toContain("a purpose-built 40-part adversarial DOCX");
+		expect(grown).toContain("Weighted score across the 120 checks; critical features are the 31 constructs");
+		expect(grown).toContain("opened in Word 16.200, before any repair");
+		expect(grown).toContain("pass all 120 checks, keep all 40 parts");
+		expect(grown).toContain("produce files Word 16.200 refuses");
+	});
+	it("leaves no stale count behind", () => {
+		for (const stale of ["Thirteen", "99 checks", "35-part", "29 constructs", "16.115", "all 35 parts"])
+			expect(grown).not.toContain(stale);
+	});
+	it("claims facts.json only for what it generates: the findings are the main report's", () => {
+		expect(grown).not.toContain("Every figure on this page is generated");
+		expect(grown).toContain("Every score and count in the table, the tiles and the text above is generated");
+	});
+});
+
 describe("defectClassesIn: the twelve classes, counted from Report B's per-defect matrix", () => {
 	it("counts the d-rows of the detection matrix, once each", () => {
 		expect(defectClassesIn(REPORT_B)).toBe(12);
@@ -319,6 +350,13 @@ describe.skipIf(!existsSync(PIN))("the pinned et release", () => {
 		expect(page).toContain(
 			`eigenpal moves from 98.5% to ${Number(pinned["rt.eigenpal.weighted"]).toFixed(1)}%.`,
 		);
+	});
+	it("prints the release's own prose counts: thirteen editors, 99 checks, 35 parts, Word 16.115", () => {
+		const page = scorecardHtml(pinned, { defectClasses: 12, release });
+		expect(page).toContain("<h1>Thirteen DOCX editors, one <span class=\"mk\">hostile</span> document, 99 checks.</h1>");
+		expect(page).toContain("critical features are the 29 constructs");
+		expect(page).toContain("pass all 99 checks, keep all 35 parts");
+		expect(page).toContain("produce files Word 16.115 refuses");
 	});
 	it("counts the twelve defect classes from the bundle's Report B itself", () => {
 		const reportB = readFileSync(
