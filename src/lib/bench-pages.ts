@@ -66,12 +66,32 @@ export function benchRows(site: string): Row[] {
 	return existsSync(root) ? reportRows(root) : [];
 }
 
+/**
+ * The case browser used to live at /neurotic-docx-bench/ itself, so its links are
+ * /neurotic-docx-bench/#<group>/<case>. That address is the leaderboard now; a hash that
+ * names a group and a case (it decodes to something with a slash, which no leaderboard
+ * anchor has) is sent to the case browser, hash unchanged. Plain JS: the page inlines
+ * this function's own source.
+ */
+export function oldCaseLink(hash: string): string | null {
+	if (!hash || hash.length < 2) return null;
+	let decoded = "";
+	try {
+		decoded = decodeURIComponent(hash.slice(1));
+	} catch {
+		return null;
+	}
+	return decoded.indexOf("/") > 0 ? `cases/${hash}` : null;
+}
+
+const OLD_LINK_SCRIPT = `<script>(function(){var oldCaseLink=${oldCaseLink.toString()};var to=oldCaseLink(location.hash);if(to)location.replace(to);})();</script>`;
+
 /** The leaderboard page: bench-viewer's arthur-law page with the site navbar above it. */
 export function leaderboardHtml(scores: Scores, rows: ReturnType<typeof benchRows>): string {
 	const nav = navbarHtml({ crumb: "Scores", current: "benches", path: "/neurotic-docx-bench/", rows });
 	// injectNavbar swaps the placeholder for the navbar and links /nav.css + /nav.js in the head.
 	const page = buildLeaderboardPage(scores).replace("<body>", () => '<body>\n<header id="brand"></header>');
-	return withSiteIcon(injectNavbar(page, nav));
+	return withSiteIcon(injectNavbar(page, nav)).replace("</head>", () => `${OLD_LINK_SCRIPT}\n</head>`);
 }
 
 // ---- the case browsers and the speed page, from the same bundle -------------------------------------------

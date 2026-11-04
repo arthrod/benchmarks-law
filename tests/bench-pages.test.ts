@@ -300,3 +300,22 @@ describe("pnpm run deploy", () => {
 		expect(pkg.scripts.deploy).toContain("wrangler deploy");
 	});
 });
+
+// ---- old links (plan 5 acceptance: the old URL still opens the case browser) ---------------
+
+describe("old case links on /neurotic-docx-bench/", async () => {
+	const { oldCaseLink, leaderboardHtml: page } = await import("../src/lib/bench-pages");
+	it("sends a group/case hash to the case browser, unchanged", () => {
+		expect(oldCaseLink("#corpus%2Fclean%2F959f4d9de2")).toBe("cases/#corpus%2Fclean%2F959f4d9de2");
+		expect(oldCaseLink("#cases/case17")).toBe("cases/#cases/case17");
+	});
+	it("leaves the leaderboard's own anchors and an empty hash alone", () => {
+		for (const hash of ["", "#", "#conversion-sample", "#lb-samples", "#%E0%A4%A"]) expect(oldCaseLink(hash), hash).toBeNull();
+	});
+	it.skipIf(!scores)("runs in the leaderboard's head, before anything renders", () => {
+		const html = page(scores as Scores, []);
+		const head = html.slice(0, html.indexOf("</head>"));
+		expect(head).toContain("oldCaseLink");
+		expect(head).toContain("location.replace");
+	});
+});
