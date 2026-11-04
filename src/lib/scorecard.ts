@@ -197,7 +197,7 @@ export function scorecardHtml(facts: Facts, opts: ScorecardPage): string {
 </head>
 <body class="doc">
 <header id="brand"><span class="crumb">/ Editors trial</span></header>
-<nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Benches</a> &middot; Editors trial</nav>
+<nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Scores</a> &middot; Editors trial</nav>
 <main id="main">
 <p class="meta"><span>${EDITION}, corrected ${esc(corrected)}</span><span>Word ${word} as validator</span><span>Every repo cloned at a pinned commit</span></p>
 <h1>${editors} DOCX editors, one <span class="mk">hostile</span> document, ${checks} checks.</h1>

@@ -24,6 +24,27 @@ describe("trialGroups", () => {
 	});
 });
 
+describe("the wordmark is the way home; the links start at Scores (Arthur, 2026-11-03)", () => {
+	const home = navbarHtml({ crumb: "benchmarks.law", current: "site", path: "/", rows });
+	const scores = navbarHtml({ crumb: "Scores", current: "benches", path: "/neurotic-docx-bench/", rows });
+	it("links the wordmark to the site's home, not the leaderboard", () => {
+		for (const h of [home, scores]) expect(h).toContain('<a class="wm" href="/">');
+	});
+	it("drops the benchmarks.law link and names the leaderboard Scores", () => {
+		for (const h of [home, scores]) {
+			expect(h).not.toMatch(/<a[^>]*>benchmarks\.law<\/a>/);
+			expect(h).not.toContain(">Benches<");
+			expect(h).toContain('<nav id="site-links" aria-label="Site"><a href="/neurotic-docx-bench/"');
+		}
+		expect(scores).toContain('<a href="/neurotic-docx-bench/" aria-current="page">Scores</a>');
+		expect(home).toContain('<a href="/neurotic-docx-bench/">Scores</a>');
+	});
+	it("keeps each page's crumb: benchmarks.law at home, Scores on the leaderboard", () => {
+		expect(home).toContain('<span class="crumb">/ benchmarks.law</span>');
+		expect(scores).toContain('<span class="crumb">/ Scores</span>');
+	});
+});
+
 describe("navbarHtml", () => {
 	const html = navbarHtml({ crumb: "Report C", current: "editors", path: "/editors-trial/report-c", rows });
 
@@ -32,7 +53,7 @@ describe("navbarHtml", () => {
 		expect(html).toContain('<span class="del">CHILL</span><span class="ins">NEUROTIC</span>');
 		expect(html).toContain('<span class="crumb">/ Report C</span>');
 		const labels = [...html.matchAll(/<(?:a|summary|span class="nav-title")[^>]*>([^<]+)</g)].map((m) => m[1]).filter((t) => !/^(CHILL|NEUROTIC)$/.test(t));
-		expect(labels.slice(0, 8)).toEqual(["benchmarks.law", "Benches", "DOCX → PDF", "Redlines", "Speed", "Editors trial", "At a glance", "All reports"]);
+		expect(labels.slice(0, 8)).toEqual(["Scores", "DOCX → PDF", "Redlines", "Speed", "Editors trial", "At a glance", "All reports", "The field"]);
 		expect(html).toContain('href="https://github.com/jandira-tech/neurotic_docx_bench"');
 		expect(html).toContain('class="nav-contact"');
 	});
