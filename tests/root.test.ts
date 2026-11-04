@@ -73,13 +73,23 @@ describe("fullCheckout", () => {
 });
 
 describe("checkoutRef", () => {
-	const git = (cwd: string, ...a: string[]) => spawnSync("git", ["-C", cwd, ...a], { encoding: "utf8" });
+	// A fixture repository must not depend on the machine's git config: signing is off and every
+	// setup command must succeed (CodeRabbit, #73).
+	const git = (cwd: string, ...a: string[]) => {
+		const r = spawnSync(
+			"git",
+			["-C", cwd, "-c", "commit.gpgSign=false", "-c", "tag.gpgSign=false", "-c", "user.name=t", "-c", "user.email=t@t", ...a],
+			{ encoding: "utf8" },
+		);
+		if (r.status !== 0) throw new Error(`git ${a.join(" ")} failed: ${r.stderr}`);
+		return r;
+	};
 	const repo = () =>
 		scratch((d) => {
 			git(d, "init", "-q");
 			writeFileSync(join(d, "f"), "x");
 			git(d, "add", "f");
-			git(d, "-c", "user.name=t", "-c", "user.email=t@t", "commit", "-qm", "c");
+			git(d, "commit", "-qm", "c");
 		});
 	it("returns the commit of a checkout that is its own repository", () => {
 		const dir = repo();
