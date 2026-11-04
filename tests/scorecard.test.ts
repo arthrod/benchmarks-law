@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
-import { describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 import {
 	defectClassesIn,
 	type Facts,
@@ -289,11 +289,16 @@ describe("defectClassesIn: the twelve classes, counted from Report B's per-defec
 	});
 });
 
+// Vitest runs a skipped suite's body during collection, so the pinned files are read in beforeAll.
 describe.skipIf(!existsSync(PIN))("the pinned et release", () => {
-	const pinned = JSON.parse(readFileSync(PIN, "utf8")) as Facts;
-	const release = JSON.parse(readFileSync(join(SITE, ".bench/editors_trial/out/release.json"), "utf8")) as {
-		date: string;
-	};
+	let pinned: Facts = {};
+	let release = { date: "" };
+	beforeAll(() => {
+		pinned = JSON.parse(readFileSync(PIN, "utf8")) as Facts;
+		release = JSON.parse(readFileSync(join(SITE, ".bench/editors_trial/out/release.json"), "utf8")) as {
+			date: string;
+		};
+	});
 
 	it("drives the page: the leaders and the floor are the release's own numbers", () => {
 		const rows = scorecardRows(pinned);

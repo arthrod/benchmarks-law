@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { createRequire } from "node:module";
-import { describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 import {
 	casesPage,
 	editorsPage,
@@ -23,26 +23,32 @@ const rows: never[] = [];
 // browser fetch /favicon.ico, which 404s. The pages are generated (src/lib/bench-pages.ts),
 // so the lesson pins the builders, not a copied file.
 describe.skipIf(!PINNED)("bench pages name the site icon", () => {
-	const pages: [string, string][] = [
-		["the leaderboard", leaderboardHtml(pinnedScores(SITE), rows)],
-		["the cases browser", casesPage(rows)],
-		["the redlines browser", redlinesPage(rows)],
-		["the speed page", speedPage(rows)],
+	// Vitest runs a skipped suite's body during collection, so the pages are built inside the tests.
+	const pages: [string, () => string][] = [
+		["the leaderboard", () => leaderboardHtml(pinnedScores(SITE), rows)],
+		["the cases browser", () => casesPage(rows)],
+		["the redlines browser", () => redlinesPage(rows)],
+		["the speed page", () => speedPage(rows)],
 		[
 			"the editors scorecard",
-			editorsPage(pinnedFacts(SITE), rows, {
-				defectClasses: defectClassesIn(pinnedReportB(SITE)),
-				release: pinnedRelease(SITE),
-			}),
+			() =>
+				editorsPage(pinnedFacts(SITE), rows, {
+					defectClasses: defectClassesIn(pinnedReportB(SITE)),
+					release: pinnedRelease(SITE),
+				}),
 		],
 	];
-	it.each(pages)("%s links /b-law.svg exactly once", (_n, page) => {
+	it.each(pages)("%s links /b-law.svg exactly once", (_n, build) => {
+		const page = build();
 		expect(page.match(/<link rel="icon"[^>]*href="\/b-law\.svg"/g)?.length).toBe(1);
 	});
 
 	// Lighthouse accessibility (landmark-one-main) failed on the speed page.
 	describe("the speed page", () => {
-		const s = pages[3][1];
+		let s = "";
+		beforeAll(() => {
+			s = speedPage(rows);
+		});
 		it("has exactly one main landmark around its content", () => {
 			expect(s.match(/<main id="main">/g)?.length).toBe(1);
 			expect(s.indexOf("<main")).toBeGreaterThan(s.indexOf("</header>"));

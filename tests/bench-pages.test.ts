@@ -1,7 +1,7 @@
 import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, relative, resolve } from "node:path";
-import { afterAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { parseScores, type Scores } from "@jandira-tech/bench-viewer";
 import { type Row, leaderboardHtml, pinnedRelease, pinnedReportB, SITE_DOC_SCOPE } from "../src/lib/bench-pages";
 import { defectClassesIn } from "../src/lib/scorecard";
@@ -31,9 +31,14 @@ const fixture: Scores = {
 	method: [],
 };
 
+// Vitest runs a skipped suite's body during collection: every pinned read below sits in a
+// beforeAll or a test, so a fresh clone (no .bench/) collects and skips instead of throwing.
 describe.skipIf(!existsSync(PINNED_ET))("the editors scorecard page", () => {
-	const ctx = { defectClasses: defectClassesIn(pinnedReportB(SITE)), release: pinnedRelease(SITE) };
-	const page = editorsPage(JSON.parse(readFileSync(PINNED_ET, "utf8")), [], ctx);
+	let page = "";
+	beforeAll(() => {
+		const ctx = { defectClasses: defectClassesIn(pinnedReportB(SITE)), release: pinnedRelease(SITE) };
+		page = editorsPage(JSON.parse(readFileSync(PINNED_ET, "utf8")), [], ctx);
+	});
 
 	it("wears the site navbar in place of its own header and marks its section", () => {
 		expect(page).toContain('<header id="brand" class="site-nav">');
@@ -63,7 +68,10 @@ describe.skipIf(!existsSync(PINNED_ET))("the editors scorecard page", () => {
 });
 
 describe.skipIf(!scores)("the leaderboard page from the pinned scores", () => {
-	const page = leaderboardHtml(scores as Scores, []);
+	let page = "";
+	beforeAll(() => {
+		page = leaderboardHtml(scores as Scores, []);
+	});
 
 	it("renders no headline text (plan 5 rev 3)", () => {
 		for (const h of (scores as Scores).headlines) {
@@ -205,12 +213,13 @@ function inlineScriptHashes(page: string): string[] {
 
 describe.skipIf(!scores)("the CSP of the inline-script pages", () => {
 	const rows: Row[] = [];
-	const pages: [string, string][] = [
-		["/neurotic-docx-bench/cases/*", casesPage(rows)],
-		["/neurotic-docx-bench/redlines/*", redlinesPage(rows)],
-		["/neurotic-docx-bench/speed/*", speedPage(rows)],
+	const pages: [string, () => string][] = [
+		["/neurotic-docx-bench/cases/*", () => casesPage(rows)],
+		["/neurotic-docx-bench/redlines/*", () => redlinesPage(rows)],
+		["/neurotic-docx-bench/speed/*", () => speedPage(rows)],
 	];
-	it.each(pages)("%s allows its inline scripts by sha256 only", (path, page) => {
+	it.each(pages)("%s allows its inline scripts by sha256 only", (path, build) => {
+		const page = build();
 		const csp = headers(path).find((l) => l.includes("Content-Security-Policy")) ?? "";
 		for (const hash of inlineScriptHashes(page)) expect(csp).toContain(`'sha256-${hash}'`);
 		expect(csp).not.toContain("'unsafe-inline'");
@@ -247,9 +256,10 @@ describe.skipIf(!existsSync(join(SITE, ".bench/ndb/results/release/cases/index.j
 		const { writeBenchPages } = await import("../src/lib/bench-pages");
 		const out = mkdtempSync(join(tmpdir(), "blaw-pages-"));
 		afterAll(() => rmSync(out, { recursive: true, force: true }));
-		const index = JSON.parse(
-			readFileSync(join(SITE, ".bench/ndb/results/release/cases/index.json"), "utf8"),
-		) as { groups: { path: string }[] };
+		let index: { groups: { path: string }[] } = { groups: [] };
+		beforeAll(() => {
+			index = JSON.parse(readFileSync(join(SITE, ".bench/ndb/results/release/cases/index.json"), "utf8"));
+		});
 
 		it("writes the leaderboard, the browsers, the speed page and the files they fetch", () => {
 			writeBenchPages(SITE, relative(SITE, out));
