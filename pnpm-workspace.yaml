@@ -6,7 +6,7 @@ allowBuilds:
   # The bench renderer (plan 5), git-pinned to ndb commit 2575f95c. pnpm keys a
   # git-hosted package by its full tarball URL; its prepare rebuilds dist/ (tsc) from
   # the sources committed in that repo, so the pin builds what it pins.
-  "@jandira-tech/bench-viewer@https://codeload.github.com/jandira-tech/neurotic_docx_bench/tar.gz/2575f95c6691cff526199fe55f276e5102ada3b4#path:packages/bench-viewer": true
+  "@jandira-tech/bench-viewer@https://codeload.github.com/jandira-tech/neurotic_docx_bench/tar.gz/d12621a34bb5267009291b10676b341b6e401547#path:packages/bench-viewer": true
   better-sqlite3: false
   sharp: false
 

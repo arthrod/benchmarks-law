@@ -18,8 +18,8 @@ importers:
         specifier: ^1.4.0
         version: 1.4.0(a2f8b2a75a35ab06c86a431c80b0f03f)
       '@jandira-tech/bench-viewer':
-        specifier: github:jandira-tech/neurotic_docx_bench#2575f95c6691cff526199fe55f276e5102ada3b4&path:packages/bench-viewer
-        version: https://codeload.github.com/jandira-tech/neurotic_docx_bench/tar.gz/2575f95c6691cff526199fe55f276e5102ada3b4#path:packages/bench-viewer
+        specifier: github:jandira-tech/neurotic_docx_bench#d12621a34bb5267009291b10676b341b6e401547&path:packages/bench-viewer
+        version: https://codeload.github.com/jandira-tech/neurotic_docx_bench/tar.gz/d12621a34bb5267009291b10676b341b6e401547#path:packages/bench-viewer
       astro:
         specifier: ^7.4.4
         version: 7.4.4(@types/node@26.6.6)(esbuild@0.28.2)(tsx@4.23.15)(yaml@2.9.1)
@@ -960,8 +960,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@jandira-tech/bench-viewer@https://codeload.github.com/jandira-tech/neurotic_docx_bench/tar.gz/2575f95c6691cff526199fe55f276e5102ada3b4#path:packages/bench-viewer':
-    resolution: {gitHosted: true, integrity: sha512-DSJjT2lQ2dpZsctNbdFF78B+/3QIwOzJcobqapGVhkndlOAIfamfdoK7l5nfC7HMettqyR9aZSf6+n00nKYvgg==, path: packages/bench-viewer, tarball: https://codeload.github.com/jandira-tech/neurotic_docx_bench/tar.gz/2575f95c6691cff526199fe55f276e5102ada3b4}
+  '@jandira-tech/bench-viewer@https://codeload.github.com/jandira-tech/neurotic_docx_bench/tar.gz/d12621a34bb5267009291b10676b341b6e401547#path:packages/bench-viewer':
+    resolution: {gitHosted: true, integrity: sha512-KJFfBPgKYIhYAuihHr/em5xv6HfjlLEH+blUfIsC+1kD+9PhJq6SOXMpXy6FLOJM5ictsa9UEahPR6c+GTLDjw==, path: packages/bench-viewer, tarball: https://codeload.github.com/jandira-tech/neurotic_docx_bench/tar.gz/d12621a34bb5267009291b10676b341b6e401547}
     version: 0.1.0
 
   '@jridgewell/resolve-uri@3.1.2':
@@ -4713,7 +4713,7 @@ snapshots:
   '@img/sharp-win32-x64@0.35.5':
     optional: true
 
-  '@jandira-tech/bench-viewer@https://codeload.github.com/jandira-tech/neurotic_docx_bench/tar.gz/2575f95c6691cff526199fe55f276e5102ada3b4#path:packages/bench-viewer': {}
+  '@jandira-tech/bench-viewer@https://codeload.github.com/jandira-tech/neurotic_docx_bench/tar.gz/d12621a34bb5267009291b10676b341b6e401547#path:packages/bench-viewer': {}
 
   '@jridgewell/resolve-uri@3.1.2': {}
 
