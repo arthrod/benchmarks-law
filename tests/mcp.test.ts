@@ -215,6 +215,12 @@ describe("the rate limit", () => {
 		expect(config).toMatch(/"limit":\s*60/);
 		expect(config).toMatch(/"period":\s*60/);
 	});
+
+	it("reads the rate limiter from cloudflare:workers, not Astro.locals.runtime.env", () => {
+		const page = readFileSync(new URL("../src/pages/mcp.ts", import.meta.url), "utf8");
+		expect(page).toContain('from "cloudflare:workers"');
+		expect(page).not.toContain("locals.runtime");
+	});
 });
 
 describe("discovery", () => {

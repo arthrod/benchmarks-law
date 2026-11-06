@@ -1,4 +1,5 @@
 import type { APIRoute } from "astro";
+import { env } from "cloudflare:workers";
 import { getEmDashCollection } from "emdash";
 import { listReports } from "../lib/cms";
 import { STUDIES, studyBody } from "../lib/legalAi";
@@ -55,12 +56,12 @@ async function loadData(): Promise<McpData> {
 	};
 }
 
-function limiterFrom(locals: unknown): RateLimit | undefined {
-	const runtime = (locals as { runtime?: { env?: { MCP_RATE_LIMITER?: RateLimit } } }).runtime;
-	return runtime?.env?.MCP_RATE_LIMITER;
+function limiterFrom(): RateLimit | undefined {
+	// Astro 6 removed the locals runtime env. The binding is absent in local dev.
+	return (env as Env & { MCP_RATE_LIMITER?: RateLimit }).MCP_RATE_LIMITER;
 }
 
-const respond: APIRoute = ({ request, locals }) => handleMcp(request, limiterFrom(locals), loadData);
+const respond: APIRoute = ({ request }) => handleMcp(request, limiterFrom(), loadData);
 
 export const GET = respond;
 export const POST = respond;
