@@ -1,0 +1,23 @@
+{
+  "serverInfo": {
+    "name": "benchmarks-law",
+    "title": "benchmarks.law",
+    "version": "1.0.0"
+  },
+  "description": "Read-only MCP access to the published DOCX benchmarks and legal-AI studies on benchmarks.law. Scores are the published measurements, not legal advice.",
+  "transport": {
+    "type": "streamable-http",
+    "endpoint": "https://benchmarks.law/mcp"
+  },
+  "capabilities": { "tools": { "listChanged": false } },
+  "documentation": "https://benchmarks.law/",
+  "tools": [
+    { "name": "search_reports", "description": "Search editors-trial reports by title, code, dek, or slug." },
+    { "name": "list_reports", "description": "List the editors-trial reports in reading order." },
+    { "name": "get_report", "description": "Fetch one report by slug, including its text up to a cap." },
+    { "name": "list_vendors", "description": "List DOCX editors with round-trip and hostile-input scores." },
+    { "name": "get_vendor", "description": "Fetch one editor by slug." },
+    { "name": "list_studies", "description": "List the legal-AI studies." },
+    { "name": "get_study", "description": "Fetch one legal-AI study by slug." }
+  ]
+}

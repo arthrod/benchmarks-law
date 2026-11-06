@@ -13,6 +13,12 @@ Two benches are published:
 
 The reports are written in [arthrod/editors_trial](https://github.com/arthrod/editors_trial) (branch `benchmark-fairness-reports`); this repository only publishes them.
 
+## For agents
+
+`POST https://benchmarks.law/mcp` is a read-only MCP server (stateless Streamable HTTP). It lists and fetches the editors-trial reports, the vendor scores, and the legal-AI studies. The server card is at `https://benchmarks.law/.well-known/mcp/server-card.json`.
+
+The endpoint allows 60 requests per 60 seconds per client IP, the same cap as Live Contracts, enforced by the `MCP_RATE_LIMITER` binding in `wrangler.jsonc`. A local dev session without that binding still answers. Report and study text is capped at 20,000 characters per call.
+
 ## Stack
 
 | Layer | Choice |
@@ -20,6 +26,7 @@ The reports are written in [arthrod/editors_trial](https://github.com/arthrod/ed
 | Framework | [Astro](https://astro.build) 7, `output: "server"`, `@astrojs/cloudflare` adapter |
 | CMS | [EmDash](https://github.com/emdash-cms/emdash): the `reports` and `vendors` collections, site settings and the admin UI |
 | Runtime | Cloudflare Worker `benchmarks-law` (`src/worker.ts`), custom domain `benchmarks.law` |
+| Agents | `POST /mcp`, 60 requests / 60 seconds per IP (`MCP_RATE_LIMITER`) |
 | Database / storage | Cloudflare D1 (`DB`), R2 (`MEDIA`). The bench's page images are served from the public R2 origin the pinned release's `cases/index.json` lists (`assets_base`). |
 | Cache | Astro route cache on Cloudflare (`cacheCloudflare()`); see [Caching](#caching) |
 | Design | Paper, ink and one yellow highlighter; radius 0; Libre Franklin and Roboto Mono (SIL OFL 1.1, `public/fonts/OFL.txt`); no icons |

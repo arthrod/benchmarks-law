@@ -29,6 +29,17 @@
 	],
 	// Worker cache layer for Astro route caching (see astro.config.mjs).
 	"cache": { "enabled": true },
+	// Same cap as live-contracts: 60 requests per 60 seconds per client IP on
+	// the public /mcp endpoint. Workers only allows a period of 10 or 60, so
+	// this is one sustained request per second with a burst of 60.
+	// namespace_id is account-wide; 3101 is benchmarks.law's, not live-contracts' 1001.
+	"ratelimits": [
+		{
+			"name": "MCP_RATE_LIMITER",
+			"namespace_id": "3101",
+			"simple": { "limit": 60, "period": 60 }
+		}
+	],
 	// Request logs on; traces off.
 	"observability": {
 		"enabled": true,
