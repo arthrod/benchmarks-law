@@ -20,3 +20,13 @@ minimumReleaseAgeExclude:
   # the owner's own package; 0.17.0 pinned exactly (benchmarks-law#56)
   - jubarte-wasm
 blockExoticSubdeps: true
+
+# @astrojs/astro2tsx (pulled by @astrojs/check) depends on @emnapi/core@1.11.3.
+# Its @napi-rs/wasm-runtime peer accepts either 1.11.x or 2.0.0-beta, and peer
+# dedupe was binding it to Rolldown's @emnapi/runtime@2.0.0-beta.2. That pair
+# crashes astro check (setLastError / deleteEnv missing). A direct dependency
+# keeps the check stack on the runtime that matches its core.
+packageExtensions:
+  "@astrojs/astro2tsx@0.1.3":
+    dependencies:
+      "@emnapi/runtime": 1.11.3

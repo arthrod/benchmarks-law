@@ -22,26 +22,26 @@
 		"bench:pages": "bench fetch --check --repo . && tsx scripts/bench-pages.ts"
 	},
 	"dependencies": {
-		"@astrojs/cloudflare": "^14.4.3",
-		"@astrojs/react": "^7.1.2",
+		"@astrojs/cloudflare": "^14.4.6",
+		"@astrojs/react": "^7.1.4",
 		"@emdash-cms/cloudflare": "^1.4.0",
 		"@jandira-tech/bench-viewer": "github:jandira-tech/neurotic_docx_bench#d12621a34bb5267009291b10676b341b6e401547&path:packages/bench-viewer",
-		"astro": "^7.4.4",
+		"astro": "^7.4.7",
 		"emdash": "^1.4.0",
 		"github-slugger": "^2.0.0",
 		"jubarte-wasm": "0.17.0",
 		"lenis": "^1.3.27",
-		"marked": "^18.1.2",
+		"marked": "^18.1.3",
 		"react": "19.3.1",
 		"react-dom": "19.3.1"
 	},
 	"devDependencies": {
 		"@astrojs/check": "^0.9.12",
-		"@cloudflare/workers-types": "^5.20261030.1",
+		"@cloudflare/workers-types": "^5.20261104.1",
 		"fflate": "0.8.3",
 		"tsx": "^4.23.15",
 		"typescript": "^6.0.3",
-		"vitest": "^5.0.5",
-		"wrangler": "^4.156.0"
+		"vitest": "^5.1.0",
+		"wrangler": "^4.158.0"
 	}
 }
