@@ -12,7 +12,7 @@
 import { spawnSync } from "node:child_process";
 import { appendFileSync, copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, rmdirSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
-import { dirname, join, relative, resolve } from "node:path";
+import { dirname, join, relative } from "node:path";
 import { buildLeaderboardPage, parseScores, renderCasesPage, renderSpeedPage, type Scores } from "@jandira-tech/bench-viewer";
 import { benchPage, injectNavbar, navbarHtml } from "./navbar";
 import { reportRows } from "./reports";

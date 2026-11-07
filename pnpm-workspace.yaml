@@ -30,3 +30,10 @@ packageExtensions:
   "@astrojs/astro2tsx@0.1.3":
     dependencies:
       "@emnapi/runtime": 1.11.3
+
+# emdash@1.4.0 (latest) and the @emdash-cms packages it pulls depend on
+# zod@4.5.4 exactly. That release is GHSA-mrhx-c7xc-m3w5 (patched in 4.6.6).
+# Dependabot stops at the exact pin. Astro already resolves 4.6.7, which
+# satisfies every peer in this tree (^4, ^4.0.0, ^4.6.7).
+overrides:
+  "zod@<4.6.6": 4.6.7

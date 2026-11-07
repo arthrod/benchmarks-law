@@ -7,7 +7,7 @@ import demos from "../../data/demos.json" with { type: "json" };
 import type { DemoEntry } from "../../lib/demos";
 import { renderMarkdown } from "../../lib/reports";
 import vendorsData from "../../data/vendors.json" with { type: "json" };
-import { Word, fieldCounts, word } from "../../lib/vendorFacts";
+import { fieldCounts, word } from "../../lib/vendorFacts";
 import { SAFETY_PASS, type VendorData, bestPlacement, fmtScore, ordinal, rankOn, safeSiteUrl, safetyVerdict } from "../../lib/vendors";
 
 const { entries, cacheHint } = await getEmDashCollection("vendors", { limit: 100 });
