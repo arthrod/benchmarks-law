@@ -21,10 +21,11 @@ export function reportsRoot(env: { REPORTS_ROOT?: string }, site: string): strin
 }
 
 /**
- * `sync:assets` and `sync:demos` read files the release bundle does not carry (the reference
- * document, the figure renders, the demo manifests); only a real checkout holds them. Call this
- * before touching anything published, so a bundle-rooted run stops with the fix in the message
- * instead of wiping public/editors-trial/figures and copying nothing back.
+ * `sync:assets` reads files the release bundle does not carry (the reference document and the
+ * figure renders); only a real checkout holds them. `sync:demos` reads `out/demos` and
+ * `out/demo-files` from the bundle and does not call this. Call this before touching the
+ * figure folders, so a bundle-rooted asset sync stops with the fix in the message instead of
+ * wiping public/editors-trial/figures and copying nothing back.
  */
 export function fullCheckout(root: string): void {
 	const ref = join(root, "build/reference.docx");

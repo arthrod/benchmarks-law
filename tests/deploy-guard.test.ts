@@ -1,6 +1,7 @@
-// #82: public/demo-apps is git-ignored and nothing published rebuilds it, so a deploy
-// from a checkout without it removes every live demo. The deploy checks first, and each
-// step only runs when the one before it succeeded.
+// #82: public/demo-apps is git-ignored. `pnpm sync:demos` rebuilds it from the editors_trial
+// bundle (`out/demos`, `out/demo-files`), and a deploy from a checkout that has not done that
+// removes every live demo. The deploy checks first, and each step only runs when the one
+// before it succeeded.
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 

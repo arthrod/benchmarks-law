@@ -5,18 +5,19 @@
  *   pnpm sync:assets    # figures and the .docx reference (styles for the live download) → public/
  *   pnpm sync:content   # upsert every report into the EmDash `reports` collection
  *   pnpm sync:vendors   # upsert the field's vendors into the EmDash `vendors` collection
- *   pnpm sync:demos     # live editor demos: bundles → public/demo-apps/, sanitized copies, src/data/demos.json
+ *   pnpm sync:demos     # live editor demos from the bundle's out/demos and out/demo-files → public/
  *
- * REPORTS_ROOT  editors_trial checkout (default ../../editors_trial); every command stops if it is absent
+ * REPORTS_ROOT  editors_trial checkout, or the fetched bundle (default .bench/editors_trial).
+ *               sync:assets still needs a real checkout (build/reference.docx). sync:demos does not.
  * EMDASH_URL    EmDash instance (default https://benchmarks.law)
- * DEMO_APPS     folder holding one built demo per editor, <slug>/dist/ (default /tmp/demos)
  * EMDASH_TOKEN  personal access token with content:write
  */
 import { cpSync, existsSync, rmSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { dirname, join, resolve } from "node:path";
 import vendorsData from "../src/data/vendors.json" with { type: "json" };
-import { type DemoEntry, type DemoManifest, buildDemoEntry } from "../src/lib/demos";
+import demosData from "../src/data/demos.json" with { type: "json" };
+import { materializeDemos } from "../src/lib/demos";
 import { REPORT_FILES, buildEntry, splitSections } from "../src/lib/reports";
 import { checkoutRef, isLocalEmDash, fullCheckout, reportsRoot } from "../src/lib/root";
 import { applyFacts } from "../src/lib/vendorFacts";
@@ -213,36 +214,19 @@ async function content() {
 }
 
 /**
- * Publishes every editor whose demo is built: DEMO_APPS/<slug>/dist/ (with its SOURCE.txt) is copied to
- * public/demo-apps/<slug>/, the sanitized copy from editors_trial (out/demo/<slug>.docx, made by
- * build/make_demo_docs.py) is placed beside it and under /editors-trial/demo-files/, and src/data/demos.json
- * lists what was published. An editor without a built bundle is left out, never half-published.
+ * Copies the release bundle's live demos into public/. The catalog stays src/data/demos.json:
+ * a slug listed there and missing from out/demos or out/demo-files aborts before any app is replaced.
  */
 function demos() {
-	// make_demo_docs.py and the demo manifests live in the checkout, not the bundle.
-	fullCheckout(ROOT);
-	const apps = resolve(process.env.DEMO_APPS ?? "/tmp/demos");
-	const made = spawnSync("python3", ["-I", join(ROOT, "build/make_demo_docs.py"), join(ROOT, "out/demo")], { stdio: "inherit" });
-	if (made.status !== 0) throw new Error("build/make_demo_docs.py failed");
-	const out: Record<string, DemoEntry> = {};
-	const files = join(SITE, "public/editors-trial/demo-files");
-	mkdirSync(files, { recursive: true });
-	for (const v of vendorsData as { slug: string; name: string; license: string }[]) {
-		const dist = join(apps, v.slug, "dist");
-		const manifestPath = join(ROOT, "out/demo", `${v.slug}.json`);
-		if (!existsSync(join(dist, "index.html")) || !existsSync(join(dist, "SOURCE.txt")) || !existsSync(manifestPath)) continue;
-		const manifest = JSON.parse(readFileSync(manifestPath, "utf8")) as DemoManifest;
-		const entry = buildDemoEntry(v.slug, manifest, readFileSync(join(dist, "SOURCE.txt"), "utf8"), v);
-		const target = join(SITE, "public/demo-apps", v.slug);
-		rmSync(target, { recursive: true, force: true });
-		cpSync(dist, target, { recursive: true, dereference: true });
-		const docx = join(ROOT, "out/demo", `${v.slug}.docx`);
-		cpSync(docx, join(target, "document.docx"));
-		cpSync(docx, join(files, `${v.slug}.docx`));
-		out[v.slug] = entry;
-	}
-	writeFileSync(join(SITE, "src/data/demos.json"), `${JSON.stringify(out, null, "\t")}\n`);
-	console.log(`demos ${Object.keys(out).length}: ${Object.keys(out).join(", ") || "none"}`);
+	const slugs = Object.keys(demosData as Record<string, unknown>);
+	materializeDemos({
+		demosDir: join(ROOT, "out/demos"),
+		filesDir: join(ROOT, "out/demo-files"),
+		publicApps: join(SITE, "public/demo-apps"),
+		publicFiles: join(SITE, "public/editors-trial/demo-files"),
+		slugs,
+	});
+	console.log(`demos ${slugs.length}: ${slugs.join(", ") || "none"}`);
 }
 
 const cmd = process.argv[2];

@@ -1,4 +1,7 @@
-/** A live, client-side demo of one editor, as listed in src/data/demos.json (written by `pnpm sync:demos`). */
+import { cpSync, existsSync, mkdirSync, rmSync } from "node:fs";
+import { join } from "node:path";
+
+/** A live, client-side demo of one editor, as listed in src/data/demos.json. `pnpm sync:demos` copies its files out of the release bundle. */
 export interface DemoEntry {
 	slug: string;
 	name: string;
@@ -32,6 +35,41 @@ export function parseSourceTxt(txt: string): { repo: string; commit: string } {
 export function commitUrl(repo: string, commit: string): string {
 	const base = repo.replace(/\/$/, "");
 	return new URL(base).hostname === "github.com" ? `${base}/tree/${commit}` : `${base}/src/commit/${commit}`;
+}
+
+/**
+ * Copy the release bundle's live demos into `public/`.
+ *
+ * `out/demos/<slug>/` is the app the iframe serves (index.html, SOURCE.txt, assets,
+ * document.docx). `out/demo-files/<slug>.docx` is the sanitized download linked beside it.
+ * The two docx files are not the same bytes. Every slug is checked before anything is deleted.
+ */
+export function materializeDemos(opts: {
+	demosDir: string;
+	filesDir: string;
+	publicApps: string;
+	publicFiles: string;
+	slugs: readonly string[];
+}): void {
+	const missing: string[] = [];
+	for (const slug of opts.slugs) {
+		const app = join(opts.demosDir, slug);
+		for (const name of ["index.html", "SOURCE.txt", "document.docx"]) {
+			if (!existsSync(join(app, name))) missing.push(`${slug}/${name}`);
+		}
+		if (!existsSync(join(opts.filesDir, `${slug}.docx`))) missing.push(`demo-files/${slug}.docx`);
+	}
+	if (missing.length) {
+		throw new Error(`editors_trial bundle is missing demo files: ${missing.join(", ")}`);
+	}
+	mkdirSync(opts.publicApps, { recursive: true });
+	mkdirSync(opts.publicFiles, { recursive: true });
+	for (const slug of opts.slugs) {
+		const target = join(opts.publicApps, slug);
+		rmSync(target, { recursive: true, force: true });
+		cpSync(join(opts.demosDir, slug), target, { recursive: true, dereference: true });
+		cpSync(join(opts.filesDir, `${slug}.docx`), join(opts.publicFiles, `${slug}.docx`));
+	}
 }
 
 export function buildDemoEntry(slug: string, manifest: DemoManifest, sourceTxt: string, vendor: { name: string; license: string }): DemoEntry {

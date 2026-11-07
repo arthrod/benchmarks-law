@@ -1,8 +1,9 @@
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import demos from "../src/data/demos.json" with { type: "json" };
 import vendors from "../src/data/vendors.json" with { type: "json" };
-import { type DemoEntry, buildDemoEntry, commitUrl, parseSourceTxt } from "../src/lib/demos";
+import { type DemoEntry, buildDemoEntry, commitUrl, materializeDemos, parseSourceTxt } from "../src/lib/demos";
 
 const src = (p: string) => readFileSync(new URL(`../${p}`, import.meta.url), "utf8");
 const here = (p: string) => existsSync(new URL(`../${p}`, import.meta.url));
@@ -130,5 +131,60 @@ describe("sync secrets", () => {
 describe("sync:demos", () => {
 	it("is a package script", () => {
 		expect(JSON.parse(src("package.json")).scripts["sync:demos"]).toBe("tsx scripts/sync.ts demos");
+	});
+	it("copies out/demos from the fetched bundle and does not need a full checkout", () => {
+		const text = src("scripts/sync.ts");
+		const body = text.slice(text.indexOf("function demos()"), text.indexOf("\nconst cmd"));
+		expect(body).toContain('join(ROOT, "out/demos")');
+		expect(body).toContain('join(ROOT, "out/demo-files")');
+		expect(body).toContain("materializeDemos");
+		expect(body).not.toContain("fullCheckout");
+		expect(body).not.toContain("make_demo_docs");
+		expect(body).not.toContain("DEMO_APPS");
+	});
+});
+
+describe("materializeDemos", () => {
+	it("copies a complete demo and refuses to replace anything when one slug is incomplete", () => {
+		// .bench is git-ignored. /tmp can be over the machine quota (EDQUOT, errno -122).
+		const scratch = join(import.meta.dirname, "../.bench");
+		mkdirSync(scratch, { recursive: true });
+		const dir = mkdtempSync(join(scratch, "blaw-demos-"));
+		const app = join(dir, "out/demos/superdoc");
+		const files = join(dir, "out/demo-files");
+		mkdirSync(app, { recursive: true });
+		mkdirSync(files, { recursive: true });
+		writeFileSync(join(app, "index.html"), "<html>ok</html>");
+		writeFileSync(join(app, "SOURCE.txt"), "Repository: https://example.test\nCommit: abcdef0\n");
+		writeFileSync(join(app, "document.docx"), "PK-app");
+		writeFileSync(join(files, "superdoc.docx"), "PK-file");
+		const publicApps = join(dir, "public/demo-apps");
+		const publicFiles = join(dir, "public/demo-files");
+		mkdirSync(join(publicApps, "superdoc"), { recursive: true });
+		writeFileSync(join(publicApps, "superdoc", "keep"), "sentinel");
+
+		expect(() =>
+			materializeDemos({
+				demosDir: join(dir, "out/demos"),
+				filesDir: files,
+				publicApps,
+				publicFiles,
+				slugs: ["superdoc", "plate"],
+			}),
+		).toThrow(/plate/);
+		expect(readFileSync(join(publicApps, "superdoc", "keep"), "utf8")).toBe("sentinel");
+
+		materializeDemos({
+			demosDir: join(dir, "out/demos"),
+			filesDir: files,
+			publicApps,
+			publicFiles,
+			slugs: ["superdoc"],
+		});
+		expect(readFileSync(join(publicApps, "superdoc", "index.html"), "utf8")).toContain("ok");
+		expect(readFileSync(join(publicApps, "superdoc", "document.docx"), "utf8")).toBe("PK-app");
+		expect(readFileSync(join(publicFiles, "superdoc.docx"), "utf8")).toBe("PK-file");
+		expect(existsSync(join(publicApps, "superdoc", "keep"))).toBe(false);
+		rmSync(dir, { recursive: true, force: true });
 	});
 });
