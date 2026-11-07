@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /_emdash/
+
+Sitemap: https://benchmarks.law/sitemap-index.xml

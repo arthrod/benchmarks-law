@@ -1,3 +1,8 @@
+# Static files. HTML from the Worker sets the same two headers in middleware.
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+
 # The live editor demos run third-party editor code on this origin. The browser enforces that
 # nothing they load or send leaves benchmarks.law, and that only this site may frame them. Inline
 # scripts are allowed: the bundles' own host pages use them, and the policy is about the network.

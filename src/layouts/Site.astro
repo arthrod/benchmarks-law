@@ -3,6 +3,7 @@ import { getSiteSettings } from "emdash";
 import { createPublicPageContext } from "emdash/page";
 import { EmDashBodyEnd, EmDashBodyStart, EmDashHead } from "emdash/ui";
 import { listReports } from "../lib/cms";
+import { breadcrumbs, breadcrumbJsonLd, organizationJsonLd, PUBLICATION_DESCRIPTION, safeJsonLd, SITE_ORIGIN } from "../lib/discovery";
 import { navbarHtml } from "../lib/navbar";
 import "../styles/site.css";
 import "../styles/bench.css";
@@ -21,9 +22,13 @@ const { title, description, current = "home", crumb, progress = false, noindex =
 const settings = await getSiteSettings();
 const siteTitle = settings?.title || "benchmarks.law";
 const fullTitle = title ? `${title} · ${siteTitle}` : `${siteTitle} · DOCX tools and legal AI, measured`;
-const siteDescription =
-	description ||
-	"Open benchmarks for lawyers: DOCX editors and converters scored against Microsoft Word, with every input, output and log published, and legal AI tools tested against in-house lawyers.";
+const siteDescription = description || PUBLICATION_DESCRIPTION;
+
+const origin = Astro.site?.origin ?? SITE_ORIGIN;
+const canonical = noindex ? undefined : new URL(Astro.url.pathname, origin).href;
+const trail = breadcrumbs(Astro.url.pathname, title, origin);
+const orgLd = safeJsonLd(organizationJsonLd(PUBLICATION_DESCRIPTION));
+const crumbLd = trail.length > 1 ? safeJsonLd(breadcrumbJsonLd(trail)) : "";
 
 const pageCtx = createPublicPageContext({
 	Astro,
@@ -32,8 +37,11 @@ const pageCtx = createPublicPageContext({
 	title: fullTitle,
 	pageTitle: title ?? siteTitle,
 	description: siteDescription,
-	canonical: noindex ? undefined : new URL(Astro.url.pathname, Astro.site ?? Astro.url.origin).href,
+	canonical,
+	image: new URL("/og.png", origin).href,
 	siteName: siteTitle,
+	siteUrl: origin,
+	breadcrumbs: trail,
 });
 
 const { rows } = await listReports();
@@ -51,6 +59,9 @@ const navbar = navbarHtml({
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<link rel="icon" type="image/svg+xml" href="/b-law.svg" />
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+		<link rel="manifest" href="/manifest.webmanifest" />
+		<link rel="alternate" type="application/rss+xml" title="benchmarks.law" href="/rss.xml" />
 		<link rel="preload" href="/fonts/libre-franklin.woff2" as="font" type="font/woff2" crossorigin />
 		<link rel="preload" href="/fonts/roboto-mono.woff2" as="font" type="font/woff2" crossorigin />
 		<title>{fullTitle}</title>
@@ -59,6 +70,8 @@ const navbar = navbarHtml({
 		<link rel="stylesheet" href="/nav.css" />
 		<script is:inline src="/nav.js" defer></script>
 		<EmDashHead page={pageCtx} />
+		<script is:inline type="application/ld+json" set:html={orgLd} />
+		{crumbLd && <script is:inline type="application/ld+json" set:html={crumbLd} />}
 	</head>
 	<body>
 		<EmDashBodyStart page={pageCtx} />
@@ -78,6 +91,7 @@ const navbar = navbarHtml({
 						<a href="https://github.com/arthrod/editors_trial" rel="noopener" aria-label="Editors trial on GitHub">GH</a>
 						<a href="https://huggingface.co/arthrod" rel="noopener" aria-label="Hugging Face">HF</a>
 						<a href="https://arthur.law/" rel="noopener" aria-label="arthur.law">AR</a>
+						<a href="/rss.xml" rel="alternate" type="application/rss+xml" aria-label="RSS feed">Feed</a>
 					</div>
 				</div>
 				<p class="disclaimer">

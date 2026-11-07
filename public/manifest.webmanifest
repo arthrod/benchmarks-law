@@ -1,0 +1,15 @@
+{
+	"name": "benchmarks.law",
+	"short_name": "benchmarks.law",
+	"description": "Open benchmarks for lawyers: DOCX editors and converters scored against Microsoft Word, and legal AI tools tested against in-house lawyers.",
+	"lang": "en",
+	"start_url": "/",
+	"scope": "/",
+	"display": "browser",
+	"theme_color": "#FAFAF8",
+	"background_color": "#FAFAF8",
+	"icons": [
+		{ "src": "/b-law.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+		{ "src": "/apple-touch-icon.png", "sizes": "180x180", "type": "image/png", "purpose": "any" }
+	]
+}
