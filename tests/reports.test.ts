@@ -20,6 +20,12 @@ describe("slugForPath", () => {
 		expect(slugForPath("reports/Report A2 - Pass-Through (2026).md")).toBe("report-a2");
 		expect(slugForPath("reports/Report D1 - Jubarte on the Hostile Packages (2026).md")).toBe("report-d1-jubarte");
 		expect(slugForPath("reports/Report D2 - What Word Protects Against (2026).md")).toBe("report-d2-word");
+		// et-v0.10.0: the two speed reports. No slug may start "report-e-": that prefix belongs to the renamed slugs.
+		expect(slugForPath("reports/Report E - Speed, Opening and Saving a Document (2026).md")).toBe("report-e");
+		expect(slugForPath("reports/Report E2 - Speed in the Browser (2026).md")).toBe("report-e2");
+		const e = REPORT_FILES.find((f) => f.slug === "report-e")!;
+		const e2 = REPORT_FILES.find((f) => f.slug === "report-e2")!;
+		expect([e.code, e.position, e.group, e2.code, e2.position, e2.group]).toEqual(["Report E", 60, "reports", "Report E2", 61, "reports"]);
 		expect(slugForPath("reports/Report E - What Word Protects Against (2026).md")).toBeNull();
 		expect(
 			slugForPath("Open-Source DOCX Editors Re-verified Against Code and Measured Round-Trip (2026).md"),
