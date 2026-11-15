@@ -29,6 +29,9 @@ export const REPORT_FILES: ReportFile[] = [
 	{ path: "reports/Report D - Safety, Resource Bombs and Hostile Input (2026).md", slug: "report-d", code: "Report D", position: 50, group: "reports" },
 	{ path: "reports/Report D1 - Jubarte on the Hostile Packages (2026).md", slug: "report-d1-jubarte", code: "Report D1", position: 51, group: "reports" },
 	{ path: "reports/Report D2 - What Word Protects Against (2026).md", slug: "report-d2-word", code: "Report D2", position: 52, group: "reports" },
+	// et-v0.10.0. Plain slugs: anything starting "report-e-" is reserved for the renamed slugs below.
+	{ path: "reports/Report E - Speed, Opening and Saving a Document (2026).md", slug: "report-e", code: "Report E", position: 60, group: "reports" },
+	{ path: "reports/Report E2 - Speed in the Browser (2026).md", slug: "report-e2", code: "Report E2", position: 61, group: "reports" },
 	{ path: "reports/vendors.md", slug: "vendor-notes", code: "Vendors", position: 70, group: "notes" },
 	{ path: "reports/rendering-openability.md", slug: "rendering-openability", code: "Note", position: 71, group: "notes" },
 	...[
