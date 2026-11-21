@@ -89,7 +89,8 @@ describe("speed, data and memory scores come from the browser pass", () => {
 		const g = grades("docxodus", p as never);
 		// The times are still said, as that machine's; only the score is withheld.
 		expect(g.speed.score).toBeNull();
-		expect(g.speed.why).toMatch(/^Not scored: it was timed on another machine, a MacBook Pro \(.+ on the rich sample, .+ on the 500 pages\)$/);
+		// Its 500 pages were timed on the pass's machine, so that time is not said to be the MacBook's.
+		expect(g.speed.why).toMatch(/^Not scored: it was timed on another machine, a MacBook Pro \([^,]+ on the rich sample\)$/);
 		expect(g.data).toEqual(grades("docxodus", pass).data);
 		expect(g.memory).toEqual(grades("docxodus", pass).memory);
 	});

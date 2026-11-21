@@ -106,7 +106,8 @@ export function grades(slug: string, pass: BrowserPass): Record<Axis, Grade> {
 		// A time is the machine's as much as the engine's: one taken on another machine than the table's is not scored against it.
 		if (rich.elsewhere) {
 			// The figures are still said: they are what that machine measured, and only the comparison is withheld.
-			const there = [rich.settledMs == null ? null : `${time(rich.settledMs)} on the rich sample`, long?.settledMs == null ? null : `${time(long.settledMs)} on the 500 pages`].filter(Boolean).join(", ");
+			const there = [rich.settledMs == null ? null : `${time(rich.settledMs)} on the rich sample`, // Only when the 500 pages were timed on that same machine: another machine's time is not this sentence's.
+				long?.settledMs == null || long.elsewhere !== rich.elsewhere ? null : `${time(long.settledMs)} on the 500 pages`].filter(Boolean).join(", ");
 			return { score: null, why: `Not scored: it was timed on another machine, ${rich.elsewhere}${there ? ` (${there})` : ""}` };
 		}
 		// The printed rule: a file that did not become usable in the time the test waits scores 0 for its half.
