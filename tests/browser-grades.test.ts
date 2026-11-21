@@ -102,6 +102,8 @@ describe("speed, data and memory scores come from the browser pass", () => {
 			expect(g.data.score, slug).not.toBeNull();
 			expect(g.speed.score, slug).toBeNull();
 			expect(g.speed.why, slug).toMatch(/another machine, a MacBook Pro .*on the rich sample/);
+			// Both of their times are that Mac's, so both are said.
+			expect(g.speed.why, slug).toMatch(/on the 500 pages\)$/);
 			expect(g.memory.why, slug).toMatch(/MB\) was taken on another machine, a MacBook Pro/);
 		}
 	});
