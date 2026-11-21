@@ -2,6 +2,7 @@ import GithubSlugger from "github-slugger";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { Marked, type Tokens } from "marked";
+import vendorsData from "../data/vendors.json" with { type: "json" };
 
 export interface TocItem {
 	id: string;
@@ -16,6 +17,13 @@ export interface ReportFile {
 	code: string;
 	position: number;
 	group: "reports" | "lanes" | "notes";
+}
+
+/** The anchor of a vendor's section in the vendor notes (`/editors-trial/vendor-notes#<anchor>`): its heading, slugged as the page slugs it. */
+export function vendorAnchor(slug: string): string {
+	const v = vendorsData.find((x) => x.slug === slug);
+	if (!v) throw new Error(`${slug}: not a vendor of the field`);
+	return new GithubSlugger().slug(v.section);
 }
 
 const MAIN = "Open-Source DOCX Editors Re-verified Against Code and Measured Round-Trip (2026).md";
@@ -34,34 +42,32 @@ export const REPORT_FILES: ReportFile[] = [
 	{ path: "reports/Report E2 - Speed in the Browser (2026).md", slug: "report-e2", code: "Report E2", position: 61, group: "reports" },
 	{ path: "reports/vendors.md", slug: "vendor-notes", code: "Vendors", position: 70, group: "notes" },
 	{ path: "reports/rendering-openability.md", slug: "rendering-openability", code: "Note", position: 71, group: "notes" },
-	...[
-		"apryse",
-		"canvas",
-		"docen",
-		"docsplus",
-		"docxodus",
-		"eigenpal",
-		"fidus",
-		"folio",
-		"genoffice",
-		"lo_baseline",
-		"officeopen",
-		"plate",
-		"superdoc",
-		"wordcraft",
-	].map((n, i) => ({
-		path: `reports/extras/${n}.md`,
-		slug: `lane-${n.replace(/_/g, "-")}`,
-		code: "Lane note",
-		position: 100 + i,
-		group: "lanes" as const,
-	})),
 ];
+
+/** The lane notes that were published until et-v0.10.5, each with the vendor it described. */
+const LANE_VENDOR: Record<string, string> = {
+	"lane-apryse": "apryse",
+	"lane-canvas": "canvas-editor",
+	"lane-docen": "docen",
+	"lane-docsplus": "docs-plus",
+	"lane-docxodus": "docxodus",
+	"lane-eigenpal": "eigenpal",
+	"lane-fidus": "fidus-writer",
+	"lane-folio": "folio",
+	"lane-genoffice": "genoffice",
+	"lane-lo-baseline": "libreoffice",
+	"lane-officeopen": "office-open",
+	"lane-plate": "plate",
+	"lane-superdoc": "superdoc",
+	"lane-wordcraft": "wordcraft",
+};
 
 /** Slugs that were published and then renamed; the report page answers each with a 301 to its new slug. */
 export const RENAMED_SLUGS: Record<string, string> = {
 	"report-e-jubarte": "report-d1-jubarte",
 	"report-e-word": "report-d2-word",
+	// The lane notes were folded into the vendor notes: each old address goes to its vendor's section.
+	...Object.fromEntries(Object.entries(LANE_VENDOR).map(([lane, slug]) => [lane, `vendor-notes#${vendorAnchor(slug)}`])),
 };
 
 const BY_PATH = new Map(REPORT_FILES.map((f) => [f.path, f]));

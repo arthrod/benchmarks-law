@@ -19,6 +19,7 @@
 		"sync:content": "tsx scripts/sync.ts content",
 		"sync:vendors": "tsx scripts/sync.ts vendors",
 		"sync:demos": "tsx scripts/sync.ts demos",
+		"sync:browser": "tsx scripts/sync.ts browser",
 		"bench:pages": "bench fetch --check --repo . && tsx scripts/bench-pages.ts"
 	},
 	"dependencies": {

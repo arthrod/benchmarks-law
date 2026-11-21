@@ -30,7 +30,8 @@ describe("slugForPath", () => {
 		expect(
 			slugForPath("Open-Source DOCX Editors Re-verified Against Code and Measured Round-Trip (2026).md"),
 		).toBe("round-trip");
-		expect(slugForPath("reports/extras/plate.md")).toBe("lane-plate");
+		// The lane notes are no longer pages of their own (tests/lane-redirects.test.ts).
+		expect(slugForPath("reports/extras/plate.md")).toBeNull();
 	});
 	it("returns null for files outside the set", () => {
 		expect(slugForPath("README.md")).toBeNull();

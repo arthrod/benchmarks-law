@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import vendors from "../src/data/vendors.json" with { type: "json" };
-import { REPORT_FILES } from "../src/lib/reports";
+import { RENAMED_SLUGS, REPORT_FILES } from "../src/lib/reports";
 import { TOOL_OF, applyFacts } from "../src/lib/vendorFacts";
 
 const facts = {
@@ -35,11 +35,12 @@ describe("vendor figures come from the trial's facts, never typed", () => {
 		for (const v of vendors) expect(TOOL_OF[v.slug], v.slug).toBeTruthy();
 	});
 
-	it("lists Apryse, closed-source, with its lane note", () => {
+	it("lists Apryse, closed-source, and its old lane note leads to its vendor section", () => {
 		const a = vendors.find((v) => v.slug === "apryse");
-		expect(a).toMatchObject({ maker: "Apryse Software Inc.", lane: "lane-apryse" });
+		expect(a).toMatchObject({ maker: "Apryse Software Inc." });
 		expect(a?.license).toMatch(/proprietary/i);
-		expect(REPORT_FILES.some((f) => f.slug === "lane-apryse")).toBe(true);
+		expect(REPORT_FILES.some((f) => f.slug === "lane-apryse")).toBe(false);
+		expect(RENAMED_SLUGS["lane-apryse"]).toBe("vendor-notes#apryse");
 	});
 });
 

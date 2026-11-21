@@ -1,11 +1,12 @@
 ---
 import Site from "../../layouts/Site.astro";
 import { listReports } from "../../lib/cms";
+import { vendorAnchor } from "../../lib/reports";
 import vendorsData from "../../data/vendors.json" with { type: "json" };
 import { Word, fieldCounts, word } from "../../lib/vendorFacts";
 const n = fieldCounts(vendorsData);
 
-const { reports, notes, lanes, cacheHint } = await listReports();
+const { reports, notes, cacheHint } = await listReports();
 Astro.cache.set(cacheHint);
 ---
 
@@ -63,13 +64,13 @@ Astro.cache.set(cacheHint);
 		</section>
 
 		<section id="lanes">
-			<h2 class="sec-label"><span class="sq"></span> / Lane notes · one per tool</h2>
+			<h2 class="sec-label"><span class="sq"></span> / Vendors · one section per tool</h2>
 			<div class="lanes">
 				{
-					lanes.map((r) => (
-						<a href={`/editors-trial/${r.slug}`}>
-							<span class="tag">Lane note</span>
-							<b>{r.data.title}</b>
+					vendorsData.map((v) => (
+						<a href={`/editors-trial/vendor-notes#${vendorAnchor(v.slug)}`}>
+							<span class="tag">Vendor note</span>
+							<b>{v.name}</b>
 						</a>
 					))
 				}

@@ -13,7 +13,6 @@
 		"safety": 0.3,
 		"site": "https://superdoc.dev/",
 		"renderSection": "2.1 SuperDoc — the closest thing to a Word clone",
-		"lane": null,
 		"position": 10
 	},
 	{
@@ -30,7 +29,6 @@
 		"safety": 0.56,
 		"site": "https://github.com/stella/folio",
 		"renderSection": "2.2 Folio — everything except the chart",
-		"lane": "lane-folio",
 		"position": 20
 	},
 	{
@@ -47,7 +45,6 @@
 		"safety": 0.24,
 		"site": "https://github.com/genspark-ai/genoffice",
 		"renderSection": "2.3 GenOffice — the only editor that draws the SmartArt's node texts",
-		"lane": "lane-genoffice",
 		"position": 30
 	},
 	{
@@ -64,7 +61,6 @@
 		"safety": 0.56,
 		"site": "https://docx-editor.dev/",
 		"renderSection": "2.4 eigenpal — a near-exact page-3 reproduction",
-		"lane": "lane-eigenpal",
 		"position": 40
 	},
 	{
@@ -81,7 +77,6 @@
 		"safety": 0.14,
 		"site": "https://github.com/DemoMacro/office-open",
 		"renderSection": "2.6 Office-Open — a library, not an editor",
-		"lane": "lane-officeopen",
 		"position": 50
 	},
 	{
@@ -98,7 +93,6 @@
 		"safety": 0.14,
 		"site": "https://github.com/DemoMacro/docen",
 		"renderSection": "2.5 Docen — right page count, wrong chart",
-		"lane": "lane-docen",
 		"position": 60
 	},
 	{
@@ -115,7 +109,6 @@
 		"safety": 0.6,
 		"site": "https://github.com/storytold/wordcraft",
 		"renderSection": "2.7 WordCraft — its own renderer, and it is very good",
-		"lane": "lane-wordcraft",
 		"position": 70
 	},
 	{
@@ -132,7 +125,6 @@
 		"safety": 0.72,
 		"site": "https://github.com/fiduswriter/fiduswriter",
 		"renderSection": "2.11 Fidus Writer — the text renders, the table does not exist",
-		"lane": "lane-fidus",
 		"position": 80
 	},
 	{
@@ -149,7 +141,6 @@
 		"safety": 0.62,
 		"site": "https://platejs.org/",
 		"renderSection": "2.9 Plate.js — everything except the pictures",
-		"lane": "lane-plate",
 		"position": 90
 	},
 	{
@@ -166,7 +157,6 @@
 		"safety": 0.6,
 		"site": "https://docs.plus/",
 		"renderSection": "2.10 docs.plus — the corpus arrives as HTML",
-		"lane": "lane-docsplus",
 		"position": 100
 	},
 	{
@@ -183,7 +173,6 @@
 		"safety": 0.48,
 		"site": "https://github.com/Hufe921/canvas-editor",
 		"renderSection": "2.8 Canvas-Editor — the body does not render",
-		"lane": "lane-canvas",
 		"position": 110
 	},
 	{
@@ -200,7 +189,6 @@
 		"safety": 0.34,
 		"site": "https://github.com/JSv4/Docxodus",
 		"renderSection": "2.13 Docxodus — the engine that draws what it cannot render",
-		"lane": "lane-docxodus",
 		"position": 120
 	},
 	{
@@ -217,7 +205,6 @@
 		"safety": 0.32,
 		"site": "https://apryse.com/products/webviewer",
 		"renderSection": "2.14 Apryse WebViewer — Word's pages, and a trial stamp on every one",
-		"lane": "lane-apryse",
 		"position": 130
 	},
 	{
@@ -234,7 +221,6 @@
 		"safety": 0.6,
 		"site": "https://www.libreoffice.org/",
 		"renderSection": "2.12 LibreOffice — the closest full-featured renderer",
-		"lane": "lane-lo-baseline",
 		"position": 200
 	}
 ]

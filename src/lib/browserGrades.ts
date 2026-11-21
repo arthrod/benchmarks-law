@@ -1,0 +1,120 @@
+/**
+ * Speed, data and memory scores on the field page. They come from the browser pass of
+ * editors.benchmarks.law (src/data/browser-pass.json, `pnpm sync:browser`): the same three files opened
+ * in every engine, in a real Chrome, on one machine. A score is a place on a logarithmic scale between
+ * two anchors that the page prints, so a reader can work any of them out from the figure beside it.
+ */
+
+export interface PassCell {
+	loadMs: number | null;
+	settledMs: number | null;
+	/** Runs in which the page never went idle for two seconds within the 180 s the test waits. */
+	settleTimedOut?: number | null;
+	rendererRss: number | null;
+	bytes: number | null;
+}
+
+export interface BrowserPass {
+	/** Where the figures were copied from, and at which commit. */
+	source: string;
+	commit: string;
+	measuredAt: string;
+	environment: string;
+	samples: Record<string, Record<string, PassCell>>;
+}
+
+export type Axis = "speed" | "data" | "memory";
+export interface Grade {
+	/** 0 to 10, one decimal; null when the axis is not scored for this tool. */
+	score: number | null;
+	/** The measured figures the score stands on. */
+	basis?: string;
+	/** Why there is no score. */
+	why?: string;
+}
+
+/** The anchors: the figure that scores 10 and the figure that scores 0. */
+export const ANCHORS = {
+	richMs: [300, 10_000],
+	longMs: [3_000, 120_000],
+	bytes: [1_000_000, 30_000_000],
+	rss: [500 * 1048576, 5000 * 1048576],
+} as const;
+
+/** Field-page slug → engine id on editors.benchmarks.law. A tool that is not there has no entry. */
+export const ENGINE_OF: Record<string, string> = {
+	superdoc: "superdoc",
+	folio: "folio",
+	eigenpal: "eigenpal",
+	docen: "docen",
+	wordcraft: "wordcraft",
+	plate: "plate",
+	"canvas-editor": "canvas-editor",
+	docxodus: "docxodus",
+	apryse: "apryse",
+	"react-docx": "react-docx",
+	univer: "univer",
+	opendoc: "opendoc",
+	betteroffice: "betteroffice",
+	onlyoffice: "onlyoffice",
+	nutrient: "nutrient",
+};
+
+const NO_GPU = "the test machine has no graphics card";
+/**
+ * Axes that are not scored, with the reason. Each is a figure the two sites list under "Figures to
+ * distrust" as the machine's or the method's, not the engine's: scoring it would blame the engine.
+ */
+export const NOT_SCORED: Record<string, Partial<Record<Axis, string>>> = {
+	wordcraft: { speed: `Not scored: ${NO_GPU}, and WordCraft draws through one. There its drawing never went idle; on a Mac it settled in 3 to 4 s` },
+	"canvas-editor": { memory: `Not scored: ${NO_GPU}, so Chrome kept every page canvas in memory (4.8 GB there, 0.5 to 1.8 GB on a Mac)` },
+	apryse: { speed: "Not scored: its engine works in a background thread that the timing cannot see" },
+	univer: Object.fromEntries(
+		(["speed", "data", "memory"] as const).map((a) => [a, "Not scored: its open-source packages cannot open a .docx, so it was handed plain text"]),
+	),
+};
+
+export const NOT_IN_PASS = "Not on editors.benchmarks.law, so not timed in a browser";
+
+/** 10 at `best` or better, 0 at `worst` or worse, logarithmic between; one decimal. */
+export function scale(value: number, best: number, worst: number): number {
+	const x = (Math.log(worst) - Math.log(value)) / (Math.log(worst) - Math.log(best));
+	return Math.round(Math.min(1, Math.max(0, x)) * 100) / 10;
+}
+
+const time = (ms: number) => (ms < 1000 ? `${Math.round(ms)} ms` : `${(ms / 1000).toFixed(ms < 10_000 ? 2 : 1)} s`);
+const megabytes = (b: number) => `${(b / 1_000_000).toFixed(b < 10_000_000 ? 1 : 0)} MB`;
+const mebibytes = (b: number) => `${Math.round(b / 1048576)} MB`;
+
+/** The three scores of one tool on the field page. */
+export function grades(slug: string, pass: BrowserPass): Record<Axis, Grade> {
+	const engine = ENGINE_OF[slug];
+	const rich = engine ? pass.samples.showcase?.[engine] : undefined;
+	const long = engine ? pass.samples["lorem-500"]?.[engine] : undefined;
+	if (!engine || !rich) return { speed: { score: null, why: NOT_IN_PASS }, data: { score: null, why: NOT_IN_PASS }, memory: { score: null, why: NOT_IN_PASS } };
+	const skip = NOT_SCORED[slug] ?? {};
+
+	const speed = (): Grade => {
+		if (skip.speed) return { score: null, why: skip.speed };
+		if (rich.settledMs == null) return { score: null, why: "Not scored: the rich sample never went idle in the time the test waits" };
+		const short = scale(rich.settledMs, ...ANCHORS.richMs);
+		if (long?.settledMs == null) {
+			return { score: Math.round(short * 5) / 10, basis: `${time(rich.settledMs)} on the rich sample; the 500 pages did not become usable in the time the test waits` };
+		}
+		return {
+			score: Math.round((short + scale(long.settledMs, ...ANCHORS.longMs)) * 5) / 10,
+			basis: `${time(rich.settledMs)} on the rich sample, ${time(long.settledMs)} on the 500 pages`,
+		};
+	};
+	const data = (): Grade => {
+		if (skip.data) return { score: null, why: skip.data };
+		if (rich.bytes == null) return { score: null, why: "Not scored: the transfer was not recorded" };
+		return { score: scale(rich.bytes, ...ANCHORS.bytes), basis: `${megabytes(rich.bytes)} to open the rich sample` };
+	};
+	const memory = (): Grade => {
+		if (skip.memory) return { score: null, why: skip.memory };
+		if (long?.rendererRss == null) return { score: null, why: "Not scored: no memory reading with the 500 pages open" };
+		return { score: scale(long.rendererRss, ...ANCHORS.rss), basis: `${mebibytes(long.rendererRss)} with the 500 pages open` };
+	};
+	return { speed: speed(), data: data(), memory: memory() };
+}
