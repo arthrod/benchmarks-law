@@ -84,6 +84,14 @@ describe("speed, data and memory scores come from the browser pass", () => {
 		expect(grades("docxodus", pass).memory.basis).toBe("749 MB with the 500 pages open");
 	});
 
+	it("does not score a rich-sample time taken on another machine; the bytes downloaded and the memory stay scored", () => {
+		const p = { ...pass, samples: { ...pass.samples, showcase: { ...pass.samples.showcase, docxodus: { ...pass.samples.showcase.docxodus, elsewhere: "a MacBook Pro" } } } };
+		const g = grades("docxodus", p as never);
+		expect(g.speed).toEqual({ score: null, why: "Not scored: its rich sample was timed on another machine, a MacBook Pro" });
+		expect(g.data).toEqual(grades("docxodus", pass).data);
+		expect(g.memory).toEqual(grades("docxodus", pass).memory);
+	});
+
 	it("does not score a reading taken on another machine than the rest of the table, and names the machine", () => {
 		const mac = { ...pass, samples: { ...pass.samples, "lorem-500": { ...pass.samples["lorem-500"], docen: { loadMs: 2296, settledMs: null, rendererRss: 1781 * 1048576, bytes: 1_900_000, elsewhere: "a MacBook Pro" } } } };
 		const g = grades("docen", mac as never);

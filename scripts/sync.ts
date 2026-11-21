@@ -245,13 +245,16 @@ function browser() {
 	const root = process.env.OPEN_DOCS_ROOT;
 	if (!root) throw new Error("OPEN_DOCS_ROOT is not set (a checkout of arthrod/open-docs)");
 	const git = (...args: string[]) => {
-		const r = spawnSync("git", ["-C", root, ...args], { encoding: "utf8" });
+		const r = spawnSync("git", ["-C", root, ...args], { encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
 		if (r.status !== 0) throw new Error(`git ${args.join(" ")} failed in ${root}: ${r.stderr}`);
 		return r.stdout.trim();
 	};
 	const rel = "docs/samples/latest.json";
 	if (git("status", "--porcelain", "--", rel)) throw new Error(`${rel} has uncommitted changes in ${root}: commit it first, so the page names a commit that holds these figures`);
-	const latest = JSON.parse(readFileSync(join(root, rel), "utf8"));
+	// Read from the commit that is named on the page, not from the working tree: an edit made
+	// after the check above cannot put figures on the page that the commit does not hold.
+	const commit = git("rev-parse", "HEAD");
+	const latest = JSON.parse(git("show", `${commit}:${rel}`));
 	const keep = ["loadMs", "settledMs", "settleTimedOut", "rendererRss", "bytes"];
 	const samples = Object.fromEntries(
 		Object.entries(latest.samples as Record<string, Record<string, Record<string, unknown>>>).map(([sample, rows]) => [
@@ -270,8 +273,8 @@ function browser() {
 		]),
 	);
 	const out = {
-		source: `https://github.com/arthrod/open-docs/blob/${git("rev-parse", "HEAD")}/${rel}`,
-		commit: git("rev-parse", "HEAD"),
+		source: `https://github.com/arthrod/open-docs/blob/${commit}/${rel}`,
+		commit,
 		measuredAt: latest.measuredAt,
 		environment: latest.environment,
 		samples,

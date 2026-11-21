@@ -98,6 +98,8 @@ export function grades(slug: string, pass: BrowserPass): Record<Axis, Grade> {
 
 	const speed = (): Grade => {
 		if (skip.speed) return { score: null, why: skip.speed };
+		// A time is the machine's as much as the engine's: one taken on another machine than the table's is not scored against it.
+		if (rich.elsewhere) return { score: null, why: `Not scored: its rich sample was timed on another machine, ${rich.elsewhere}` };
 		// The printed rule: a file that did not become usable in the time the test waits scores 0 for its half.
 		const short = rich.settledMs == null ? 0 : scale(rich.settledMs, ...ANCHORS.richMs);
 		const richSaid = rich.settledMs == null ? "the rich sample did not become usable in the time the test waits" : `${time(rich.settledMs)} on the rich sample`;
