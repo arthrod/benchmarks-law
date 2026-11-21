@@ -11,6 +11,8 @@ export interface PassCell {
 	/** Runs in which the page never went idle for two seconds within the 180 s the test waits. */
 	settleTimedOut?: number | null;
 	rendererRss: number | null;
+	/** Set when this row was measured on another machine than the rest of its table: which one. */
+	elsewhere?: string;
 	bytes: number | null;
 }
 
@@ -98,6 +100,9 @@ export function grades(slug: string, pass: BrowserPass): Record<Axis, Grade> {
 		if (skip.speed) return { score: null, why: skip.speed };
 		if (rich.settledMs == null) return { score: null, why: "Not scored: the rich sample never went idle in the time the test waits" };
 		const short = scale(rich.settledMs, ...ANCHORS.richMs);
+		if (long?.elsewhere && long.settledMs != null) {
+			return { score: null, why: `Not scored: its 500-page time was taken on another machine, ${long.elsewhere}` };
+		}
 		if (long?.settledMs == null) {
 			return { score: Math.round(short * 5) / 10, basis: `${time(rich.settledMs)} on the rich sample; the 500 pages did not become usable in the time the test waits` };
 		}
@@ -114,6 +119,7 @@ export function grades(slug: string, pass: BrowserPass): Record<Axis, Grade> {
 	const memory = (): Grade => {
 		if (skip.memory) return { score: null, why: skip.memory };
 		if (long?.rendererRss == null) return { score: null, why: "Not scored: no memory reading with the 500 pages open" };
+		if (long.elsewhere) return { score: null, why: `Not scored: its 500-page reading (${mebibytes(long.rendererRss)}) was taken on another machine, ${long.elsewhere}` };
 		return { score: scale(long.rendererRss, ...ANCHORS.rss), basis: `${mebibytes(long.rendererRss)} with the 500 pages open` };
 	};
 	return { speed: speed(), data: data(), memory: memory() };

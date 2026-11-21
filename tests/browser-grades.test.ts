@@ -61,6 +61,16 @@ describe("speed, data and memory scores come from the browser pass", () => {
 		expect(g.memory.why).toMatch(/500 pages/);
 	});
 
+	it("does not score a reading taken on another machine than the rest of the table, and names the machine", () => {
+		const mac = { ...pass, samples: { ...pass.samples, "lorem-500": { ...pass.samples["lorem-500"], docen: { loadMs: 2296, settledMs: null, rendererRss: 1781 * 1048576, bytes: 1_900_000, elsewhere: "a MacBook Pro" } } } };
+		const g = grades("docen", mac as never);
+		expect(g.memory).toEqual({ score: null, why: "Not scored: its 500-page reading (1781 MB) was taken on another machine, a MacBook Pro" });
+		// It never went idle there either, which is what the speed half already says.
+		expect(g.speed.basis).toMatch(/did not become usable/);
+		const settled = { ...mac, samples: { ...mac.samples, "lorem-500": { ...mac.samples["lorem-500"], docen: { ...mac.samples["lorem-500"].docen, settledMs: 9000 } } } };
+		expect(grades("docen", settled as never).speed).toEqual({ score: null, why: "Not scored: its 500-page time was taken on another machine, a MacBook Pro" });
+	});
+
 	it("does not score an axis whose figure is the test machine's or the method's, and prints why", () => {
 		expect(grades("wordcraft", pass).speed).toMatchObject({ score: null });
 		expect(grades("wordcraft", pass).speed.why).toMatch(/graphics card/);

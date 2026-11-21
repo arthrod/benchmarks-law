@@ -234,6 +234,11 @@ function demos() {
  * copied with the commit it was read at so the page can be traced to the runs. Only the fields the
  * scores use are kept (src/lib/browserGrades.ts).
  */
+const LOAD = "; machine load (1-minute average) ";
+const machineOf = (env: string) => (env ?? "").split(LOAD)[0];
+/** "<browser and method>; <the machine>": the machine. */
+const placeOf = (env: string) => machineOf(env).split("; ").slice(1).join("; ") || machineOf(env);
+
 function browser() {
 	const root = process.env.OPEN_DOCS_ROOT;
 	if (!root) throw new Error("OPEN_DOCS_ROOT is not set (a checkout of arthrod/open-docs)");
@@ -249,7 +254,17 @@ function browser() {
 	const samples = Object.fromEntries(
 		Object.entries(latest.samples as Record<string, Record<string, Record<string, unknown>>>).map(([sample, rows]) => [
 			sample,
-			Object.fromEntries(Object.entries(rows).map(([engine, row]) => [engine, Object.fromEntries(keep.map((k) => [k, row[k] ?? null]))])),
+			Object.fromEntries(
+				Object.entries(rows).map(([engine, row]) => [
+					engine,
+					{
+						...Object.fromEntries(keep.map((k) => [k, row[k] ?? null])),
+						// A row measured on another machine than its table (the text before the load of the step): its
+						// seconds and megabytes are not comparable with the others', so it is not scored on them.
+						...(typeof row.environment === "string" && machineOf(row.environment) !== machineOf(latest.environment) ? { elsewhere: placeOf(row.environment) } : {}),
+					},
+				]),
+			),
 		]),
 	);
 	const out = {

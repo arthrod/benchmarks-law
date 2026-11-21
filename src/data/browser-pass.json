@@ -1,6 +1,6 @@
 {
-	"source": "https://github.com/arthrod/open-docs/blob/739eb5d35898fc5376fe983dddf580e2c77f1a17/docs/samples/latest.json",
-	"commit": "739eb5d35898fc5376fe983dddf580e2c77f1a17",
+	"source": "https://github.com/arthrod/open-docs/blob/2d24f7f036ef4804684e7ab9e28d805e2170c4f6/docs/samples/latest.json",
+	"commit": "2d24f7f036ef4804684e7ab9e28d805e2170c4f6",
 	"measuredAt": "2026-11-21",
 	"environment": "Google Chrome 158.0.8127.36 (installed, headed) via Playwright, fresh profile per run (cold cache), 3 runs, median; a Hugging Face Jobs cpu-xl machine (16 vCPU, 124 GB, Linux x86-64, no GPU: Chrome draws in software; the load average and core count recorded with each run are the shared host's), Chrome under Xvfb with --no-sandbox --disable-dev-shm-usage; machine load (1-minute average) median 56.6, highest 75.7, on 64 cores",
 	"samples": {
@@ -276,11 +276,12 @@
 				"bytes": 1597892
 			},
 			"docen": {
-				"loadMs": null,
+				"loadMs": 2296,
 				"settledMs": null,
-				"settleTimedOut": 0,
-				"rendererRss": null,
-				"bytes": null
+				"settleTimedOut": 3,
+				"rendererRss": 1867202560,
+				"bytes": 1977584,
+				"elsewhere": "a MacBook Pro (Apple M4 Pro, 12 cores, 24 GB, with its graphics card)"
 			},
 			"eigenpal": {
 				"loadMs": 5204,

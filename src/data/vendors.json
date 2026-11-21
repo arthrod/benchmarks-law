@@ -87,7 +87,7 @@
 		"license": "MIT",
 		"kind": "Editor on TipTap, ProseMirror and LeaferJS that paginates by Word's stacking rules",
 		"leads": "Use Docen for short documents and experiments only",
-		"detail": "Use Docen to try a canvas editor that pages like Word on short files: it kept nearly all the text and matched Word's 6 pages. Its own README says it is not ready for production, Word refused the file it saved, and the 500-page sample never opened in the browser.",
+		"detail": "Use Docen to try a canvas editor that pages like Word on short files: it kept nearly all the text and matched Word's 6 pages. Its own README says it is not ready for production, Word refused the file it saved, and the 500-page sample opens but leaves the tab unresponsive for minutes.",
 		"roundtrip": 91.5,
 		"critical": "24/29",
 		"safety": 0.14,

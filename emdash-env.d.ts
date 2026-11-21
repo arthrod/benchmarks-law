@@ -19,28 +19,6 @@ export interface Page {
   terms?: Record<string, TaxonomyTerm[]>;
 }
 
-export interface Report {
-  id: string;
-  slug: string | null;
-  status: string;
-  title: string;
-  code?: string;
-  series?: string;
-  dek?: string;
-  body?: string;
-  position?: number;
-  notice?: string;
-  source_path?: string;
-  docx_path?: string;
-  updated?: string;
-  createdAt: Date;
-  updatedAt: Date;
-  publishedAt: Date | null;
-  byline?: BylineSummary | null;
-  bylines?: ContentBylineCredit[];
-  terms?: Record<string, TaxonomyTerm[]>;
-}
-
 export interface Vendor {
   id: string;
   slug: string | null;
@@ -56,7 +34,6 @@ export interface Vendor {
   safety?: number;
   site?: string;
   render_section?: string;
-  lane?: string;
   about?: string;
   position?: number;
   createdAt: Date;
@@ -70,7 +47,6 @@ export interface Vendor {
 declare module "emdash" {
   interface EmDashCollections {
     pages: Page;
-    reports: Report;
     vendors: Vendor;
   }
 }
