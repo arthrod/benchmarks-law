@@ -87,9 +87,25 @@ describe("speed, data and memory scores come from the browser pass", () => {
 	it("does not score a rich-sample time taken on another machine; the bytes downloaded and the memory stay scored", () => {
 		const p = { ...pass, samples: { ...pass.samples, showcase: { ...pass.samples.showcase, docxodus: { ...pass.samples.showcase.docxodus, elsewhere: "a MacBook Pro" } } } };
 		const g = grades("docxodus", p as never);
-		expect(g.speed).toEqual({ score: null, why: "Not scored: its rich sample was timed on another machine, a MacBook Pro" });
+		// The times are still said, as that machine's; only the score is withheld.
+		expect(g.speed.score).toBeNull();
+		// Its 500 pages were timed on the pass's machine, so that time is not said to be the MacBook's.
+		expect(g.speed.why).toMatch(/^Not scored: it was timed on another machine, a MacBook Pro \([^,]+ on the rich sample\)$/);
 		expect(g.data).toEqual(grades("docxodus", pass).data);
 		expect(g.memory).toEqual(grades("docxodus", pass).memory);
+	});
+
+	it("scores the four tools that run through the trial's demo builds on data only: their times and memory are a Mac's", async () => {
+		const live = (await import("../src/data/browser-pass.json")).default;
+		for (const slug of ["genoffice", "office-open", "fidus-writer", "docs-plus"]) {
+			const g = grades(slug, live as never);
+			expect(g.data.score, slug).not.toBeNull();
+			expect(g.speed.score, slug).toBeNull();
+			expect(g.speed.why, slug).toMatch(/another machine, a MacBook Pro .*on the rich sample/);
+			// Both of their times are that Mac's, so both are said.
+			expect(g.speed.why, slug).toMatch(/on the 500 pages\)$/);
+			expect(g.memory.why, slug).toMatch(/MB\) was taken on another machine, a MacBook Pro/);
+		}
 	});
 
 	it("does not score a reading taken on another machine than the rest of the table, and names the machine", () => {
