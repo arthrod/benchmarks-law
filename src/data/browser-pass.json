@@ -1,6 +1,6 @@
 {
-	"source": "https://github.com/arthrod/open-docs/blob/2d24f7f036ef4804684e7ab9e28d805e2170c4f6/docs/samples/latest.json",
-	"commit": "2d24f7f036ef4804684e7ab9e28d805e2170c4f6",
+	"source": "https://github.com/arthrod/open-docs/blob/62596707127eecd0302ef038e448fcebaa383efd/docs/samples/latest.json",
+	"commit": "62596707127eecd0302ef038e448fcebaa383efd",
 	"measuredAt": "2026-11-21",
 	"environment": "Google Chrome 158.0.8127.36 (installed, headed) via Playwright, fresh profile per run (cold cache), 3 runs, median; a Hugging Face Jobs cpu-xl machine (16 vCPU, 124 GB, Linux x86-64, no GPU: Chrome draws in software; the load average and core count recorded with each run are the shared host's), Chrome under Xvfb with --no-sandbox --disable-dev-shm-usage; machine load (1-minute average) median 56.6, highest 75.7, on 64 cores",
 	"samples": {
@@ -123,6 +123,38 @@
 				"settleTimedOut": 0,
 				"rendererRss": 709210112,
 				"bytes": 21386141
+			},
+			"genoffice": {
+				"loadMs": 391,
+				"settledMs": 391,
+				"settleTimedOut": 0,
+				"rendererRss": 593379328,
+				"bytes": 5646904,
+				"elsewhere": "a MacBook Pro (Apple M4 Pro, 12 cores, 24 GB, with its graphics card)"
+			},
+			"office-open": {
+				"loadMs": 297,
+				"settledMs": 297,
+				"settleTimedOut": 0,
+				"rendererRss": 529711104,
+				"bytes": 475955,
+				"elsewhere": "a MacBook Pro (Apple M4 Pro, 12 cores, 24 GB, with its graphics card)"
+			},
+			"fidus-writer": {
+				"loadMs": 185,
+				"settledMs": 185,
+				"settleTimedOut": 0,
+				"rendererRss": 397295616,
+				"bytes": 980841,
+				"elsewhere": "a MacBook Pro (Apple M4 Pro, 12 cores, 24 GB, with its graphics card)"
+			},
+			"docs-plus": {
+				"loadMs": 190,
+				"settledMs": 190,
+				"settleTimedOut": 0,
+				"rendererRss": 443105280,
+				"bytes": 1007733,
+				"elsewhere": "a MacBook Pro (Apple M4 Pro, 12 cores, 24 GB, with its graphics card)"
 			}
 		},
 		"redline": {
@@ -244,6 +276,38 @@
 				"settleTimedOut": 0,
 				"rendererRss": 763133952,
 				"bytes": 21418845
+			},
+			"genoffice": {
+				"loadMs": 592,
+				"settledMs": 592,
+				"settleTimedOut": 0,
+				"rendererRss": 618856448,
+				"bytes": 5679906,
+				"elsewhere": "a MacBook Pro (Apple M4 Pro, 12 cores, 24 GB, with its graphics card)"
+			},
+			"office-open": {
+				"loadMs": 292,
+				"settledMs": 292,
+				"settleTimedOut": 0,
+				"rendererRss": 541687808,
+				"bytes": 508810,
+				"elsewhere": "a MacBook Pro (Apple M4 Pro, 12 cores, 24 GB, with its graphics card)"
+			},
+			"fidus-writer": {
+				"loadMs": 183,
+				"settledMs": 183,
+				"settleTimedOut": 0,
+				"rendererRss": 397312000,
+				"bytes": 1013245,
+				"elsewhere": "a MacBook Pro (Apple M4 Pro, 12 cores, 24 GB, with its graphics card)"
+			},
+			"docs-plus": {
+				"loadMs": 190,
+				"settledMs": 190,
+				"settleTimedOut": 0,
+				"rendererRss": 446382080,
+				"bytes": 1040136,
+				"elsewhere": "a MacBook Pro (Apple M4 Pro, 12 cores, 24 GB, with its graphics card)"
 			}
 		},
 		"lorem-500": {
@@ -366,6 +430,38 @@
 				"settleTimedOut": 0,
 				"rendererRss": 954122240,
 				"bytes": 21806629
+			},
+			"genoffice": {
+				"loadMs": 531,
+				"settledMs": 5505,
+				"settleTimedOut": 0,
+				"rendererRss": 1123778560,
+				"bytes": 6067711,
+				"elsewhere": "a MacBook Pro (Apple M4 Pro, 12 cores, 24 GB, with its graphics card)"
+			},
+			"office-open": {
+				"loadMs": 533,
+				"settledMs": 533,
+				"settleTimedOut": 0,
+				"rendererRss": 725499904,
+				"bytes": 895821,
+				"elsewhere": "a MacBook Pro (Apple M4 Pro, 12 cores, 24 GB, with its graphics card)"
+			},
+			"fidus-writer": {
+				"loadMs": 292,
+				"settledMs": 292,
+				"settleTimedOut": 0,
+				"rendererRss": 480706560,
+				"bytes": 1275517,
+				"elsewhere": "a MacBook Pro (Apple M4 Pro, 12 cores, 24 GB, with its graphics card)"
+			},
+			"docs-plus": {
+				"loadMs": 582,
+				"settledMs": 582,
+				"settleTimedOut": 0,
+				"rendererRss": 604241920,
+				"bytes": 1428023,
+				"elsewhere": "a MacBook Pro (Apple M4 Pro, 12 cores, 24 GB, with its graphics card)"
 			}
 		}
 	}

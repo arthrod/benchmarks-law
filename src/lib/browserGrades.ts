@@ -60,6 +60,11 @@ export const ENGINE_OF: Record<string, string> = {
 	betteroffice: "betteroffice",
 	onlyoffice: "onlyoffice",
 	nutrient: "nutrient",
+	// Through the trial's own demo builds of them, on editors.benchmarks.law since 2026-11-21.
+	genoffice: "genoffice",
+	"office-open": "office-open",
+	"fidus-writer": "fidus-writer",
+	"docs-plus": "docs-plus",
 };
 
 const NO_GPU = "the test machine has no graphics card";
@@ -99,7 +104,11 @@ export function grades(slug: string, pass: BrowserPass): Record<Axis, Grade> {
 	const speed = (): Grade => {
 		if (skip.speed) return { score: null, why: skip.speed };
 		// A time is the machine's as much as the engine's: one taken on another machine than the table's is not scored against it.
-		if (rich.elsewhere) return { score: null, why: `Not scored: its rich sample was timed on another machine, ${rich.elsewhere}` };
+		if (rich.elsewhere) {
+			// The figures are still said: they are what that machine measured, and only the comparison is withheld.
+			const there = [rich.settledMs == null ? null : `${time(rich.settledMs)} on the rich sample`, long?.settledMs == null ? null : `${time(long.settledMs)} on the 500 pages`].filter(Boolean).join(", ");
+			return { score: null, why: `Not scored: it was timed on another machine, ${rich.elsewhere}${there ? ` (${there})` : ""}` };
+		}
 		// The printed rule: a file that did not become usable in the time the test waits scores 0 for its half.
 		const short = rich.settledMs == null ? 0 : scale(rich.settledMs, ...ANCHORS.richMs);
 		const richSaid = rich.settledMs == null ? "the rich sample did not become usable in the time the test waits" : `${time(rich.settledMs)} on the rich sample`;
