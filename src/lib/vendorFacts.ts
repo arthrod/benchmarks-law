@@ -19,9 +19,31 @@ export const TOOL_OF: Record<string, string> = {
 	docxodus: "docxodus",
 	apryse: "apryse",
 	libreoffice: "lo_baseline",
+	// On editors.benchmarks.law since 2026-11-18; the names are the trial's lane names for them.
+	"react-docx": "reactdocx",
+	univer: "univer",
+	opendoc: "opendoc",
+	betteroffice: "betteroffice",
+	onlyoffice: "onlyoffice",
+	nutrient: "nutrient",
 };
 
-type Measured = { slug: string; roundtrip: number; critical: string; safety: number };
+/**
+ * Tools on the field page whose trial lanes are not in a published bundle yet. Until the facts hold
+ * their figures, their round trip and hostile-input cells read "not measured"; every other tool must
+ * have its figures or the sync stops.
+ */
+export const NOT_YET_IN_THE_TRIAL = new Set(["react-docx", "univer", "opendoc", "betteroffice", "onlyoffice", "nutrient"]);
+
+/**
+ * Vendors whose section is not in the vendor notes being published. Every card's "About" link and every
+ * old lane address lands on that section, so a sync against notes that lack one must stop.
+ */
+export function missingSections(vendors: { slug: string; section: string }[], sections: { has(name: string): boolean }): string[] {
+	return vendors.filter((v) => !sections.has(v.section)).map((v) => `${v.slug} ("${v.section}")`);
+}
+
+type Measured = { slug: string; roundtrip: number | null; critical: string; safety: number | null };
 
 export function applyFacts<T extends Measured>(vendors: T[], facts: Record<string, unknown>): T[] {
 	return vendors.map((v) => {
@@ -32,6 +54,17 @@ export function applyFacts<T extends Measured>(vendors: T[], facts: Record<strin
 			return x;
 		};
 		if (!t) throw new Error(`${v.slug}: no trial tool mapped`);
+		const has = (k: string) => typeof facts[k] === "number";
+		if (NOT_YET_IN_THE_TRIAL.has(v.slug)) {
+			// Each axis on its own: a tool may have a round trip before it has a hostile-input grade.
+			const rt = has(`rt.${t}.weighted`) && has(`rt.${t}.critical_passed`) && has(`rt.${t}.critical_total`);
+			return {
+				...v,
+				roundtrip: rt ? get(`rt.${t}.weighted`) : null,
+				critical: rt ? `${get(`rt.${t}.critical_passed`)}/${get(`rt.${t}.critical_total`)}` : "",
+				safety: has(`bomb.${t}.grade`) ? get(`bomb.${t}.grade`) : null,
+			};
+		}
 		return {
 			...v,
 			roundtrip: get(`rt.${t}.weighted`),
@@ -42,10 +75,12 @@ export function applyFacts<T extends Measured>(vendors: T[], facts: Record<strin
 }
 
 /** Positions from 200 up are the baseline (LibreOffice), not a tool in the field. */
-export function fieldCounts(vendors: { position: number; license: string }[]) {
+export function fieldCounts(vendors: { position: number; license: string; roundtrip?: number | null }[]) {
 	const field = vendors.filter((v) => v.position < 200);
 	const commercial = field.filter((v) => /proprietary|commercial/i.test(v.license)).length;
-	return { tools: field.length, open: field.length - commercial, commercial };
+	// `measured`: tools with a round-trip figure, i.e. run through the trial's own lanes.
+	const measured = field.filter((v) => typeof v.roundtrip === "number").length;
+	return { tools: field.length, open: field.length - commercial, commercial, measured };
 }
 
 const WORDS = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen", "twenty"];

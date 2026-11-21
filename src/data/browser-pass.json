@@ -1,0 +1,372 @@
+{
+	"source": "https://github.com/arthrod/open-docs/blob/2d24f7f036ef4804684e7ab9e28d805e2170c4f6/docs/samples/latest.json",
+	"commit": "2d24f7f036ef4804684e7ab9e28d805e2170c4f6",
+	"measuredAt": "2026-11-21",
+	"environment": "Google Chrome 158.0.8127.36 (installed, headed) via Playwright, fresh profile per run (cold cache), 3 runs, median; a Hugging Face Jobs cpu-xl machine (16 vCPU, 124 GB, Linux x86-64, no GPU: Chrome draws in software; the load average and core count recorded with each run are the shared host's), Chrome under Xvfb with --no-sandbox --disable-dev-shm-usage; machine load (1-minute average) median 56.6, highest 75.7, on 64 cores",
+	"samples": {
+		"showcase": {
+			"canvas-editor": {
+				"loadMs": 427,
+				"settledMs": 427,
+				"settleTimedOut": 0,
+				"rendererRss": 485900288,
+				"bytes": 714131
+			},
+			"docxodus": {
+				"loadMs": 1230,
+				"settledMs": 1230,
+				"settleTimedOut": 0,
+				"rendererRss": 586080256,
+				"bytes": 7539178
+			},
+			"superdoc": {
+				"loadMs": 1356,
+				"settledMs": 1356,
+				"settleTimedOut": 0,
+				"rendererRss": 639848448,
+				"bytes": 8229968
+			},
+			"plate": {
+				"loadMs": 542,
+				"settledMs": 542,
+				"settleTimedOut": 0,
+				"rendererRss": 476725248,
+				"bytes": 1177170
+			},
+			"docen": {
+				"loadMs": 317,
+				"settledMs": 317,
+				"settleTimedOut": 0,
+				"rendererRss": 587014144,
+				"bytes": 1525805
+			},
+			"eigenpal": {
+				"loadMs": 1384,
+				"settledMs": 1384,
+				"settleTimedOut": 0,
+				"rendererRss": 564600832,
+				"bytes": 5303235
+			},
+			"folio": {
+				"loadMs": 589,
+				"settledMs": 751,
+				"settleTimedOut": 0,
+				"rendererRss": 499224576,
+				"bytes": 2327859
+			},
+			"wordcraft": {
+				"loadMs": 646,
+				"settledMs": null,
+				"settleTimedOut": 3,
+				"rendererRss": 577757184,
+				"bytes": 23101511
+			},
+			"word-online": {
+				"loadMs": 599,
+				"settledMs": 599,
+				"settleTimedOut": 0,
+				"rendererRss": 928301056,
+				"bytes": 2171473
+			},
+			"google-viewer": {
+				"loadMs": 595,
+				"settledMs": 595,
+				"settleTimedOut": 0,
+				"rendererRss": 653774848,
+				"bytes": 1418324
+			},
+			"apryse": {
+				"loadMs": 300,
+				"settledMs": 300,
+				"settleTimedOut": 0,
+				"rendererRss": 750637056,
+				"bytes": 7396321
+			},
+			"nutrient": {
+				"loadMs": 4792,
+				"settledMs": 4792,
+				"settleTimedOut": 0,
+				"rendererRss": 825368576,
+				"bytes": 25708059
+			},
+			"react-docx": {
+				"loadMs": 1105,
+				"settledMs": 1105,
+				"settleTimedOut": 0,
+				"rendererRss": 548696064,
+				"bytes": 8150161
+			},
+			"univer": {
+				"loadMs": 469,
+				"settledMs": 469,
+				"settleTimedOut": 0,
+				"rendererRss": 546308096,
+				"bytes": 2430054
+			},
+			"betteroffice": {
+				"loadMs": 1389,
+				"settledMs": 1582,
+				"settleTimedOut": 0,
+				"rendererRss": 679186432,
+				"bytes": 15275856
+			},
+			"onlyoffice": {
+				"loadMs": 3062,
+				"settledMs": 3062,
+				"settleTimedOut": 0,
+				"rendererRss": 935096320,
+				"bytes": 14747263
+			},
+			"opendoc": {
+				"loadMs": 720,
+				"settledMs": 840,
+				"settleTimedOut": 0,
+				"rendererRss": 709210112,
+				"bytes": 21386141
+			}
+		},
+		"redline": {
+			"canvas-editor": {
+				"loadMs": 413,
+				"settledMs": 413,
+				"settleTimedOut": 0,
+				"rendererRss": 488771584,
+				"bytes": 746731
+			},
+			"docxodus": {
+				"loadMs": 1091,
+				"settledMs": 1091,
+				"settleTimedOut": 0,
+				"rendererRss": 600780800,
+				"bytes": 7572204
+			},
+			"superdoc": {
+				"loadMs": 1835,
+				"settledMs": 1835,
+				"settleTimedOut": 0,
+				"rendererRss": 679317504,
+				"bytes": 8262569
+			},
+			"plate": {
+				"loadMs": 523,
+				"settledMs": 523,
+				"settleTimedOut": 0,
+				"rendererRss": 479748096,
+				"bytes": 1209768
+			},
+			"docen": {
+				"loadMs": 388,
+				"settledMs": 388,
+				"settleTimedOut": 0,
+				"rendererRss": 592132096,
+				"bytes": 1558071
+			},
+			"eigenpal": {
+				"loadMs": 1367,
+				"settledMs": 1367,
+				"settleTimedOut": 0,
+				"rendererRss": 562626560,
+				"bytes": 5335863
+			},
+			"folio": {
+				"loadMs": 452,
+				"settledMs": 614,
+				"settleTimedOut": 0,
+				"rendererRss": 497057792,
+				"bytes": 2360408
+			},
+			"wordcraft": {
+				"loadMs": 519,
+				"settledMs": 2927,
+				"settleTimedOut": 0,
+				"rendererRss": 559943680,
+				"bytes": 23133846
+			},
+			"word-online": {
+				"loadMs": 313,
+				"settledMs": 313,
+				"settleTimedOut": 0,
+				"rendererRss": 919576576,
+				"bytes": 2179454
+			},
+			"google-viewer": {
+				"loadMs": 558,
+				"settledMs": 558,
+				"settleTimedOut": 0,
+				"rendererRss": 652275712,
+				"bytes": 1440148
+			},
+			"apryse": {
+				"loadMs": 300,
+				"settledMs": 300,
+				"settleTimedOut": 0,
+				"rendererRss": 750227456,
+				"bytes": 7517237
+			},
+			"nutrient": {
+				"loadMs": 3962,
+				"settledMs": 3962,
+				"settleTimedOut": 0,
+				"rendererRss": 824246272,
+				"bytes": 25787643
+			},
+			"react-docx": {
+				"loadMs": 988,
+				"settledMs": 1030,
+				"settleTimedOut": 0,
+				"rendererRss": 537620480,
+				"bytes": 8182961
+			},
+			"univer": {
+				"loadMs": 381,
+				"settledMs": 381,
+				"settleTimedOut": 0,
+				"rendererRss": 542715904,
+				"bytes": 2462647
+			},
+			"betteroffice": {
+				"loadMs": 1279,
+				"settledMs": 1279,
+				"settleTimedOut": 0,
+				"rendererRss": 730150912,
+				"bytes": 15308128
+			},
+			"onlyoffice": {
+				"loadMs": 2552,
+				"settledMs": 2552,
+				"settleTimedOut": 0,
+				"rendererRss": 941514752,
+				"bytes": 14779720
+			},
+			"opendoc": {
+				"loadMs": 813,
+				"settledMs": 1039,
+				"settleTimedOut": 0,
+				"rendererRss": 763133952,
+				"bytes": 21418845
+			}
+		},
+		"lorem-500": {
+			"canvas-editor": {
+				"loadMs": 18447,
+				"settledMs": 18542,
+				"settleTimedOut": 0,
+				"rendererRss": 5049856000,
+				"bytes": 1134325
+			},
+			"docxodus": {
+				"loadMs": 5167,
+				"settledMs": 5167,
+				"settleTimedOut": 0,
+				"rendererRss": 784900096,
+				"bytes": 7959433
+			},
+			"superdoc": {
+				"loadMs": 13277,
+				"settledMs": 13277,
+				"settleTimedOut": 0,
+				"rendererRss": 1123233792,
+				"bytes": 8650198
+			},
+			"plate": {
+				"loadMs": 64846,
+				"settledMs": 64846,
+				"settleTimedOut": 0,
+				"rendererRss": 658481152,
+				"bytes": 1597892
+			},
+			"docen": {
+				"loadMs": 2296,
+				"settledMs": null,
+				"settleTimedOut": 3,
+				"rendererRss": 1867202560,
+				"bytes": 1977584,
+				"elsewhere": "a MacBook Pro (Apple M4 Pro, 12 cores, 24 GB, with its graphics card)"
+			},
+			"eigenpal": {
+				"loadMs": 5204,
+				"settledMs": 5204,
+				"settleTimedOut": 0,
+				"rendererRss": 735674368,
+				"bytes": 5723025
+			},
+			"folio": {
+				"loadMs": 13971,
+				"settledMs": 13971,
+				"settleTimedOut": 0,
+				"rendererRss": 2504556544,
+				"bytes": 2722219
+			},
+			"wordcraft": {
+				"loadMs": 3809,
+				"settledMs": null,
+				"settleTimedOut": 3,
+				"rendererRss": 745009152,
+				"bytes": 23521531
+			},
+			"word-online": {
+				"loadMs": 787,
+				"settledMs": 787,
+				"settleTimedOut": 0,
+				"rendererRss": 916250624,
+				"bytes": 2449073
+			},
+			"google-viewer": {
+				"loadMs": 703,
+				"settledMs": 703,
+				"settleTimedOut": 0,
+				"rendererRss": 672288768,
+				"bytes": 1411849
+			},
+			"apryse": {
+				"loadMs": 911,
+				"settledMs": 7108,
+				"settleTimedOut": 0,
+				"rendererRss": 1595897856,
+				"bytes": 7904988
+			},
+			"nutrient": {
+				"loadMs": 20772,
+				"settledMs": 20772,
+				"settleTimedOut": 0,
+				"rendererRss": 816234496,
+				"bytes": 26175562
+			},
+			"react-docx": {
+				"loadMs": 8701,
+				"settledMs": 8701,
+				"settleTimedOut": 0,
+				"rendererRss": 964546560,
+				"bytes": 8108124
+			},
+			"univer": {
+				"loadMs": 29280,
+				"settledMs": 29285,
+				"settleTimedOut": 0,
+				"rendererRss": 2510401536,
+				"bytes": 3175029
+			},
+			"betteroffice": {
+				"loadMs": 8055,
+				"settledMs": 8905,
+				"settleTimedOut": 0,
+				"rendererRss": 1359200256,
+				"bytes": 14276281
+			},
+			"onlyoffice": {
+				"loadMs": 12796,
+				"settledMs": 12796,
+				"settleTimedOut": 0,
+				"rendererRss": 995082240,
+				"bytes": 15167390
+			},
+			"opendoc": {
+				"loadMs": 3536,
+				"settledMs": 7013,
+				"settleTimedOut": 0,
+				"rendererRss": 954122240,
+				"bytes": 21806629
+			}
+		}
+	}
+}

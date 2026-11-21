@@ -5,9 +5,11 @@ import Site from "../../layouts/Site.astro";
 import { listReports } from "../../lib/cms";
 import demos from "../../data/demos.json" with { type: "json" };
 import type { DemoEntry } from "../../lib/demos";
-import { renderMarkdown } from "../../lib/reports";
+import browserPass from "../../data/browser-pass.json" with { type: "json" };
+import { ANCHORS, type Axis, type BrowserPass, grades } from "../../lib/browserGrades";
+import { vendorAnchor } from "../../lib/reports";
 import vendorsData from "../../data/vendors.json" with { type: "json" };
-import { fieldCounts, word } from "../../lib/vendorFacts";
+import { Word, fieldCounts, word } from "../../lib/vendorFacts";
 import { SAFETY_PASS, type VendorData, bestPlacement, fmtScore, ordinal, rankOn, safeSiteUrl, safetyVerdict } from "../../lib/vendors";
 
 const { entries, cacheHint } = await getEmDashCollection("vendors", { limit: 100 });
@@ -25,6 +27,16 @@ const field = all.filter((v) => v.data.position < 200);
 const baseline = all.filter((v) => v.data.position >= 200);
 const n = fieldCounts(vendorsData);
 const anchor = (h: string) => new GithubSlugger().slug(h);
+const pass = browserPass as BrowserPass;
+const AXES: [Axis, string][] = [["speed", "Speed"], ["data", "Data transferred"], ["memory", "Memory"]];
+/** A vendor that is in the CMS and not (yet) in vendors.json has no section to link to. */
+const notesHref = (slug: string) => {
+	try {
+		return `/editors-trial/vendor-notes#${vendorAnchor(slug)}`;
+	} catch {
+		return null;
+	}
+};
 const host = (u: string) => u.replace(/^https:\/\/(www\.)?/, "").replace(/\/$/, "");
 ---
 
@@ -35,11 +47,13 @@ const host = (u: string) => u.replace(/^https:\/\/(www\.)?/, "").replace(/\/$/, 
 			<p class="eyebrow">Editors trial<span class="sep">·</span>The field<span class="sep">·</span>{field.length} tools and a baseline</p>
 			<h1>Every tool here <span class="mark">leads somewhere</span>.</h1>
 			<p>
-				The projects below are DOCX editors that legal teams can actually build on: {word(n.open)} open-source projects and
-				{word(n.commercial)} commercial SDK. Each was run through its
-				own code, on the same documents, against the same reference. No single score captures a tool: the editor that keeps
-				every byte is not the one that refuses a hostile package best, and neither is the one that draws Word's page to the
-				pixel. This page leads with what each one does best, and shows both measurements beside it.
+				The projects below are DOCX tools that legal teams can actually build on: {word(n.open)} open-source projects and
+				{word(n.commercial)} commercial {n.commercial === 1 ? "SDK" : "SDKs"}. {Word(n.measured)} of them have been run through their
+				own code, on the trial's documents, against the same reference.
+				{n.tools > n.measured && <>The other {word(n.tools - n.measured)} came to <a href="https://editors.benchmarks.law">editors.benchmarks.law</a> later: they are scored here on what that site measured, where it could measure them, and their round trip and hostile-input lanes are being measured.</>}
+				{" "}No single score captures a tool: the editor that keeps every byte is not the one that refuses a hostile package
+				best, and neither is the one that draws Word's page to the pixel. Each card says first what the tool is good for,
+				and shows the measurements beside it.
 			</p>
 		</div>
 
@@ -47,6 +61,7 @@ const host = (u: string) => u.replace(/^https:\/\/(www\.)?/, "").replace(/\/$/, 
 			<div><b>Round trip</b><span>Weighted score over 99 checks, import then export through the tool's own code. Main report.</span></div>
 			<div><b>Hostile input</b><span>Mean grade over ten hostile packages, 1 = a named ceiling that refuses it. Report D. Pass line {SAFETY_PASS.toFixed(2)}.</span></div>
 			<div><b>Rendering</b><span>The tool's own UI or renderer, against Word's page. Report C.</span></div>
+			<div><b>Speed, data, memory</b><span>Scores from 0 to 10, from one browser pass of <a href="https://editors.benchmarks.law">editors.benchmarks.law</a> on {pass.measuredAt}. <a href="#scores">How they are worked out</a>.</span></div>
 		</div>
 
 		<aside class="layers">
@@ -111,19 +126,32 @@ const host = (u: string) => u.replace(/^https:\/\/(www\.)?/, "").replace(/\/$/, 
 										)}
 									</dd>
 								</div>
+								{AXES.map(([axis, label]) => {
+									const g = grades(v.slug, pass)[axis];
+									return (
+										<div class="meter">
+											<dt>{label}</dt>
+											<dd>
+												{g.score == null ? (
+													<span class="na">{g.why}</span>
+												) : (
+													<>
+														<span class="bar"><span style={`width:${g.score * 10}%`} /></span>
+														<b>{g.score.toFixed(1)}</b>
+														<em>{g.basis}</em>
+													</>
+												)}
+											</dd>
+										</div>
+									);
+								})}
 							</dl>
 							<div class="v-links">
 								{(demos as Record<string, DemoEntry>)[v.slug] && <a class="v-demo" href={`/editors-trial/demo/${v.slug}`}>Live demo <span class="arr">→</span></a>}
 								{d.render_section && <a href={`/editors-trial/report-c#${anchor(d.render_section)}`}>How it renders <span class="arr">→</span></a>}
-								{d.lane && <a href={`/editors-trial/${d.lane}`}>Lane note <span class="arr">→</span></a>}
+								{notesHref(v.slug) && <a href={notesHref(v.slug)}>About {d.title} <span class="arr">→</span></a>}
 								{safeSiteUrl(d.site) && <a href={safeSiteUrl(d.site)} rel="noopener">{host(safeSiteUrl(d.site)!)} <span class="arr">→</span></a>}
 							</div>
-							{d.about && (
-								<details class="v-about">
-									<summary>About {d.title}</summary>
-									<div class="prose" set:html={renderMarkdown(d.about).html} />
-								</details>
-							)}
 						</li>
 					);
 				})
@@ -158,6 +186,25 @@ const host = (u: string) => u.replace(/^https:\/\/(www\.)?/, "").replace(/\/$/, 
 					</article>
 				))
 			}
+			<div class="fineprint" id="scores">
+				<p>
+					<b>Speed, data and memory.</b> These three scores come from one browser pass of{" "}
+					<a href="https://editors.benchmarks.law">editors.benchmarks.law</a>, measured {pass.measuredAt}: {pass.environment}.
+					The same files were opened in every engine. Each score is a place on a logarithmic scale between two fixed
+					figures, so it can be worked out from the figure printed beside it; it is not a rank.
+				</p>
+				<ul>
+					<li><b>Speed</b> is the mean of two halves: the time until the rich sample is drawn and the page is idle ({ANCHORS.richMs[0]} ms scores 10, {ANCHORS.richMs[1] / 1000} s scores 0), and the same for the 500-page file ({ANCHORS.longMs[0] / 1000} s scores 10, {ANCHORS.longMs[1] / 1000} s scores 0). A file that did not become usable in the time the test waits scores 0 for its half.</li>
+					<li><b>Data transferred</b> is what the browser downloads to open the rich sample with an empty cache ({ANCHORS.bytes[0] / 1e6} MB scores 10, {ANCHORS.bytes[1] / 1e6} MB scores 0).</li>
+					<li><b>Memory</b> is the memory of the browser's page processes with the 500-page file open ({ANCHORS.rss[0] / 1048576} MB scores 10, {ANCHORS.rss[1] / 1048576} MB scores 0). A blank Chrome page on that machine already takes about 450 MB.</li>
+				</ul>
+				<p>
+					An axis is left without a score where the figure it needs is the test machine's or the method's, not the
+					engine's; the card says which and why. Tools that are not on editors.benchmarks.law have no browser figures
+					here: <a href="/editors-trial/report-e2">Report E2</a> times nine of the editors in a browser by another method,
+					and <a href="/editors-trial/report-e">Report E</a> times opening and saving without one.
+				</p>
+			</div>
 			<p class="fineprint">
 				Scores describe the pinned versions on the published inputs, as of the reports' dates. Round trip is measured in{" "}
 				<a href="/editors-trial/round-trip">the main report</a>, hostile input in <a href="/editors-trial/report-d">Report D</a>, and

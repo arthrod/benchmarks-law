@@ -9,9 +9,10 @@ const REPORTS_ROOT = resolve(process.env.REPORTS_ROOT ?? join(SITE, "../../edito
 
 describe("Report E became Reports D1 and D2", () => {
 	it("redirects each old slug to a report that exists", () => {
-		expect(RENAMED_SLUGS).toEqual({ "report-e-jubarte": "report-d1-jubarte", "report-e-word": "report-d2-word" });
+		expect(RENAMED_SLUGS).toMatchObject({ "report-e-jubarte": "report-d1-jubarte", "report-e-word": "report-d2-word" });
 		const slugs = new Set(REPORT_FILES.map((f) => f.slug));
-		for (const to of Object.values(RENAMED_SLUGS)) expect(slugs.has(to)).toBe(true);
+		// A lane note's old address goes to a section of the vendor notes: the page before the "#" must exist.
+		for (const to of Object.values(RENAMED_SLUGS)) expect(slugs.has(to.split("#")[0])).toBe(true);
 		for (const from of Object.keys(RENAMED_SLUGS)) expect(slugs.has(from)).toBe(false);
 	});
 

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import vendors from "../src/data/vendors.json" with { type: "json" };
-import { REPORT_FILES } from "../src/lib/reports";
-import { TOOL_OF, applyFacts } from "../src/lib/vendorFacts";
+import { RENAMED_SLUGS, REPORT_FILES } from "../src/lib/reports";
+import { NOT_YET_IN_THE_TRIAL, TOOL_OF, applyFacts } from "../src/lib/vendorFacts";
 
 const facts = {
 	"rt.superdoc.weighted": 100.0,
@@ -35,17 +35,54 @@ describe("vendor figures come from the trial's facts, never typed", () => {
 		for (const v of vendors) expect(TOOL_OF[v.slug], v.slug).toBeTruthy();
 	});
 
-	it("lists Apryse, closed-source, with its lane note", () => {
+	it("lists Apryse, closed-source, and its old lane note leads to its vendor section", () => {
 		const a = vendors.find((v) => v.slug === "apryse");
-		expect(a).toMatchObject({ maker: "Apryse Software Inc.", lane: "lane-apryse" });
+		expect(a).toMatchObject({ maker: "Apryse Software Inc." });
 		expect(a?.license).toMatch(/proprietary/i);
-		expect(REPORT_FILES.some((f) => f.slug === "lane-apryse")).toBe(true);
+		expect(REPORT_FILES.some((f) => f.slug === "lane-apryse")).toBe(false);
+		expect(RENAMED_SLUGS["lane-apryse"]).toBe("vendor-notes#apryse");
 	});
 });
 
 describe("the field's counts are computed, not typed", () => {
 	it("counts the tools, the open-source ones and the commercial ones, without the baseline", async () => {
 		const { fieldCounts } = await import("../src/lib/vendorFacts");
-		expect(fieldCounts(vendors)).toEqual({ tools: 13, open: 12, commercial: 1 });
+		expect(fieldCounts(vendors)).toEqual({ tools: 19, open: 17, commercial: 2, measured: 13 });
+	});
+});
+
+describe("tools the trial has not measured yet", () => {
+	it("are on the field page with no round-trip or hostile-input figure, never a typed one", () => {
+		const [o] = applyFacts([{ slug: "onlyoffice", roundtrip: 55, critical: "9/29", safety: 0.5 }], facts);
+		expect(o).toMatchObject({ slug: "onlyoffice", roundtrip: null, critical: "", safety: null });
+	});
+
+	it("take their figures from the facts as soon as the trial has them", () => {
+		const [o] = applyFacts([{ slug: "onlyoffice", roundtrip: null, critical: "", safety: null }], {
+			...facts,
+			"rt.onlyoffice.weighted": 88.1,
+			"rt.onlyoffice.critical_passed": 24,
+			"rt.onlyoffice.critical_total": 29,
+			"bomb.onlyoffice.grade": 0.4,
+		});
+		expect(o).toMatchObject({ roundtrip: 88.1, critical: "24/29", safety: 0.4 });
+	});
+
+	it("still refuse a measured tool whose figure is missing", () => {
+		expect(() => applyFacts([{ slug: "docen", roundtrip: 1, critical: "", safety: 1 }], facts)).toThrow(/docen/);
+	});
+
+	it("are the six that editors.benchmarks.law has and the trial's reports do not yet", () => {
+		expect([...NOT_YET_IN_THE_TRIAL].sort()).toEqual(["betteroffice", "nutrient", "onlyoffice", "opendoc", "react-docx", "univer"]);
+		for (const slug of NOT_YET_IN_THE_TRIAL) expect(vendors.some((v) => v.slug === slug), slug).toBe(true);
+	});
+});
+
+describe("the vendor notes being published", () => {
+	it("must hold a section for every vendor, or the sync stops and names the ones without", async () => {
+		const { missingSections } = await import("../src/lib/vendorFacts");
+		const vs = [{ slug: "docen", section: "Docen" }, { slug: "opendoc", section: "OpenDoc" }];
+		expect(missingSections(vs, new Map([["Docen", ""], ["OpenDoc", ""]]))).toEqual([]);
+		expect(missingSections(vs, new Map([["Docen", ""]]))).toEqual(['opendoc ("OpenDoc")']);
 	});
 });

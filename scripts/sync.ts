@@ -6,9 +6,11 @@
  *   pnpm sync:content   # upsert every report into the EmDash `reports` collection
  *   pnpm sync:vendors   # upsert the field's vendors into the EmDash `vendors` collection
  *   pnpm sync:demos     # live editor demos from the bundle's out/demos and out/demo-files → public/
+ *   pnpm sync:browser   # the browser pass of editors.benchmarks.law → src/data/browser-pass.json (field-page scores)
  *
  * REPORTS_ROOT  editors_trial checkout, or the fetched bundle (default .bench/editors_trial).
  *               sync:assets still needs a real checkout (build/reference.docx). sync:demos does not.
+ * OPEN_DOCS_ROOT a checkout of arthrod/open-docs, committed and clean (sync:browser reads docs/samples/latest.json)
  * EMDASH_URL    EmDash instance (default https://benchmarks.law)
  * EMDASH_TOKEN  personal access token with content:write
  */
@@ -20,7 +22,7 @@ import demosData from "../src/data/demos.json" with { type: "json" };
 import { materializeDemos } from "../src/lib/demos";
 import { REPORT_FILES, buildEntry, splitSections } from "../src/lib/reports";
 import { checkoutRef, isLocalEmDash, fullCheckout, reportsRoot } from "../src/lib/root";
-import { applyFacts } from "../src/lib/vendorFacts";
+import { applyFacts, missingSections } from "../src/lib/vendorFacts";
 
 const SITE = resolve(import.meta.dirname, "..");
 /** EMDASH_TOKEN and the other variables above can live in .env (git-ignored; see .env.example). The shell wins. */
@@ -120,7 +122,6 @@ const VENDOR_FIELDS: [string, string, string, boolean?][] = [
 	["safety", "number", "Hostile-input grade (0-1)"],
 	["site", "string", "Site"],
 	["render_section", "string", "Report C section heading"],
-	["lane", "string", "Lane note slug"],
 	["about", "text", "About (markdown, from vendors.md)"],
 	["position", "integer", "Position"],
 ];
@@ -170,6 +171,8 @@ function vendors() {
 	requireToken();
 	ensureSchema("vendors", "Vendors", "Vendor", VENDOR_FIELDS);
 	const about = splitSections(readFileSync(join(ROOT, "reports/vendors.md"), "utf8"));
+	const absent = missingSections(vendorsData, about);
+	if (absent.length) throw new Error(`reports/vendors.md in ${ROOT} has no section for: ${absent.join(", ")}. The cards' "About" links and the lane redirects point at those sections: publish a trial release that has them first.`);
 	// Measured figures come from the trial's facts; vendors.json is rewritten so the repo never holds a stale one.
 	const facts = JSON.parse(readFileSync(join(ROOT, "out/facts.json"), "utf8"));
 	const measured = applyFacts(vendorsData, facts);
@@ -188,7 +191,6 @@ function vendors() {
 			safety: v.safety,
 			site: v.site,
 			render_section: v.renderSection,
-			lane: v.lane ?? "",
 			about: about.get(v.section) ?? "",
 			position: v.position,
 		}, bySlug);
@@ -229,12 +231,65 @@ function demos() {
 	console.log(`demos ${slugs.length}: ${slugs.join(", ") || "none"}`);
 }
 
+/**
+ * The figures the field page scores speed, data and memory from: one pass of editors.benchmarks.law,
+ * copied with the commit it was read at so the page can be traced to the runs. Only the fields the
+ * scores use are kept (src/lib/browserGrades.ts).
+ */
+const LOAD = "; machine load (1-minute average) ";
+const machineOf = (env: string) => (env ?? "").split(LOAD)[0];
+/** "<browser and method>; <the machine>": the machine. */
+const placeOf = (env: string) => machineOf(env).split("; ").slice(1).join("; ") || machineOf(env);
+
+function browser() {
+	const root = process.env.OPEN_DOCS_ROOT;
+	if (!root) throw new Error("OPEN_DOCS_ROOT is not set (a checkout of arthrod/open-docs)");
+	const git = (...args: string[]) => {
+		const r = spawnSync("git", ["-C", root, ...args], { encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
+		if (r.status !== 0) throw new Error(`git ${args.join(" ")} failed in ${root}: ${r.stderr}`);
+		return r.stdout.trim();
+	};
+	const rel = "docs/samples/latest.json";
+	if (git("status", "--porcelain", "--", rel)) throw new Error(`${rel} has uncommitted changes in ${root}: commit it first, so the page names a commit that holds these figures`);
+	// Read from the commit that is named on the page, not from the working tree: an edit made
+	// after the check above cannot put figures on the page that the commit does not hold.
+	const commit = git("rev-parse", "HEAD");
+	const latest = JSON.parse(git("show", `${commit}:${rel}`));
+	const keep = ["loadMs", "settledMs", "settleTimedOut", "rendererRss", "bytes"];
+	const samples = Object.fromEntries(
+		Object.entries(latest.samples as Record<string, Record<string, Record<string, unknown>>>).map(([sample, rows]) => [
+			sample,
+			Object.fromEntries(
+				Object.entries(rows).map(([engine, row]) => [
+					engine,
+					{
+						...Object.fromEntries(keep.map((k) => [k, row[k] ?? null])),
+						// A row measured on another machine than its table (the text before the load of the step): its
+						// seconds and megabytes are not comparable with the others', so it is not scored on them.
+						...(typeof row.environment === "string" && machineOf(row.environment) !== machineOf(latest.environment) ? { elsewhere: placeOf(row.environment) } : {}),
+					},
+				]),
+			),
+		]),
+	);
+	const out = {
+		source: `https://github.com/arthrod/open-docs/blob/${commit}/${rel}`,
+		commit,
+		measuredAt: latest.measuredAt,
+		environment: latest.environment,
+		samples,
+	};
+	writeFileSync(join(SITE, "src/data/browser-pass.json"), `${JSON.stringify(out, null, "\t")}\n`);
+	console.log(`browser pass ${out.measuredAt} at ${out.commit.slice(0, 9)}: ${Object.keys(samples).join(", ")}`);
+}
+
 const cmd = process.argv[2];
 if (cmd === "assets") assets();
 else if (cmd === "content") await content();
 else if (cmd === "vendors") vendors();
 else if (cmd === "demos") demos();
+else if (cmd === "browser") browser();
 else {
-	console.error("usage: sync.ts assets|content|vendors|demos");
+	console.error("usage: sync.ts assets|content|vendors|demos|browser");
 	process.exit(2);
 }
