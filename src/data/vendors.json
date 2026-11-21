@@ -215,7 +215,7 @@
 		"license": "MIT",
 		"kind": "Paged Word viewer and editor for React, on a Rust parser compiled to WebAssembly",
 		"leads": "Use react-docx for a React editor whose files Word opens",
-		"detail": "Use react-docx to put a paged Word viewer and editor in a React app: Word opened the file it saved, it kept every part of the test document, and it showed the 500-page sample on 500 pages in under 9 seconds. It lost 7 of the test document's 169 pieces of text and all of its math, it kept the weapon in five of ten hostile files, and it runs only in a browser.",
+		"detail": "Use react-docx to put a paged Word viewer and editor in a React app: Word opened the file it saved, it kept every part of the test document, and it showed the 500-page sample on 500 pages in under 9 seconds. It lost 7 of the test document's 169 pieces of text (the text box and the embedded document), it kept the weapon in five of ten hostile files, and it runs only in a browser.",
 		"roundtrip": 91.5,
 		"critical": "26/29",
 		"safety": 0.2,
