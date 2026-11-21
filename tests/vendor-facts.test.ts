@@ -77,3 +77,12 @@ describe("tools the trial has not measured yet", () => {
 		for (const slug of NOT_YET_IN_THE_TRIAL) expect(vendors.some((v) => v.slug === slug), slug).toBe(true);
 	});
 });
+
+describe("the vendor notes being published", () => {
+	it("must hold a section for every vendor, or the sync stops and names the ones without", async () => {
+		const { missingSections } = await import("../src/lib/vendorFacts");
+		const vs = [{ slug: "docen", section: "Docen" }, { slug: "opendoc", section: "OpenDoc" }];
+		expect(missingSections(vs, new Map([["Docen", ""], ["OpenDoc", ""]]))).toEqual([]);
+		expect(missingSections(vs, new Map([["Docen", ""]]))).toEqual(['opendoc ("OpenDoc")']);
+	});
+});

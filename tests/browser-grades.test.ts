@@ -61,6 +61,29 @@ describe("speed, data and memory scores come from the browser pass", () => {
 		expect(g.memory.why).toMatch(/500 pages/);
 	});
 
+	it("scores 0 for the half of a rich sample that never became usable, as the printed rule says", () => {
+		const p = { ...pass, samples: { ...pass.samples, showcase: { ...pass.samples.showcase, docxodus: cell(null, 559 * 1048576, 7_500_000, { settleTimedOut: 3 }) } } };
+		const g = grades("docxodus", p as never);
+		expect(g.speed.score).toBeGreaterThan(0);
+		expect(g.speed.score).toBeLessThanOrEqual(5);
+		expect(g.speed.basis).toBe("the rich sample did not become usable in the time the test waits, 5.17 s on the 500 pages");
+	});
+
+	it("does not call an absent 500-page row a wait that ran out", () => {
+		const { docxodus: _gone, ...rest } = pass.samples["lorem-500"];
+		const p = { ...pass, samples: { ...pass.samples, "lorem-500": rest } };
+		const g = grades("docxodus", p as never);
+		expect(g.speed).toEqual({ score: null, why: "Not scored: the 500 pages were not measured for it" });
+		expect(g.memory.score).toBeNull();
+		expect(g.data.score).not.toBeNull();
+	});
+
+	it("says so when the memory figure was read from a page still busy", () => {
+		const p = { ...pass, samples: { ...pass.samples, "lorem-500": { ...pass.samples["lorem-500"], docxodus: cell(null, 749 * 1048576, 8_000_000, { settleTimedOut: 3 }) } } };
+		expect(grades("docxodus", p as never).memory.basis).toBe("749 MB with the 500 pages open, read while the page was still busy");
+		expect(grades("docxodus", pass).memory.basis).toBe("749 MB with the 500 pages open");
+	});
+
 	it("does not score a reading taken on another machine than the rest of the table, and names the machine", () => {
 		const mac = { ...pass, samples: { ...pass.samples, "lorem-500": { ...pass.samples["lorem-500"], docen: { loadMs: 2296, settledMs: null, rendererRss: 1781 * 1048576, bytes: 1_900_000, elsewhere: "a MacBook Pro" } } } };
 		const g = grades("docen", mac as never);

@@ -235,7 +235,9 @@ function toolResult(data: McpData, name: string, args: Json): Json | null {
 		if (!report) {
 			const moved = data.renames[slug];
 			if (!moved) return null;
-			return { moved_to: moved, slug, url: `${SITE}/editors-trial/${moved}` };
+			// A report folded into another names that report's slug (what get_report takes) and the section in it.
+			const [to, section] = moved.split("#");
+			return { moved_to: to, ...(section ? { section } : {}), slug, url: `${SITE}/editors-trial/${moved}` };
 		}
 		return { ...reportSummary(report), ...cap(report.body) };
 	}

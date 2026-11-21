@@ -98,18 +98,21 @@ export function grades(slug: string, pass: BrowserPass): Record<Axis, Grade> {
 
 	const speed = (): Grade => {
 		if (skip.speed) return { score: null, why: skip.speed };
-		if (rich.settledMs == null) return { score: null, why: "Not scored: the rich sample never went idle in the time the test waits" };
-		const short = scale(rich.settledMs, ...ANCHORS.richMs);
+		// The printed rule: a file that did not become usable in the time the test waits scores 0 for its half.
+		const short = rich.settledMs == null ? 0 : scale(rich.settledMs, ...ANCHORS.richMs);
+		const richSaid = rich.settledMs == null ? "the rich sample did not become usable in the time the test waits" : `${time(rich.settledMs)} on the rich sample`;
+		// No 500-page row at all is not a wait that ran out: there is nothing to score that half on.
+		if (!long) return { score: null, why: "Not scored: the 500 pages were not measured for it" };
 		// Before the "never went idle" case: a wait that ran out on another machine is not this pass's finding either.
-		if (long?.elsewhere) {
+		if (long.elsewhere) {
 			return { score: null, why: `Not scored: its 500 pages were timed on another machine, ${long.elsewhere}${long.settledMs == null ? ", where it was still busy when the test stopped waiting" : ""}` };
 		}
-		if (long?.settledMs == null) {
-			return { score: Math.round(short * 5) / 10, basis: `${time(rich.settledMs)} on the rich sample; the 500 pages did not become usable in the time the test waits` };
+		if (long.settledMs == null) {
+			return { score: Math.round(short * 5) / 10, basis: `${richSaid}; the 500 pages did not become usable in the time the test waits` };
 		}
 		return {
 			score: Math.round((short + scale(long.settledMs, ...ANCHORS.longMs)) * 5) / 10,
-			basis: `${time(rich.settledMs)} on the rich sample, ${time(long.settledMs)} on the 500 pages`,
+			basis: `${richSaid}, ${time(long.settledMs)} on the 500 pages`,
 		};
 	};
 	const data = (): Grade => {
@@ -121,7 +124,9 @@ export function grades(slug: string, pass: BrowserPass): Record<Axis, Grade> {
 		if (skip.memory) return { score: null, why: skip.memory };
 		if (long?.rendererRss == null) return { score: null, why: "Not scored: no memory reading with the 500 pages open" };
 		if (long.elsewhere) return { score: null, why: `Not scored: its 500-page reading (${mebibytes(long.rendererRss)}) was taken on another machine, ${long.elsewhere}` };
-		return { score: scale(long.rendererRss, ...ANCHORS.rss), basis: `${mebibytes(long.rendererRss)} with the 500 pages open` };
+		// A page still busy when the wait ended was read mid-work: the figure is what it held then, and says so.
+		const busy = long.settledMs == null ? ", read while the page was still busy" : "";
+		return { score: scale(long.rendererRss, ...ANCHORS.rss), basis: `${mebibytes(long.rendererRss)} with the 500 pages open${busy}` };
 	};
 	return { speed: speed(), data: data(), memory: memory() };
 }

@@ -35,6 +35,14 @@ export const TOOL_OF: Record<string, string> = {
  */
 export const NOT_YET_IN_THE_TRIAL = new Set(["react-docx", "univer", "opendoc", "betteroffice", "onlyoffice", "nutrient"]);
 
+/**
+ * Vendors whose section is not in the vendor notes being published. Every card's "About" link and every
+ * old lane address lands on that section, so a sync against notes that lack one must stop.
+ */
+export function missingSections(vendors: { slug: string; section: string }[], sections: { has(name: string): boolean }): string[] {
+	return vendors.filter((v) => !sections.has(v.section)).map((v) => `${v.slug} ("${v.section}")`);
+}
+
 type Measured = { slug: string; roundtrip: number | null; critical: string; safety: number | null };
 
 export function applyFacts<T extends Measured>(vendors: T[], facts: Record<string, unknown>): T[] {

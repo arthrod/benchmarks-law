@@ -22,7 +22,7 @@ import demosData from "../src/data/demos.json" with { type: "json" };
 import { materializeDemos } from "../src/lib/demos";
 import { REPORT_FILES, buildEntry, splitSections } from "../src/lib/reports";
 import { checkoutRef, isLocalEmDash, fullCheckout, reportsRoot } from "../src/lib/root";
-import { applyFacts } from "../src/lib/vendorFacts";
+import { applyFacts, missingSections } from "../src/lib/vendorFacts";
 
 const SITE = resolve(import.meta.dirname, "..");
 /** EMDASH_TOKEN and the other variables above can live in .env (git-ignored; see .env.example). The shell wins. */
@@ -171,6 +171,8 @@ function vendors() {
 	requireToken();
 	ensureSchema("vendors", "Vendors", "Vendor", VENDOR_FIELDS);
 	const about = splitSections(readFileSync(join(ROOT, "reports/vendors.md"), "utf8"));
+	const absent = missingSections(vendorsData, about);
+	if (absent.length) throw new Error(`reports/vendors.md in ${ROOT} has no section for: ${absent.join(", ")}. The cards' "About" links and the lane redirects point at those sections: publish a trial release that has them first.`);
 	// Measured figures come from the trial's facts; vendors.json is rewritten so the repo never holds a stale one.
 	const facts = JSON.parse(readFileSync(join(ROOT, "out/facts.json"), "utf8"));
 	const measured = applyFacts(vendorsData, facts);

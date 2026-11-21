@@ -143,6 +143,16 @@ describe("MCP JSON-RPC", () => {
 		});
 	});
 
+	it("a report folded into a section of another names that report's slug, the section, and the address", async () => {
+		const res = await handleMcp(
+			post({ id: 6, jsonrpc: "2.0", method: "tools/call", params: { arguments: { slug: "lane-docen" }, name: "get_report" } }),
+			undefined,
+			() => Promise.resolve({ ...DATA, renames: { ...DATA.renames, "lane-docen": "vendor-notes#docen" } }),
+		);
+		const body = (await res.json()) as { result: { content: { text: string }[] } };
+		expect(JSON.parse(body.result.content[0]?.text ?? "{}")).toEqual({ moved_to: "vendor-notes", section: "docen", slug: "lane-docen", url: "https://benchmarks.law/editors-trial/vendor-notes#docen" });
+	});
+
 	it("get_vendor returns the scores", async () => {
 		const response = await handleMcp(
 			post({
