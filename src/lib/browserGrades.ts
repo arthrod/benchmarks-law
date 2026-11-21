@@ -44,7 +44,7 @@ export const ANCHORS = {
 } as const;
 
 /** Field-page slug → engine id on editors.benchmarks.law. A tool that is not there has no entry. */
-export const ENGINE_OF: Record<string, string> = {
+const ENGINE_OF: Record<string, string> = {
 	superdoc: "superdoc",
 	folio: "folio",
 	eigenpal: "eigenpal",
@@ -67,7 +67,7 @@ const NO_GPU = "the test machine has no graphics card";
  * Axes that are not scored, with the reason. Each is a figure the two sites list under "Figures to
  * distrust" as the machine's or the method's, not the engine's: scoring it would blame the engine.
  */
-export const NOT_SCORED: Record<string, Partial<Record<Axis, string>>> = {
+const NOT_SCORED: Record<string, Partial<Record<Axis, string>>> = {
 	wordcraft: { speed: `Not scored: ${NO_GPU}, and WordCraft draws through one. There its drawing never went idle; on a Mac it settled in 3 to 4 s` },
 	"canvas-editor": { memory: `Not scored: ${NO_GPU}, so Chrome kept every page canvas in memory (4.8 GB there, 0.5 to 1.8 GB on a Mac)` },
 	apryse: { speed: "Not scored: its engine works in a background thread that the timing cannot see" },
@@ -76,7 +76,7 @@ export const NOT_SCORED: Record<string, Partial<Record<Axis, string>>> = {
 	),
 };
 
-export const NOT_IN_PASS = "Not on editors.benchmarks.law, so it has no figure from that pass";
+const NOT_IN_PASS = "Not on editors.benchmarks.law, so it has no figure from that pass";
 
 /** 10 at `best` or better, 0 at `worst` or worse, logarithmic between; one decimal. */
 export function scale(value: number, best: number, worst: number): number {
