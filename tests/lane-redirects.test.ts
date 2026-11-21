@@ -30,3 +30,13 @@ describe("the vendor notes are the one page about each vendor", () => {
 		expect(() => vendorAnchor("no-such-tool")).toThrow();
 	});
 });
+
+describe("a moved report's Markdown", () => {
+	it("is refused before the CMS is asked, so a superseded lane note is not served at its .md address", async () => {
+		const { readFileSync } = await import("node:fs");
+		const src = readFileSync(new URL("../src/pages/editors-trial/[slug].md.ts", import.meta.url), "utf8");
+		const guard = src.indexOf("Object.hasOwn(RENAMED_SLUGS");
+		expect(guard).toBeGreaterThan(-1);
+		expect(guard).toBeLessThan(src.indexOf("getEmDashEntry(\"reports\""));
+	});
+});

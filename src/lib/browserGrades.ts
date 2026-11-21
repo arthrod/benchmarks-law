@@ -76,7 +76,7 @@ export const NOT_SCORED: Record<string, Partial<Record<Axis, string>>> = {
 	),
 };
 
-export const NOT_IN_PASS = "Not on editors.benchmarks.law, so not timed in a browser";
+export const NOT_IN_PASS = "Not on editors.benchmarks.law, so it has no figure from that pass";
 
 /** 10 at `best` or better, 0 at `worst` or worse, logarithmic between; one decimal. */
 export function scale(value: number, best: number, worst: number): number {
@@ -100,8 +100,9 @@ export function grades(slug: string, pass: BrowserPass): Record<Axis, Grade> {
 		if (skip.speed) return { score: null, why: skip.speed };
 		if (rich.settledMs == null) return { score: null, why: "Not scored: the rich sample never went idle in the time the test waits" };
 		const short = scale(rich.settledMs, ...ANCHORS.richMs);
-		if (long?.elsewhere && long.settledMs != null) {
-			return { score: null, why: `Not scored: its 500-page time was taken on another machine, ${long.elsewhere}` };
+		// Before the "never went idle" case: a wait that ran out on another machine is not this pass's finding either.
+		if (long?.elsewhere) {
+			return { score: null, why: `Not scored: its 500 pages were timed on another machine, ${long.elsewhere}${long.settledMs == null ? ", where it was still busy when the test stopped waiting" : ""}` };
 		}
 		if (long?.settledMs == null) {
 			return { score: Math.round(short * 5) / 10, basis: `${time(rich.settledMs)} on the rich sample; the 500 pages did not become usable in the time the test waits` };
