@@ -43,7 +43,7 @@ describe("reportsRoot", () => {
 		const base = mkdtempSync(join(tmpdir(), "root-"));
 		const site = join(base, "a", "site");
 		expect(() => reportsRoot({}, site)).toThrow(/REPORTS_ROOT not found/);
-		expect(src("scripts/sync.ts")).toMatch(/REPORTS_ROOT\s+editors_trial checkout \(default \.\.\/\.\.\/editors_trial\)/);
+		expect(src("scripts/sync.ts")).toMatch(/REPORTS_ROOT\s+editors_trial checkout, or the fetched bundle \(default \.bench\/editors_trial\)/);
 	});
 	it("returns an existing checkout", () => {
 		const dir = mkdtempSync(join(tmpdir(), "et-"));
