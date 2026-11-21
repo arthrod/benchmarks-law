@@ -10,7 +10,7 @@ New collection `reports`: title (string, req), series (string: `editors-trial`),
 Markdown is stored after import-time rewriting:
 - links to sibling report `.md` files → `/editors-trial/<slug>`
 - `../out/**.png` figures → `/editors-trial/figures/<path>` (static assets in `public/`)
-- other repo-relative links → `https://github.com/arthrod/editors_trial/blob/benchmark-fairness-reports/<path>`
+- other repo-relative links → `https://github.com/arthrod/editors_trial/blob/<trialRef>/<path>` (the ref in `src/data/release.json`, currently `et-v0.11.0`)
 Rendering: `marked` (GFM) with heading ids from github-slugger; contents from H2/H3; tables wrapped for horizontal scroll.
 
 ## Routes (all SSR, Astro.cache.set(cacheHint))
@@ -19,7 +19,9 @@ Rendering: `marked` (GFM) with heading ids from github-slugger; contents from H2
 - `/neurotic-docx-bench/` the restyled static viewers from the zip (DOCX→PDF, redlines, speed, editors, home), served from `public/`. Fix its dead links to `jandira-tech/editors_trial`.
 
 ## Import
-`scripts/sync.ts` (`pnpm sync:assets`, `pnpm sync:content`, `pnpm sync:vendors`) reads `REPORTS_ROOT` (default `../../editors_trial`; every command stops if it is absent), builds entries, and upserts via `emdash content create/update` against `EMDASH_URL` (default `https://benchmarks.law`) with `EMDASH_TOKEN`.
+`scripts/sync.ts` (`pnpm sync:assets`, `pnpm sync:content`, `pnpm sync:vendors`) reads `REPORTS_ROOT` (default `.bench/editors_trial`, materialised by `bench fetch`; the root must contain `reports/`), builds entries, and upserts via `emdash content create/update` against `EMDASH_URL` (default `https://benchmarks.law`) with `EMDASH_TOKEN`.
+
+`sync:assets` requires a full checkout with `build/reference.docx`; `sync:content` requires the source to be its own Git checkout to pin links. `sync:vendors` can use the fetched bundle. See the [README measurement scope](../README.md#editors-trial-measurement-scope) for the `et-v0.11.0` results and the three tools without round-trip scores.
 
 ## Acceptance
 vitest on slugging, title/dek extraction, TOC, link rewriting. Live: `/`, every report, the neurotic viewers return 200 without console errors; admin `/_emdash/admin` still loads.

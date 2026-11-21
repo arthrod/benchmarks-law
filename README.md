@@ -8,7 +8,7 @@ Two benches are published:
 
 | Bench | Where | What it measures |
 |---|---|---|
-| **01 · Editors trial** | [`/editors-trial/`](https://benchmarks.law/editors-trial/) | 12 open-source DOCX editors, plus LibreOffice as a baseline. Each editor's own code imports and exports one adversarial document, and the result is scored construct by construct and opened in Word. Ten hostile packages are opened in a sandbox. The reports are the main report, A, A2, B, C, D, D1 and D2, plus the vendor notes and one lane note per editor. |
+| **01 · Editors trial** | [`/editors-trial/`](https://benchmarks.law/editors-trial/) | 19 DOCX tools (17 open-source and two commercial), plus LibreOffice as a baseline; 16 tools have round-trip scores in `et-v0.11.0`. Each editor's own code imports and exports one adversarial document, and the result is scored construct by construct and opened in Word. Ten hostile packages are opened in a sandbox. The reports are the main report, A, A2, B, C, D, D1 and D2, plus the vendor notes and one lane note per editor. |
 | **02 · neurotic_docx_bench** | [`/neurotic-docx-bench/`](https://benchmarks.law/neurotic-docx-bench/) | DOCX → PDF and redlines, page by page against Word (pixel, ink overlap, drift-tolerant SSIM, text boundaries), plus a speed run on 10,000 inputs. |
 
 The reports are written in [arthrod/editors_trial](https://github.com/arthrod/editors_trial) (branch `benchmark-fairness-reports`); this repository only publishes them.
@@ -56,7 +56,7 @@ The endpoint allows 60 requests per 60 seconds per client IP, the same cap as Li
 Reports are edited in editors_trial, never here. To publish:
 
 ```bash
-export REPORTS_ROOT=/path/to/editors_trial      # default ../../editors_trial; every command stops if it is missing
+export REPORTS_ROOT=/path/to/editors_trial      # full checkout for assets and content; default source is .bench/editors_trial
 export EMDASH_TOKEN=…                           # personal access token with content:write
 pnpm sync:assets     # figures and the .docx download (styles for the live .docx builder) → public/
 pnpm sync:content    # upsert every report; pins source links to the trial tag or commit (src/data/release.json)
@@ -96,10 +96,24 @@ bench fetch --check --repo .       # offline: re-hash .bench/ against the lock (
 ```
 
 A fresh clone needs no sibling checkouts: `pnpm install && bench fetch && pnpm build` (the et
-bundle is private, so fetch needs a Hugging Face token that can read it). `REPORTS_ROOT` still
-overrides the editors_trial source for the heavy `sync:*` commands, which read files the release
-bundle does not carry (figures, the reference document, demo manifests); they refuse to run from
-the bundle instead of publishing half.
+bundle is private, so fetch needs a Hugging Face token that can read it). The default source is
+`.bench/editors_trial`; `REPORTS_ROOT` overrides it. `sync:assets` requires a full checkout with
+`build/reference.docx` and figure renders; `sync:content` requires a checkout with its own Git ref
+for source links. `sync:vendors` can read the fetched bundle, and `sync:demos` reads its
+`out/demos` and `out/demo-files`. Source resolution stops if the root or its `reports/` folder is missing.
+
+## Editors trial measurement scope
+
+The site pins `et-v0.11.0` in `bench.lock` and `src/data/release.json`. react-docx,
+OpenDoc and BetterOffice now have round-trip, critical-feature and hostile-input results.
+Report C also includes twelve new figures: pages 1, 3 and 4 for each of react-docx,
+OpenDoc, BetterOffice and Nutrient.
+
+Three field entries have no round-trip score: OnlyOffice’s browser build could not open the
+test document, Univer’s open-source packages have no DOCX reader or writer, and Nutrient is
+a viewer that does not save DOCX. OnlyOffice still has a hostile-input grade. A missing
+round-trip score does not mean that every measurement is unavailable or pending.
+`sync:vendors` requires numeric facts for every other tool and stops if any are missing.
 
 ## Lighthouse
 
