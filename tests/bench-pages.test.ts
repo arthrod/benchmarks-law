@@ -58,7 +58,7 @@ describe.skipIf(!existsSync(PINNED_ET))("the editors scorecard page", () => {
 		);
 		expect(page).toContain("Edition 2 · 2026-10-30, corrected");
 		expect(page).toContain(`<span>Word ${facts["word.version"]} as validator</span>`);
-		expect(page).toMatch(/<b>13<\/b><span>tools measured/);
+		expect(page).toMatch(/<b>16<\/b><span>tools measured/);
 		expect(page).toMatch(/<b>99<\/b><span>checks/);
 		expect(page).toMatch(/<b>35<\/b><span>package parts/);
 		expect(page).toMatch(/<b>29<\/b><span>critical features/);

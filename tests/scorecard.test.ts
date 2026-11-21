@@ -351,9 +351,9 @@ describe.skipIf(!existsSync(PIN))("the pinned et release", () => {
 			`eigenpal moves from 98.5% to ${Number(pinned["rt.eigenpal.weighted"]).toFixed(1)}%.`,
 		);
 	});
-	it("prints the release's own prose counts: thirteen editors, 99 checks, 35 parts, Word 16.115", () => {
+	it("prints the release's own prose counts: sixteen editors, 99 checks, 35 parts, Word 16.115", () => {
 		const page = scorecardHtml(pinned, { defectClasses: 12, release });
-		expect(page).toContain("<h1>Thirteen DOCX editors, one <span class=\"mk\">hostile</span> document, 99 checks.</h1>");
+		expect(page).toContain("<h1>Sixteen DOCX editors, one <span class=\"mk\">hostile</span> document, 99 checks.</h1>");
 		expect(page).toContain("critical features are the 29 constructs");
 		expect(page).toContain("pass all 99 checks, keep all 35 parts");
 		expect(page).toContain("produce files Word 16.115 refuses");

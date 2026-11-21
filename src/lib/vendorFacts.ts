@@ -29,11 +29,13 @@ export const TOOL_OF: Record<string, string> = {
 };
 
 /**
- * Tools on the field page whose trial lanes are not in a published bundle yet. Until the facts hold
- * their figures, their round trip and hostile-input cells read "not measured"; every other tool must
- * have its figures or the sync stops.
+ * Tools on the field page with no round-trip score in the trial, each for a measured reason (et-v0.11.0):
+ * OnlyOffice's browser build wrote no output from the test document, Univer has no .docx path in its
+ * open-source packages, and Nutrient is a viewer. Their round-trip cell reads "not measured"; a hostile-input
+ * grade is shown when the facts hold one (OnlyOffice has one). Every other tool must have its figures or
+ * the sync stops.
  */
-export const NOT_YET_IN_THE_TRIAL = new Set(["react-docx", "univer", "opendoc", "betteroffice", "onlyoffice", "nutrient"]);
+export const NOT_YET_IN_THE_TRIAL = new Set(["univer", "onlyoffice", "nutrient"]);
 
 /**
  * Vendors whose section is not in the vendor notes being published. Every card's "About" link and every

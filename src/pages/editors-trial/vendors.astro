@@ -47,10 +47,10 @@ const host = (u: string) => u.replace(/^https:\/\/(www\.)?/, "").replace(/\/$/, 
 			<p class="eyebrow">Editors trial<span class="sep">·</span>The field<span class="sep">·</span>{field.length} tools and a baseline</p>
 			<h1>Every tool here <span class="mark">leads somewhere</span>.</h1>
 			<p>
-				The projects below are DOCX tools that legal teams can actually build on: {word(n.open)} open-source projects and
+				The projects below are DOCX tools that legal teams can actually build on: {word(n.open)} open-source projects and{" "}
 				{word(n.commercial)} commercial {n.commercial === 1 ? "SDK" : "SDKs"}. {Word(n.measured)} of them have been run through their
-				own code, on the trial's documents, against the same reference.
-				{n.tools > n.measured && <>The other {word(n.tools - n.measured)} came to <a href="https://editors.benchmarks.law">editors.benchmarks.law</a> later: they are scored here on what that site measured, where it could measure them, and their round trip and hostile-input lanes are being measured.</>}
+				own code, on the trial's documents, against the same reference.{" "}
+				{n.tools > n.measured && <>The other {word(n.tools - n.measured)} have no round-trip score, each for a reason the trial measured: OnlyOffice's browser build did not open the test document, Univer's open-source packages cannot read a Word file, and Nutrient is a viewer that does not save one. They are scored here on what <a href="https://editors.benchmarks.law">editors.benchmarks.law</a> measured.</>}
 				{" "}No single score captures a tool: the editor that keeps every byte is not the one that refuses a hostile package
 				best, and neither is the one that draws Word's page to the pixel. Each card says first what the tool is good for,
 				and shows the measurements beside it.

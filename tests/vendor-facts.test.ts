@@ -47,7 +47,7 @@ describe("vendor figures come from the trial's facts, never typed", () => {
 describe("the field's counts are computed, not typed", () => {
 	it("counts the tools, the open-source ones and the commercial ones, without the baseline", async () => {
 		const { fieldCounts } = await import("../src/lib/vendorFacts");
-		expect(fieldCounts(vendors)).toEqual({ tools: 19, open: 17, commercial: 2, measured: 13 });
+		expect(fieldCounts(vendors)).toEqual({ tools: 19, open: 17, commercial: 2, measured: 16 });
 	});
 });
 
@@ -72,8 +72,8 @@ describe("tools the trial has not measured yet", () => {
 		expect(() => applyFacts([{ slug: "docen", roundtrip: 1, critical: "", safety: 1 }], facts)).toThrow(/docen/);
 	});
 
-	it("are the six that editors.benchmarks.law has and the trial's reports do not yet", () => {
-		expect([...NOT_YET_IN_THE_TRIAL].sort()).toEqual(["betteroffice", "nutrient", "onlyoffice", "opendoc", "react-docx", "univer"]);
+	it("are the three with no round-trip score in the trial: no output, no .docx path, a viewer", () => {
+		expect([...NOT_YET_IN_THE_TRIAL].sort()).toEqual(["nutrient", "onlyoffice", "univer"]);
 		for (const slug of NOT_YET_IN_THE_TRIAL) expect(vendors.some((v) => v.slug === slug), slug).toBe(true);
 	});
 });
