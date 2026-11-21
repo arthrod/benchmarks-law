@@ -9,7 +9,7 @@ import browserPass from "../../data/browser-pass.json" with { type: "json" };
 import { ANCHORS, type Axis, type BrowserPass, grades } from "../../lib/browserGrades";
 import { vendorAnchor } from "../../lib/reports";
 import vendorsData from "../../data/vendors.json" with { type: "json" };
-import { fieldCounts, word } from "../../lib/vendorFacts";
+import { Word, fieldCounts, word } from "../../lib/vendorFacts";
 import { SAFETY_PASS, type VendorData, bestPlacement, fmtScore, ordinal, rankOn, safeSiteUrl, safetyVerdict } from "../../lib/vendors";
 
 const { entries, cacheHint } = await getEmDashCollection("vendors", { limit: 100 });
@@ -47,11 +47,13 @@ const host = (u: string) => u.replace(/^https:\/\/(www\.)?/, "").replace(/\/$/, 
 			<p class="eyebrow">Editors trial<span class="sep">·</span>The field<span class="sep">·</span>{field.length} tools and a baseline</p>
 			<h1>Every tool here <span class="mark">leads somewhere</span>.</h1>
 			<p>
-				The projects below are DOCX editors that legal teams can actually build on: {word(n.open)} open-source projects and
-				{word(n.commercial)} commercial SDK. Each was run through its
-				own code, on the same documents, against the same reference. No single score captures a tool: the editor that keeps
-				every byte is not the one that refuses a hostile package best, and neither is the one that draws Word's page to the
-				pixel. This page leads with what each one does best, and shows both measurements beside it.
+				The projects below are DOCX tools that legal teams can actually build on: {word(n.open)} open-source projects and
+				{word(n.commercial)} commercial {n.commercial === 1 ? "SDK" : "SDKs"}. {Word(n.measured)} of them have been run through their
+				own code, on the trial's documents, against the same reference.
+				{n.tools > n.measured && <>The other {word(n.tools - n.measured)} came to <a href="https://editors.benchmarks.law">editors.benchmarks.law</a> later: they have browser figures here, and their round trip and hostile-input lanes are being measured.</>}
+				{" "}No single score captures a tool: the editor that keeps every byte is not the one that refuses a hostile package
+				best, and neither is the one that draws Word's page to the pixel. Each card says first what the tool is good for,
+				and shows the measurements beside it.
 			</p>
 		</div>
 

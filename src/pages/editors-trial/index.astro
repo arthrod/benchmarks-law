@@ -10,7 +10,7 @@ const { reports, notes, cacheHint } = await listReports();
 Astro.cache.set(cacheHint);
 ---
 
-<Site title="Editors trial" current="editors" description={`${Word(n.open)} open-source DOCX editors and ${word(n.commercial)} commercial one, run through their own import and export on one adversarial document, scored against Microsoft Word, and then given ten hostile packages.`}>
+<Site title="Editors trial" current="editors" description={`${Word(n.measured)} DOCX editors run through their own import and export on one adversarial document, scored against Microsoft Word, and then given ten hostile packages; ${word(n.tools)} tools in the field, ${word(n.open)} open-source and ${word(n.commercial)} commercial.`}>
 	<div class="wrap">
 		<div class="page-head">
 			<p class="eyebrow">Bench 01<span class="sep">·</span>editors_trial<span class="sep">·</span>2026</p>
