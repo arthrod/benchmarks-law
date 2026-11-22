@@ -170,6 +170,7 @@ const host = (u: string) => u.replace(/^https:\/\/(www\.)?/, "").replace(/\/$/, 
 							<p>{v.data.detail}</p>
 							<div class="links">
 								<a class="go" href={`/editors-trial/report-c#${anchor(v.data.render_section)}`}>How it renders →</a>
+								{notesHref(v.slug) && <a class="go" href={notesHref(v.slug)}>About {v.data.title} →</a>}
 								{safeSiteUrl(v.data.site) && <a class="go" href={safeSiteUrl(v.data.site)} rel="noopener">{host(safeSiteUrl(v.data.site)!)} →</a>}
 							</div>
 						</div>
