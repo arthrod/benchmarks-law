@@ -1,6 +1,6 @@
 {
-	"source": "https://github.com/arthrod/open-docs/blob/5f7cc1d589f358101b41825d5e014a4d762107f9/docs/samples/latest.json",
-	"commit": "5f7cc1d589f358101b41825d5e014a4d762107f9",
+	"source": "https://github.com/arthrod/open-docs/blob/d20a450077f9c03b526bb90b7faf2014575181a2/docs/samples/latest.json",
+	"commit": "d20a450077f9c03b526bb90b7faf2014575181a2",
 	"measuredAt": "2026-11-21",
 	"environment": "Google Chrome 158.0.8127.36 (installed, headed) via Playwright, fresh profile per run (cold cache), 3 runs, median; a Hugging Face Jobs cpu-xl machine (16 vCPU, 124 GB, Linux x86-64, no GPU: Chrome draws in software; the load average and core count recorded with each run are the shared host's), Chrome under Xvfb with --no-sandbox --disable-dev-shm-usage; machine load (1-minute average) median 56.6, highest 75.7, on 64 cores",
 	"samples": {
@@ -125,36 +125,32 @@
 				"bytes": 21386141
 			},
 			"genoffice": {
-				"loadMs": 391,
-				"settledMs": 391,
+				"loadMs": 921,
+				"settledMs": 921,
 				"settleTimedOut": 0,
-				"rendererRss": 593379328,
-				"bytes": 5646904,
-				"elsewhere": "a MacBook Pro (Apple M4 Pro, 12 cores, 24 GB, with its graphics card)"
+				"rendererRss": 569659392,
+				"bytes": 5851674
 			},
 			"office-open": {
-				"loadMs": 297,
-				"settledMs": 297,
+				"loadMs": 668,
+				"settledMs": 668,
 				"settleTimedOut": 0,
-				"rendererRss": 529711104,
-				"bytes": 475955,
-				"elsewhere": "a MacBook Pro (Apple M4 Pro, 12 cores, 24 GB, with its graphics card)"
+				"rendererRss": 569737216,
+				"bytes": 475879
 			},
 			"fidus-writer": {
-				"loadMs": 185,
-				"settledMs": 185,
+				"loadMs": 228,
+				"settledMs": 228,
 				"settleTimedOut": 0,
-				"rendererRss": 397295616,
-				"bytes": 980841,
-				"elsewhere": "a MacBook Pro (Apple M4 Pro, 12 cores, 24 GB, with its graphics card)"
+				"rendererRss": 456421376,
+				"bytes": 979930
 			},
 			"docs-plus": {
-				"loadMs": 190,
-				"settledMs": 190,
+				"loadMs": 254,
+				"settledMs": 254,
 				"settleTimedOut": 0,
-				"rendererRss": 443105280,
-				"bytes": 1007733,
-				"elsewhere": "a MacBook Pro (Apple M4 Pro, 12 cores, 24 GB, with its graphics card)"
+				"rendererRss": 467456000,
+				"bytes": 1007298
 			}
 		},
 		"redline": {
@@ -278,36 +274,32 @@
 				"bytes": 21418845
 			},
 			"genoffice": {
-				"loadMs": 592,
-				"settledMs": 592,
+				"loadMs": 998,
+				"settledMs": 998,
 				"settleTimedOut": 0,
-				"rendererRss": 618856448,
-				"bytes": 5679906,
-				"elsewhere": "a MacBook Pro (Apple M4 Pro, 12 cores, 24 GB, with its graphics card)"
+				"rendererRss": 589209600,
+				"bytes": 5883682
 			},
 			"office-open": {
-				"loadMs": 292,
-				"settledMs": 292,
+				"loadMs": 682,
+				"settledMs": 682,
 				"settleTimedOut": 0,
-				"rendererRss": 541687808,
-				"bytes": 508810,
-				"elsewhere": "a MacBook Pro (Apple M4 Pro, 12 cores, 24 GB, with its graphics card)"
+				"rendererRss": 579043328,
+				"bytes": 508479
 			},
 			"fidus-writer": {
-				"loadMs": 183,
-				"settledMs": 183,
+				"loadMs": 233,
+				"settledMs": 233,
 				"settleTimedOut": 0,
-				"rendererRss": 397312000,
-				"bytes": 1013245,
-				"elsewhere": "a MacBook Pro (Apple M4 Pro, 12 cores, 24 GB, with its graphics card)"
+				"rendererRss": 451368960,
+				"bytes": 1012495
 			},
 			"docs-plus": {
-				"loadMs": 190,
-				"settledMs": 190,
+				"loadMs": 269,
+				"settledMs": 269,
 				"settleTimedOut": 0,
-				"rendererRss": 446382080,
-				"bytes": 1040136,
-				"elsewhere": "a MacBook Pro (Apple M4 Pro, 12 cores, 24 GB, with its graphics card)"
+				"rendererRss": 468871168,
+				"bytes": 1039934
 			}
 		},
 		"lorem-500": {
@@ -340,12 +332,11 @@
 				"bytes": 1597892
 			},
 			"docen": {
-				"loadMs": 2296,
+				"loadMs": 3821,
 				"settledMs": null,
 				"settleTimedOut": 3,
-				"rendererRss": 1867202560,
-				"bytes": 1977584,
-				"elsewhere": "a MacBook Pro (Apple M4 Pro, 12 cores, 24 GB, with its graphics card)"
+				"rendererRss": 3366621184,
+				"bytes": 1946835
 			},
 			"eigenpal": {
 				"loadMs": 5204,
@@ -432,36 +423,32 @@
 				"bytes": 21806629
 			},
 			"genoffice": {
-				"loadMs": 531,
-				"settledMs": 5505,
+				"loadMs": 1620,
+				"settledMs": 22155,
 				"settleTimedOut": 0,
-				"rendererRss": 1123778560,
-				"bytes": 6067711,
-				"elsewhere": "a MacBook Pro (Apple M4 Pro, 12 cores, 24 GB, with its graphics card)"
+				"rendererRss": 1175080960,
+				"bytes": 6271357
 			},
 			"office-open": {
-				"loadMs": 533,
-				"settledMs": 533,
+				"loadMs": 1535,
+				"settledMs": 1535,
 				"settleTimedOut": 0,
-				"rendererRss": 725499904,
-				"bytes": 895821,
-				"elsewhere": "a MacBook Pro (Apple M4 Pro, 12 cores, 24 GB, with its graphics card)"
+				"rendererRss": 749768704,
+				"bytes": 896620
 			},
 			"fidus-writer": {
-				"loadMs": 292,
-				"settledMs": 292,
+				"loadMs": 553,
+				"settledMs": 553,
 				"settleTimedOut": 0,
-				"rendererRss": 480706560,
-				"bytes": 1275517,
-				"elsewhere": "a MacBook Pro (Apple M4 Pro, 12 cores, 24 GB, with its graphics card)"
+				"rendererRss": 528867328,
+				"bytes": 1275026
 			},
 			"docs-plus": {
-				"loadMs": 582,
-				"settledMs": 582,
+				"loadMs": 1211,
+				"settledMs": 1211,
 				"settleTimedOut": 0,
-				"rendererRss": 604241920,
-				"bytes": 1428023,
-				"elsewhere": "a MacBook Pro (Apple M4 Pro, 12 cores, 24 GB, with its graphics card)"
+				"rendererRss": 627122176,
+				"bytes": 1428214
 			}
 		}
 	}
