@@ -138,3 +138,18 @@ describe("speed, data and memory scores come from the browser pass", () => {
 		}
 	});
 });
+
+import { readFileSync as readVendorsPage } from "node:fs";
+describe("field page: every card links to its vendor note", () => {
+	it("the baseline card has an About link, like the vendor cards", () => {
+		const page = readVendorsPage(new URL("../src/pages/editors-trial/vendors.astro", import.meta.url), "utf8");
+		const baseline = page.slice(page.indexOf('class="feature baseline"'));
+		expect(baseline).toContain("notesHref(v.slug) && <a class=\"go\" href={notesHref(v.slug)}>About {v.data.title}");
+	});
+	it("the baseline's link has a section to land on", async () => {
+		const { vendorAnchor } = await import("../src/lib/reports");
+		expect(vendorAnchor("libreoffice")).toBe("libreoffice");
+		const notes = readVendorsPage(`${process.env.REPORTS_ROOT}/reports/vendors.md`, "utf8");
+		expect(notes).toMatch(/^## LibreOffice$/m);
+	});
+});
