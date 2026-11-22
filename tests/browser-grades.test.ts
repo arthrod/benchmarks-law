@@ -146,4 +146,10 @@ describe("field page: every card links to its vendor note", () => {
 		const baseline = page.slice(page.indexOf('class="feature baseline"'));
 		expect(baseline).toContain("notesHref(v.slug) && <a class=\"go\" href={notesHref(v.slug)}>About {v.data.title}");
 	});
+	it("the baseline's link has a section to land on", async () => {
+		const { vendorAnchor } = await import("../src/lib/reports");
+		expect(vendorAnchor("libreoffice")).toBe("libreoffice");
+		const notes = readVendorsPage(`${process.env.REPORTS_ROOT}/reports/vendors.md`, "utf8");
+		expect(notes).toMatch(/^## LibreOffice$/m);
+	});
 });
