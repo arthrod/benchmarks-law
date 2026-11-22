@@ -95,16 +95,11 @@ describe("speed, data and memory scores come from the browser pass", () => {
 		expect(g.memory).toEqual(grades("docxodus", pass).memory);
 	});
 
-	it("scores the four tools that run through the trial's demo builds on data only: their times and memory are a Mac's", async () => {
+	it("scores all three axes of the four tools that run through the trial's demo builds: they were timed on the pass's machine", async () => {
 		const live = (await import("../src/data/browser-pass.json")).default;
 		for (const slug of ["genoffice", "office-open", "fidus-writer", "docs-plus"]) {
 			const g = grades(slug, live as never);
-			expect(g.data.score, slug).not.toBeNull();
-			expect(g.speed.score, slug).toBeNull();
-			expect(g.speed.why, slug).toMatch(/another machine, a MacBook Pro .*on the rich sample/);
-			// Both of their times are that Mac's, so both are said.
-			expect(g.speed.why, slug).toMatch(/on the 500 pages\)$/);
-			expect(g.memory.why, slug).toMatch(/MB\) was taken on another machine, a MacBook Pro/);
+			for (const axis of ["speed", "data", "memory"] as const) expect(g[axis].score, `${slug} ${axis}`).not.toBeNull();
 		}
 	});
 
