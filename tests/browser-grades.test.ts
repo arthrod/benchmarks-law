@@ -134,7 +134,9 @@ describe("speed, data and memory scores come from the browser pass", () => {
 	});
 });
 
-import { readFileSync as readVendorsPage } from "node:fs";
+import { existsSync, readFileSync as readVendorsPage } from "node:fs";
+import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 describe("field page: every card links to its vendor note", () => {
 	it("the baseline card has an About link, like the vendor cards", () => {
 		const page = readVendorsPage(new URL("../src/pages/editors-trial/vendors.astro", import.meta.url), "utf8");
@@ -152,12 +154,16 @@ describe("field page: every card links to its vendor note", () => {
 			expect(g[axis].why).toBe("Not on editors.benchmarks.law, so it has no figure from that pass");
 		}
 	});
-	it("the baseline's link has a section to land on", async () => {
+	// REPORTS_ROOT when set, else the pinned bundle under .bench/editors_trial, as the site reads it. A fresh
+	// checkout has neither until `bench fetch`: skip then, like renames.test.ts (CodeRabbit on #114).
+	const SITE = fileURLToPath(new URL("..", import.meta.url));
+	const noBundle = !process.env.REPORTS_ROOT && !existsSync(join(SITE, ".bench/editors_trial/reports"));
+	it.skipIf(noBundle)("the baseline's link has a section to land on", async () => {
 		const { vendorAnchor } = await import("../src/lib/reports");
 		expect(vendorAnchor("libreoffice")).toBe("libreoffice");
-		// REPORTS_ROOT when set, else the pinned bundle under .bench/editors_trial, as the site reads it.
 		const { reportsRoot } = await import("../src/lib/root");
-		const root = reportsRoot(process.env, new URL("..", import.meta.url).pathname);
+		// fileURLToPath, not .pathname: a checkout path with a space keeps "%20" in .pathname.
+		const root = reportsRoot(process.env, SITE);
 		const notes = readVendorsPage(`${root}/reports/vendors.md`, "utf8");
 		expect(notes).toMatch(/^## LibreOffice$/m);
 	});
