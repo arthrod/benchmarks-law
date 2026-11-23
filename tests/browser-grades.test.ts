@@ -141,6 +141,17 @@ describe("field page: every card links to its vendor note", () => {
 		const baseline = page.slice(page.indexOf('class="feature baseline"'));
 		expect(baseline).toContain("notesHref(v.slug) && <a class=\"go\" href={notesHref(v.slug)}>About {v.data.title}");
 	});
+	it("the baseline card shows speed, data and memory like the tool cards, with the reason they are not scored", () => {
+		const page = readVendorsPage(new URL("../src/pages/editors-trial/vendors.astro", import.meta.url), "utf8");
+		const baseline = page.slice(page.indexOf('class="feature baseline"'), page.indexOf('id="scores"'));
+		expect(baseline).toContain("AXES.map(([axis, label])");
+		expect(baseline).toContain("grades(v.slug, pass)[axis]");
+		const g = grades("libreoffice", pass);
+		for (const axis of ["speed", "data", "memory"] as const) {
+			expect(g[axis].score).toBeNull();
+			expect(g[axis].why).toBe("Not on editors.benchmarks.law, so it has no figure from that pass");
+		}
+	});
 	it("the baseline's link has a section to land on", async () => {
 		const { vendorAnchor } = await import("../src/lib/reports");
 		expect(vendorAnchor("libreoffice")).toBe("libreoffice");
