@@ -99,7 +99,7 @@ const TOOLS = [
 	},
 	{
 		name: "list_reports",
-		description: "List the editors-trial reports, notes, and lane notes in reading order.",
+		description: "List the editors-trial reports and notes in reading order.",
 		inputSchema: {
 			type: "object",
 			properties: { limit: { type: "integer", minimum: 1, maximum: 50, default: 50 } },

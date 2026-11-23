@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { type BrowserPass, grades, scale } from "../src/lib/browserGrades";
+import { ANCHORS, type BrowserPass, grades, scale } from "../src/lib/browserGrades";
 
 const cell = (settledMs: number | null, rendererRss: number | null, bytes: number | null, extra = {}) => ({
 	loadMs: settledMs,
@@ -64,8 +64,8 @@ describe("speed, data and memory scores come from the browser pass", () => {
 	it("scores 0 for the half of a rich sample that never became usable, as the printed rule says", () => {
 		const p = { ...pass, samples: { ...pass.samples, showcase: { ...pass.samples.showcase, docxodus: cell(null, 559 * 1048576, 7_500_000, { settleTimedOut: 3 }) } } };
 		const g = grades("docxodus", p as never);
-		expect(g.speed.score).toBeGreaterThan(0);
-		expect(g.speed.score).toBeLessThanOrEqual(5);
+		// Exactly half the 500-page score: the rich half adds nothing.
+		expect(g.speed.score).toBe(Math.round(scale(5167, ...ANCHORS.longMs) * 5) / 10);
 		expect(g.speed.basis).toBe("the rich sample did not become usable in the time the test waits, 5.17 s on the 500 pages");
 	});
 
@@ -95,7 +95,7 @@ describe("speed, data and memory scores come from the browser pass", () => {
 		expect(g.memory).toEqual(grades("docxodus", pass).memory);
 	});
 
-	it("scores all three axes of the four tools that run through the trial's demo builds: they were timed on the pass's machine", async () => {
+	it("scores all three axes of the four tools that run through the trial's demo builds: they were timed on a rented machine of the pass's type", async () => {
 		const live = (await import("../src/data/browser-pass.json")).default;
 		for (const slug of ["genoffice", "office-open", "fidus-writer", "docs-plus"]) {
 			const g = grades(slug, live as never);
@@ -155,7 +155,10 @@ describe("field page: every card links to its vendor note", () => {
 	it("the baseline's link has a section to land on", async () => {
 		const { vendorAnchor } = await import("../src/lib/reports");
 		expect(vendorAnchor("libreoffice")).toBe("libreoffice");
-		const notes = readVendorsPage(`${process.env.REPORTS_ROOT}/reports/vendors.md`, "utf8");
+		// REPORTS_ROOT when set, else the pinned bundle under .bench/editors_trial, as the site reads it.
+		const { reportsRoot } = await import("../src/lib/root");
+		const root = reportsRoot(process.env, new URL("..", import.meta.url).pathname);
+		const notes = readVendorsPage(`${root}/reports/vendors.md`, "utf8");
 		expect(notes).toMatch(/^## LibreOffice$/m);
 	});
 });
