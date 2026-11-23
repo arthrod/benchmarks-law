@@ -192,7 +192,7 @@ export function scorecardHtml(facts: Facts, opts: ScorecardPage): string {
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>neurotic_docx_bench: Open-source DOCX editors, round-trip trial (2026)</title>
-<meta name="description" content="${editors} open-source DOCX editors driven through their own import → export path over one ${parts}-part adversarial document, scored on ${checks} checks, re-fed for idempotence and re-opened in Microsoft Word. Results, reports and vendors.">
+<meta name="description" content="${editors} DOCX editors driven through their own import → export path over one ${parts}-part adversarial document, scored on ${checks} checks, re-fed for idempotence and re-opened in Microsoft Word. Results, reports and vendors.">
 <link rel="stylesheet" href="../../editors-score.css">
 </head>
 <body class="doc">

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { type BrowserPass, grades, scale } from "../src/lib/browserGrades";
+import { ANCHORS, type BrowserPass, grades, scale } from "../src/lib/browserGrades";
 
 const cell = (settledMs: number | null, rendererRss: number | null, bytes: number | null, extra = {}) => ({
 	loadMs: settledMs,
@@ -64,8 +64,8 @@ describe("speed, data and memory scores come from the browser pass", () => {
 	it("scores 0 for the half of a rich sample that never became usable, as the printed rule says", () => {
 		const p = { ...pass, samples: { ...pass.samples, showcase: { ...pass.samples.showcase, docxodus: cell(null, 559 * 1048576, 7_500_000, { settleTimedOut: 3 }) } } };
 		const g = grades("docxodus", p as never);
-		expect(g.speed.score).toBeGreaterThan(0);
-		expect(g.speed.score).toBeLessThanOrEqual(5);
+		// Exactly half the 500-page score: the rich half adds nothing.
+		expect(g.speed.score).toBe(Math.round(scale(5167, ...ANCHORS.longMs) * 5) / 10);
 		expect(g.speed.basis).toBe("the rich sample did not become usable in the time the test waits, 5.17 s on the 500 pages");
 	});
 
@@ -95,7 +95,7 @@ describe("speed, data and memory scores come from the browser pass", () => {
 		expect(g.memory).toEqual(grades("docxodus", pass).memory);
 	});
 
-	it("scores all three axes of the four tools that run through the trial's demo builds: they were timed on the pass's machine", async () => {
+	it("scores all three axes of the four tools that run through the trial's demo builds: they were timed on a rented machine of the pass's type", async () => {
 		const live = (await import("../src/data/browser-pass.json")).default;
 		for (const slug of ["genoffice", "office-open", "fidus-writer", "docs-plus"]) {
 			const g = grades(slug, live as never);
@@ -134,7 +134,52 @@ describe("speed, data and memory scores come from the browser pass", () => {
 	});
 });
 
-import { readFileSync as readVendorsPage } from "node:fs";
+import { existsSync, readFileSync as readVendorsPage } from "node:fs";
+import { join } from "node:path";
+import { fileURLToPath } from "node:url";
+describe("figures the source itself calls weak are not passed off as sound (OpenCode review, 2026-11-23)", () => {
+	it("says when a figure is the median of fewer runs than were tried", () => {
+		const two = { runsOk: 2, runsOf: 3 };
+		const p: BrowserPass = {
+			...pass,
+			samples: {
+				showcase: { ...pass.samples.showcase, docxodus: cell(1230, 559 * 1048576, 7_500_000, two) },
+				"lorem-500": { ...pass.samples["lorem-500"], docxodus: cell(5167, 749 * 1048576, 8_000_000, two) },
+			},
+		};
+		const g = grades("docxodus", p);
+		expect(g.speed.score).toBe(7.3);
+		expect(g.speed.basis).toBe("1.23 s on the rich sample (2 of 3 runs), 5.17 s on the 500 pages (2 of 3 runs)");
+		expect(g.data.basis).toBe("7.5 MB to open the rich sample (2 of 3 runs)");
+		expect(g.memory.basis).toBe("749 MB with the 500 pages open (2 of 3 runs)");
+		// All runs in: nothing is added.
+		expect(grades("docxodus", pass).speed.basis).toBe("1.23 s on the rich sample, 5.17 s on the 500 pages");
+	});
+
+	it("says it on the path where a file never became usable too (Gitar on #115)", () => {
+		const two = { runsOk: 2, runsOf: 3 };
+		const stuck = (rich: number | null, long: number | null): BrowserPass => ({
+			...pass,
+			samples: {
+				showcase: { ...pass.samples.showcase, docxodus: cell(rich, 559 * 1048576, 7_500_000, two) },
+				"lorem-500": { ...pass.samples["lorem-500"], docxodus: cell(long, 749 * 1048576, 8_000_000, two) },
+			},
+		});
+		expect(grades("docxodus", stuck(1230, null)).speed.basis).toBe(
+			"1.23 s on the rich sample (2 of 3 runs); the 500 pages did not become usable in the time the test waits (2 of 3 runs)",
+		);
+		expect(grades("docxodus", stuck(null, 5167)).speed.basis).toBe(
+			"the rich sample did not become usable in the time the test waits (2 of 3 runs), 5.17 s on the 500 pages (2 of 3 runs)",
+		);
+	});
+
+	it("does not score folio's memory: the source gives it the verdict that leaves canvas-editor's unscored", async () => {
+		const { NOT_SCORED } = await import("../src/lib/browserGrades");
+		expect(NOT_SCORED.folio?.memory).toMatch(/^Not scored: the test machine has no graphics card/);
+		expect(NOT_SCORED.folio?.speed).toBeUndefined();
+	});
+});
+
 describe("field page: every card links to its vendor note", () => {
 	it("the baseline card has an About link, like the vendor cards", () => {
 		const page = readVendorsPage(new URL("../src/pages/editors-trial/vendors.astro", import.meta.url), "utf8");
@@ -152,10 +197,17 @@ describe("field page: every card links to its vendor note", () => {
 			expect(g[axis].why).toBe("Not on editors.benchmarks.law, so it has no figure from that pass");
 		}
 	});
-	it("the baseline's link has a section to land on", async () => {
+	// REPORTS_ROOT when set, else the pinned bundle under .bench/editors_trial, as the site reads it. A fresh
+	// checkout has neither until `bench fetch`: skip then, like renames.test.ts (CodeRabbit on #114).
+	const SITE = fileURLToPath(new URL("..", import.meta.url));
+	const noBundle = !process.env.REPORTS_ROOT && !existsSync(join(SITE, ".bench/editors_trial/reports"));
+	it.skipIf(noBundle)("the baseline's link has a section to land on", async () => {
 		const { vendorAnchor } = await import("../src/lib/reports");
 		expect(vendorAnchor("libreoffice")).toBe("libreoffice");
-		const notes = readVendorsPage(`${process.env.REPORTS_ROOT}/reports/vendors.md`, "utf8");
+		const { reportsRoot } = await import("../src/lib/root");
+		// fileURLToPath, not .pathname: a checkout path with a space keeps "%20" in .pathname.
+		const root = reportsRoot(process.env, SITE);
+		const notes = readVendorsPage(`${root}/reports/vendors.md`, "utf8");
 		expect(notes).toMatch(/^## LibreOffice$/m);
 	});
 });

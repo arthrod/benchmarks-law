@@ -10,7 +10,7 @@ export interface VendorData {
 	safety: number | null;
 	site: string;
 	render_section: string;
-	lane: string;
+	/** The vendor note's section, kept in the CMS entry; no page renders it since the lane notes were folded in. */
 	about: string;
 	position: number;
 }

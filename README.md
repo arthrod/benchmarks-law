@@ -8,7 +8,7 @@ Two benches are published:
 
 | Bench | Where | What it measures |
 |---|---|---|
-| **01 · Editors trial** | [`/editors-trial/`](https://benchmarks.law/editors-trial/) | 12 open-source DOCX editors, plus LibreOffice as a baseline. Each editor's own code imports and exports one adversarial document, and the result is scored construct by construct and opened in Word. Ten hostile packages are opened in a sandbox. The reports are the main report, A, A2, B, C, D, D1 and D2, plus the vendor notes and one lane note per editor. |
+| **01 · Editors trial** | [`/editors-trial/`](https://benchmarks.law/editors-trial/) | 16 DOCX editors (15 open source, plus Apryse WebViewer), plus LibreOffice as a baseline. Each editor's own code imports and exports one adversarial document, and the result is scored construct by construct and opened in Word. Ten hostile packages are opened in a sandbox. The reports are the main report, A, A2, B, C, D, D1, D2, E and E2 and the rendering and openability note, plus the vendor notes (one section per tool) and the field page that scores each tool. |
 | **02 · neurotic_docx_bench** | [`/neurotic-docx-bench/`](https://benchmarks.law/neurotic-docx-bench/) | DOCX → PDF and redlines, page by page against Word (pixel, ink overlap, drift-tolerant SSIM, text boundaries), plus a speed run on 10,000 inputs. |
 
 The reports are written in [arthrod/editors_trial](https://github.com/arthrod/editors_trial) (branch `benchmark-fairness-reports`); this repository only publishes them.
@@ -38,7 +38,7 @@ The endpoint allows 60 requests per 60 seconds per client IP, the same cap as Li
 |---|---|
 | `src/layouts/Site.astro` | The shell: the navbar shared with the bench, the footer, and EmDash's head (title, description, OG tags) |
 | `src/pages/index.astro` | Home: what is measured, the two benches, and the report index |
-| `src/pages/editors-trial/index.astro` | The editors-trial hub: the reports, notes and lane notes |
+| `src/pages/editors-trial/index.astro` | The editors-trial hub: the reports and notes |
 | `src/pages/editors-trial/vendors.astro` | "The field": each editor's round-trip score, safety grade and links, from the EmDash `vendors` collection (synced from `src/data/vendors.json`; round trip, critical features and hostile-input grade are rewritten from editors_trial `out/facts.json` on every `sync:vendors`, never typed) |
 | `src/pages/editors-trial/[slug].astro` | One report, rendered from the CMS, with the report switcher. Old slugs redirect (below). |
 | `src/lib/reports.ts` | `REPORT_FILES` (which editors_trial file becomes which slug, code and position), `RENAMED_SLUGS`, markdown rendering and link rewriting |
@@ -61,6 +61,7 @@ export EMDASH_TOKEN=…                           # personal access token with c
 pnpm sync:assets     # figures and the .docx download (styles for the live .docx builder) → public/
 pnpm sync:content    # upsert every report; pins source links to the trial tag or commit (src/data/release.json)
 pnpm sync:vendors    # figures from out/facts.json → src/data/vendors.json, then upsert the `vendors` collection
+OPEN_DOCS_ROOT=/path/to/open-docs pnpm sync:browser   # editors.benchmarks.law's browser pass (docs/samples/latest.json, a clean checkout) → src/data/browser-pass.json, the field page's speed, data and memory scores
 pnpm run deploy      # only needed when public/ or the code changed
 ```
 

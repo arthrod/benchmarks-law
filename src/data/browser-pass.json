@@ -66,7 +66,9 @@
 				"settledMs": 599,
 				"settleTimedOut": 0,
 				"rendererRss": 928301056,
-				"bytes": 2171473
+				"bytes": 2171473,
+				"runsOk": 2,
+				"runsOf": 3
 			},
 			"google-viewer": {
 				"loadMs": 595,
@@ -87,7 +89,9 @@
 				"settledMs": 4792,
 				"settleTimedOut": 0,
 				"rendererRss": 825368576,
-				"bytes": 25708059
+				"bytes": 25708059,
+				"runsOk": 2,
+				"runsOf": 3
 			},
 			"react-docx": {
 				"loadMs": 1105,
@@ -187,7 +191,9 @@
 				"settledMs": 388,
 				"settleTimedOut": 0,
 				"rendererRss": 592132096,
-				"bytes": 1558071
+				"bytes": 1558071,
+				"runsOk": 2,
+				"runsOf": 3
 			},
 			"eigenpal": {
 				"loadMs": 1367,
@@ -257,7 +263,9 @@
 				"settledMs": 1279,
 				"settleTimedOut": 0,
 				"rendererRss": 730150912,
-				"bytes": 15308128
+				"bytes": 15308128,
+				"runsOk": 2,
+				"runsOf": 3
 			},
 			"onlyoffice": {
 				"loadMs": 2552,
@@ -285,21 +293,27 @@
 				"settledMs": 682,
 				"settleTimedOut": 0,
 				"rendererRss": 579043328,
-				"bytes": 508479
+				"bytes": 508479,
+				"runsOk": 2,
+				"runsOf": 3
 			},
 			"fidus-writer": {
 				"loadMs": 233,
 				"settledMs": 233,
 				"settleTimedOut": 0,
 				"rendererRss": 451368960,
-				"bytes": 1012495
+				"bytes": 1012495,
+				"runsOk": 2,
+				"runsOf": 3
 			},
 			"docs-plus": {
 				"loadMs": 269,
 				"settledMs": 269,
 				"settleTimedOut": 0,
 				"rendererRss": 468871168,
-				"bytes": 1039934
+				"bytes": 1039934,
+				"runsOk": 2,
+				"runsOf": 3
 			}
 		},
 		"lorem-500": {
@@ -378,14 +392,18 @@
 				"settledMs": 7108,
 				"settleTimedOut": 0,
 				"rendererRss": 1595897856,
-				"bytes": 7904988
+				"bytes": 7904988,
+				"runsOk": 2,
+				"runsOf": 3
 			},
 			"nutrient": {
 				"loadMs": 20772,
 				"settledMs": 20772,
 				"settleTimedOut": 0,
 				"rendererRss": 816234496,
-				"bytes": 26175562
+				"bytes": 26175562,
+				"runsOk": 2,
+				"runsOf": 3
 			},
 			"react-docx": {
 				"loadMs": 8701,
@@ -413,7 +431,9 @@
 				"settledMs": 12796,
 				"settleTimedOut": 0,
 				"rendererRss": 995082240,
-				"bytes": 15167390
+				"bytes": 15167390,
+				"runsOk": 2,
+				"runsOf": 3
 			},
 			"opendoc": {
 				"loadMs": 3536,
