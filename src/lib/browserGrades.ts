@@ -14,6 +14,9 @@ export interface PassCell {
 	/** Set when this row was measured on another machine than the rest of its table: which one. */
 	elsewhere?: string;
 	bytes: number | null;
+	/** Set only when some runs failed: the figures are the median of `runsOk` of `runsOf` runs. */
+	runsOk?: number;
+	runsOf?: number;
 }
 
 export interface BrowserPass {
@@ -75,6 +78,8 @@ const NO_GPU = "the test machine has no graphics card";
 export const NOT_SCORED: Record<string, Partial<Record<Axis, string>>> = {
 	wordcraft: { speed: `Not scored: ${NO_GPU}, and WordCraft draws through one. There its drawing never went idle; on a Mac it settled in 3 to 4 s` },
 	"canvas-editor": { memory: `Not scored: ${NO_GPU}, so Chrome kept every page canvas in memory (4.8 GB there, 0.5 to 1.8 GB on a Mac)` },
+	// The editors site lists folio's 2,389 MB beside canvas-editor's under "This machine, not the engine".
+	folio: { memory: `Not scored: ${NO_GPU}, so Chrome kept its page canvases in memory (2.4 GB there)` },
 	apryse: { speed: "Not scored: its engine works in a background thread that the timing cannot see" },
 	univer: Object.fromEntries(
 		(["speed", "data", "memory"] as const).map((a) => [a, "Not scored: its open-source packages cannot open a .docx, so it was handed plain text"]),
@@ -92,6 +97,8 @@ export function scale(value: number, best: number, worst: number): number {
 const time = (ms: number) => (ms < 1000 ? `${Math.round(ms)} ms` : `${(ms / 1000).toFixed(ms < 10_000 ? 2 : 1)} s`);
 const megabytes = (b: number) => `${(b / 1_000_000).toFixed(b < 10_000_000 ? 1 : 0)} MB`;
 const mebibytes = (b: number) => `${Math.round(b / 1048576)} MB`;
+/** " (2 of 3 runs)" when the figure is the median of fewer runs than were tried: the editors site calls those weak. */
+const runs = (c: PassCell | undefined) => (c?.runsOk != null && c.runsOf != null && c.runsOk < c.runsOf ? ` (${c.runsOk} of ${c.runsOf} runs)` : "");
 
 /** The three scores of one tool on the field page. */
 export function grades(slug: string, pass: BrowserPass): Record<Axis, Grade> {
@@ -112,7 +119,7 @@ export function grades(slug: string, pass: BrowserPass): Record<Axis, Grade> {
 		}
 		// The printed rule: a file that did not become usable in the time the test waits scores 0 for its half.
 		const short = rich.settledMs == null ? 0 : scale(rich.settledMs, ...ANCHORS.richMs);
-		const richSaid = rich.settledMs == null ? "the rich sample did not become usable in the time the test waits" : `${time(rich.settledMs)} on the rich sample`;
+		const richSaid = rich.settledMs == null ? "the rich sample did not become usable in the time the test waits" : `${time(rich.settledMs)} on the rich sample${runs(rich)}`;
 		// No 500-page row at all is not a wait that ran out: there is nothing to score that half on.
 		if (!long) return { score: null, why: "Not scored: the 500 pages were not measured for it" };
 		// Before the "never went idle" case: a wait that ran out on another machine is not this pass's finding either.
@@ -124,13 +131,13 @@ export function grades(slug: string, pass: BrowserPass): Record<Axis, Grade> {
 		}
 		return {
 			score: Math.round((short + scale(long.settledMs, ...ANCHORS.longMs)) * 5) / 10,
-			basis: `${richSaid}, ${time(long.settledMs)} on the 500 pages`,
+			basis: `${richSaid}, ${time(long.settledMs)} on the 500 pages${runs(long)}`,
 		};
 	};
 	const data = (): Grade => {
 		if (skip.data) return { score: null, why: skip.data };
 		if (rich.bytes == null) return { score: null, why: "Not scored: the transfer was not recorded" };
-		return { score: scale(rich.bytes, ...ANCHORS.bytes), basis: `${megabytes(rich.bytes)} to open the rich sample` };
+		return { score: scale(rich.bytes, ...ANCHORS.bytes), basis: `${megabytes(rich.bytes)} to open the rich sample${runs(rich)}` };
 	};
 	const memory = (): Grade => {
 		if (skip.memory) return { score: null, why: skip.memory };
@@ -138,7 +145,7 @@ export function grades(slug: string, pass: BrowserPass): Record<Axis, Grade> {
 		if (long.elsewhere) return { score: null, why: `Not scored: its 500-page reading (${mebibytes(long.rendererRss)}) was taken on another machine, ${long.elsewhere}` };
 		// A page still busy when the wait ended was read mid-work: the figure is what it held then, and says so.
 		const busy = long.settledMs == null ? ", read while the page was still busy" : "";
-		return { score: scale(long.rendererRss, ...ANCHORS.rss), basis: `${mebibytes(long.rendererRss)} with the 500 pages open${busy}` };
+		return { score: scale(long.rendererRss, ...ANCHORS.rss), basis: `${mebibytes(long.rendererRss)} with the 500 pages open${runs(long)}${busy}` };
 	};
 	return { speed: speed(), data: data(), memory: memory() };
 }

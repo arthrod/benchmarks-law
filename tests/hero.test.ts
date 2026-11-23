@@ -20,9 +20,13 @@ describe("home hero", () => {
 	it("links to the legal-AI studies", () => {
 		expect(hero).toContain('href="/legal-ai/');
 	});
-	it("counts thirteen editors", () => {
-		expect(hero).toContain("<b>13</b>");
-		expect(hero).not.toContain("<b>12</b>");
+	it("counts the editors from the pinned trial release, as the hub and the scorecard do", () => {
+		// A literal number here went stale at et-v0.11.0 (13 while the facts said 16).
+		expect(hero).toContain("<b>{release.editors}</b>");
+		expect(hero).not.toMatch(/<b>1[0-9]<\/b><span>DOCX editors/);
+		const release = JSON.parse(readFileSync(join(__dirname, "../src/data/release.json"), "utf8"));
+		const facts = JSON.parse(readFileSync(join(__dirname, "../.bench/editors_trial/out/facts.json"), "utf8"));
+		expect(release.editors).toBe(facts["count.editors"]);
 	});
 	it("default title and description are not DOCX-only", () => {
 		expect(site).not.toContain("DOCX tooling measured against Microsoft Word");

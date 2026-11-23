@@ -137,6 +137,32 @@ describe("speed, data and memory scores come from the browser pass", () => {
 import { existsSync, readFileSync as readVendorsPage } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
+describe("figures the source itself calls weak are not passed off as sound (OpenCode review, 2026-11-23)", () => {
+	it("says when a figure is the median of fewer runs than were tried", () => {
+		const two = { runsOk: 2, runsOf: 3 };
+		const p: BrowserPass = {
+			...pass,
+			samples: {
+				showcase: { ...pass.samples.showcase, docxodus: cell(1230, 559 * 1048576, 7_500_000, two) },
+				"lorem-500": { ...pass.samples["lorem-500"], docxodus: cell(5167, 749 * 1048576, 8_000_000, two) },
+			},
+		};
+		const g = grades("docxodus", p);
+		expect(g.speed.score).toBe(7.3);
+		expect(g.speed.basis).toBe("1.23 s on the rich sample (2 of 3 runs), 5.17 s on the 500 pages (2 of 3 runs)");
+		expect(g.data.basis).toBe("7.5 MB to open the rich sample (2 of 3 runs)");
+		expect(g.memory.basis).toBe("749 MB with the 500 pages open (2 of 3 runs)");
+		// All runs in: nothing is added.
+		expect(grades("docxodus", pass).speed.basis).toBe("1.23 s on the rich sample, 5.17 s on the 500 pages");
+	});
+
+	it("does not score folio's memory: the source gives it the verdict that leaves canvas-editor's unscored", async () => {
+		const { NOT_SCORED } = await import("../src/lib/browserGrades");
+		expect(NOT_SCORED.folio?.memory).toMatch(/^Not scored: the test machine has no graphics card/);
+		expect(NOT_SCORED.folio?.speed).toBeUndefined();
+	});
+});
+
 describe("field page: every card links to its vendor note", () => {
 	it("the baseline card has an About link, like the vendor cards", () => {
 		const page = readVendorsPage(new URL("../src/pages/editors-trial/vendors.astro", import.meta.url), "utf8");

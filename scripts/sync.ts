@@ -36,7 +36,10 @@ function writeTrialRef(): string {
 	// checkout, and git -C would report this site's HEAD), so the report pages never link .../blob//
 	// or to a commit editors_trial does not have.
 	const ref = checkoutRef(ROOT);
-	writeFileSync(join(SITE, "src/data/release.json"), `${JSON.stringify({ trialRef: ref }, null, "\t")}\n`);
+	// The home page's editor count comes from the same facts the hub and the scorecard print.
+	const editors = JSON.parse(readFileSync(join(ROOT, "out/facts.json"), "utf8"))["count.editors"];
+	if (typeof editors !== "number") throw new Error(`${ROOT}/out/facts.json has no count.editors`);
+	writeFileSync(join(SITE, "src/data/release.json"), `${JSON.stringify({ trialRef: ref, editors }, null, "\t")}\n`);
 	return ref;
 }
 const BLOB = () => `https://github.com/arthrod/editors_trial/blob/${writeTrialRef()}/`;
@@ -264,6 +267,10 @@ function browser() {
 					engine,
 					{
 						...Object.fromEntries(keep.map((k) => [k, row[k] ?? null])),
+						// The source's medians of two runs are, by its own table, weak: the page says how many runs a figure stands on.
+						...(Array.isArray(row.runs) && row.runs.some((r) => r == null)
+							? { runsOk: row.runs.filter((r) => r != null).length, runsOf: row.runs.length }
+							: {}),
 						// A row measured on another machine than its table (the text before the load of the step): its
 						// seconds and megabytes are not comparable with the others', so it is not scored on them.
 						...(typeof row.environment === "string" && machineOf(row.environment) !== machineOf(latest.environment) ? { elsewhere: placeOf(row.environment) } : {}),

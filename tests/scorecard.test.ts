@@ -278,7 +278,9 @@ describe("the prose takes its counts from facts keys too (Gitar, #73)", () => {
 		{ defectClasses: 12, release: RELEASE, tools: FIELD },
 	);
 	it("prints the edition's own counts in the description, headline, lede and method", () => {
-		expect(grown).toContain('content="Fourteen open-source DOCX editors driven through their own import → export path over one 40-part adversarial document, scored on 120 checks');
+		// count.editors includes Apryse WebViewer, which is not open source.
+		expect(grown).toContain('content="Fourteen DOCX editors driven through their own import → export path over one 40-part adversarial document, scored on 120 checks');
+		expect(grown).not.toContain("open-source DOCX editors driven");
 		expect(grown).toContain("<h1>Fourteen DOCX editors, one <span class=\"mk\">hostile</span> document, 120 checks.</h1>");
 		expect(grown).toContain("a purpose-built 40-part adversarial DOCX");
 		expect(grown).toContain("Weighted score across the 120 checks; critical features are the 31 constructs");

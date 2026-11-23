@@ -50,7 +50,7 @@ const host = (u: string) => u.replace(/^https:\/\/(www\.)?/, "").replace(/\/$/, 
 				The projects below are DOCX tools that legal teams can actually build on: {word(n.open)} open-source projects and{" "}
 				{word(n.commercial)} commercial {n.commercial === 1 ? "SDK" : "SDKs"}. {Word(n.measured)} of them have been run through their
 				own code, on the trial's documents, against the same reference.{" "}
-				{n.tools > n.measured && <>The other {word(n.tools - n.measured)} have no round-trip score, each for a reason the trial measured: OnlyOffice's browser build did not open the test document, Univer's open-source packages cannot read a Word file, and Nutrient is a viewer that does not save one. They are scored here on what <a href="https://editors.benchmarks.law">editors.benchmarks.law</a> measured.</>}
+				{n.tools > n.measured && <>The other {word(n.tools - n.measured)} have no round-trip score, each for a reason the trial measured: OnlyOffice's browser build did not open the test document, Univer's open-source packages cannot read a Word file, and Nutrient is a viewer that does not save one. OnlyOffice and Nutrient are scored here on what <a href="https://editors.benchmarks.law">editors.benchmarks.law</a> measured; Univer is not, because that site hands it plain text.</>}
 				{" "}No single score captures a tool: the editor that keeps every byte is not the one that refuses a hostile package
 				best, and neither is the one that draws Word's page to the pixel. Each card says first what the tool is good for,
 				and shows the measurements beside it.
@@ -61,7 +61,7 @@ const host = (u: string) => u.replace(/^https:\/\/(www\.)?/, "").replace(/\/$/, 
 			<div><b>Round trip</b><span>Weighted score over 99 checks, import then export through the tool's own code. Main report.</span></div>
 			<div><b>Hostile input</b><span>Mean grade over ten hostile packages, 1 = a named ceiling that refuses it. Report D. Pass line {SAFETY_PASS.toFixed(2)}.</span></div>
 			<div><b>Rendering</b><span>The tool's own UI or renderer, against Word's page. Report C.</span></div>
-			<div><b>Speed, data, memory</b><span>Scores from 0 to 10, from a browser pass of <a href="https://editors.benchmarks.law">editors.benchmarks.law</a> on {pass.measuredAt}, with five tools timed again on 2026-11-22 on the same machine type. <a href="#scores">How they are worked out</a>.</span></div>
+			<div><b>Speed, data, memory</b><span>Scores from 0 to 10, from a browser pass of <a href="https://editors.benchmarks.law">editors.benchmarks.law</a> on {pass.measuredAt}, with four tools added and docen's 500 pages timed again on 2026-11-22 on the same machine type. <a href="#scores">How they are worked out</a>.</span></div>
 		</div>
 
 		<aside class="layers">
@@ -200,13 +200,13 @@ const host = (u: string) => u.replace(/^https:\/\/(www\.)?/, "").replace(/\/$/, 
 				<p>
 					<b>Speed, data and memory.</b> These three scores come from a browser pass of{" "}
 					<a href="https://editors.benchmarks.law">editors.benchmarks.law</a>, measured {pass.measuredAt}: {pass.environment}.
-					The same files were opened in every engine. Each score is a place on a logarithmic scale between two fixed
+					The same files were opened in every engine but Univer, which is handed their plain text. Each score is a place on a logarithmic scale between two fixed
 					figures, so it can be worked out from the figure printed beside it; it is not a rank.
 				</p>
 				<ul>
 					<li><b>Speed</b> is the mean of two halves: the time until the rich sample is drawn and the page is idle ({ANCHORS.richMs[0]} ms scores 10, {ANCHORS.richMs[1] / 1000} s scores 0), and the same for the 500-page file ({ANCHORS.longMs[0] / 1000} s scores 10, {ANCHORS.longMs[1] / 1000} s scores 0). A file that did not become usable in the time the test waits scores 0 for its half.</li>
 					<li><b>Data transferred</b> is what the browser downloads to open the rich sample with an empty cache ({ANCHORS.bytes[0] / 1e6} MB scores 10, {ANCHORS.bytes[1] / 1e6} MB scores 0).</li>
-					<li><b>Memory</b> is the memory of the browser's page processes with the 500-page file open ({ANCHORS.rss[0] / 1048576} MB scores 10, {ANCHORS.rss[1] / 1048576} MB scores 0). A blank Chrome page on that machine already takes about 450 MB.</li>
+					<li><b>Memory</b> is the memory of the browser's page processes with the 500-page file open ({ANCHORS.rss[0] / 1048576} MB scores 10, {ANCHORS.rss[1] / 1048576} MB scores 0). A blank Chrome page on that machine already takes about 450 MB. For memory an MB is 1,048,576 bytes, as the browser reports it; for data transferred it is 1,000,000, and the data figure is what crossed the network, compressed: the vendor notes and the editors site's own table give the larger unpacked size.</li>
 				</ul>
 				<p>
 					An axis is left without a score where the figure it needs is the test machine's or the method's, not the
@@ -214,8 +214,8 @@ const host = (u: string) => u.replace(/^https:\/\/(www\.)?/, "").replace(/\/$/, 
 					editors.benchmarks.law on 2026-11-21 and timed on 2026-11-22, and docen's 500 pages were timed again that
 					day: later jobs on a rented machine of the same type, with the same Chrome build, so their axes are scored
 					like the others'. The shared host was less busy during those jobs (load 3 to 33 on 64 cores, against 22 to
-					76 during the pass), which can only have helped their times. Tools that are not on editors.benchmarks.law have no browser figures
-					here: <a href="/editors-trial/report-e2">Report E2</a> times nine of the editors in a browser by another method,
+					76 during the pass), which can only have helped their times. LibreOffice, the baseline, is not on editors.benchmarks.law and has no
+					browser figures here. <a href="/editors-trial/report-e2">Report E2</a> times fourteen of the editors in a browser by another method,
 					and <a href="/editors-trial/report-e">Report E</a> times opening and saving without one.
 				</p>
 			</div>
