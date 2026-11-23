@@ -11,7 +11,7 @@ Two benches are published:
 | **01 · Editors trial** | [`/editors-trial/`](https://benchmarks.law/editors-trial/) | 12 open-source DOCX editors, plus LibreOffice as a baseline. Each editor's own code imports and exports one adversarial document, and the result is scored construct by construct and opened in Word. Ten hostile packages are opened in a sandbox. The reports are the main report, A, A2, B, C, D, D1 and D2, plus the vendor notes and one lane note per editor. |
 | **02 · neurotic_docx_bench** | [`/neurotic-docx-bench/`](https://benchmarks.law/neurotic-docx-bench/) | DOCX → PDF and redlines, page by page against Word (pixel, ink overlap, drift-tolerant SSIM, text boundaries), plus a speed run on 10,000 inputs. |
 
-The reports are written in [arthrod/editors_trial](https://github.com/arthrod/editors_trial) (branch `benchmark-fairness-reports`); this repository only publishes them.
+The reports are written in [arthrod/editors_trial](https://github.com/arthrod/editors_trial); this repository only publishes them. Published source links use the tag or commit recorded in `src/data/release.json`.
 
 ## For agents
 
@@ -94,6 +94,11 @@ bench bump editors_trial --repo .
 bench fetch --repo .               # download + verify the pins into .bench/ (needs the HF token for et)
 bench fetch --check --repo .       # offline: re-hash .bench/ against the lock (the pre-commit and deploy gate)
 ```
+
+Keep `src/data/release.json` (`trialRef`, used for report source links) aligned with the
+`editors_trial` release in `bench.lock`. Both now select `et-v0.11.2`; the ndb pin is unchanged.
+This release adds source-review explanations for react-docx, OpenDoc and BetterOffice in the
+main report, Reports A, A2, B and C, and vendor notes, without changing measured figures.
 
 A fresh clone needs no sibling checkouts: `pnpm install && bench fetch && pnpm build` (the et
 bundle is private, so fetch needs a Hugging Face token that can read it). `REPORTS_ROOT` still

@@ -10,7 +10,7 @@ New collection `reports`: title (string, req), series (string: `editors-trial`),
 Markdown is stored after import-time rewriting:
 - links to sibling report `.md` files → `/editors-trial/<slug>`
 - `../out/**.png` figures → `/editors-trial/figures/<path>` (static assets in `public/`)
-- other repo-relative links → `https://github.com/arthrod/editors_trial/blob/benchmark-fairness-reports/<path>`
+- other repo-relative links → `https://github.com/arthrod/editors_trial/blob/<trialRef>/<path>`, where `trialRef` is the published tag or commit recorded in `src/data/release.json` (currently `et-v0.11.2`, matching the editors_trial pin in `bench.lock`)
 Rendering: `marked` (GFM) with heading ids from github-slugger; contents from H2/H3; tables wrapped for horizontal scroll.
 
 ## Routes (all SSR, Astro.cache.set(cacheHint))
