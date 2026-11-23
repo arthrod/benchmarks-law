@@ -156,6 +156,23 @@ describe("figures the source itself calls weak are not passed off as sound (Open
 		expect(grades("docxodus", pass).speed.basis).toBe("1.23 s on the rich sample, 5.17 s on the 500 pages");
 	});
 
+	it("says it on the path where a file never became usable too (Gitar on #115)", () => {
+		const two = { runsOk: 2, runsOf: 3 };
+		const stuck = (rich: number | null, long: number | null): BrowserPass => ({
+			...pass,
+			samples: {
+				showcase: { ...pass.samples.showcase, docxodus: cell(rich, 559 * 1048576, 7_500_000, two) },
+				"lorem-500": { ...pass.samples["lorem-500"], docxodus: cell(long, 749 * 1048576, 8_000_000, two) },
+			},
+		});
+		expect(grades("docxodus", stuck(1230, null)).speed.basis).toBe(
+			"1.23 s on the rich sample (2 of 3 runs); the 500 pages did not become usable in the time the test waits (2 of 3 runs)",
+		);
+		expect(grades("docxodus", stuck(null, 5167)).speed.basis).toBe(
+			"the rich sample did not become usable in the time the test waits (2 of 3 runs), 5.17 s on the 500 pages (2 of 3 runs)",
+		);
+	});
+
 	it("does not score folio's memory: the source gives it the verdict that leaves canvas-editor's unscored", async () => {
 		const { NOT_SCORED } = await import("../src/lib/browserGrades");
 		expect(NOT_SCORED.folio?.memory).toMatch(/^Not scored: the test machine has no graphics card/);
