@@ -183,6 +183,15 @@ const host = (u: string) => u.replace(/^https:\/\/(www\.)?/, "").replace(/\/$/, 
 								<dt>Hostile input</dt>
 								<dd>{safetyVerdict(v.data.safety) === "ungraded" ? <span class="na">Not graded</span> : <><span class="bar is-mark has-pass" style={`--pass:${SAFETY_PASS * 100}%`}><span style={`width:${(v.data.safety ?? 0) * 100}%`} /></span><b>{fmtScore(v.data.safety, 2)}</b>{safetyVerdict(v.data.safety) === "pass" ? <em class="pass">Pass</em> : <em class="below">Below the pass line</em>}</>}</dd>
 							</div>
+							{AXES.map(([axis, label]) => {
+								const g = grades(v.slug, pass)[axis];
+								return (
+									<div class="meter">
+										<dt>{label}</dt>
+										<dd>{g.score == null ? <span class="na">{g.why}</span> : <><span class="bar"><span style={`width:${g.score * 10}%`} /></span><b>{g.score.toFixed(1)}</b><em>{g.basis}</em></>}</dd>
+									</div>
+								);
+							})}
 						</dl>
 					</article>
 				))
