@@ -64,7 +64,12 @@ const headings = () =>
 			.filter((l) => l.startsWith("### "))
 			.map((l) => l.slice(4).trim()),
 	);
-describe.skipIf(!existsSync(reportC))("vendor render sections", () => {
+// Skipped only when no reports directory is available at all; once one is
+// selected, a missing Report C fails rather than skipping every check.
+describe.skipIf(!existsSync(join(REPORTS_ROOT, "reports")))("vendor render sections", () => {
+	it("Report C is in the selected reports directory", () => {
+		expect(existsSync(reportC), reportC).toBe(true);
+	});
 	it.each((vendors as { name: string; renderSection?: string }[]).filter((v) => v.renderSection).map((v) => [v.name, v.renderSection!]))(
 		"%s points at a real Report C heading",
 		(_name, section) => {
