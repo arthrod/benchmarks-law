@@ -26,7 +26,7 @@
 		"@astrojs/cloudflare": "^14.4.6",
 		"@astrojs/react": "^7.1.4",
 		"@emdash-cms/cloudflare": "^1.4.0",
-		"@jandira-tech/bench-viewer": "github:jandira-tech/neurotic_docx_bench#d12621a34bb5267009291b10676b341b6e401547&path:packages/bench-viewer",
+		"@jandira-tech/bench-viewer": "github:jandira-tech/neurotic_docx_bench#a5c3de60474075e2cf5c31061c89690a6bae2c6b&path:packages/bench-viewer",
 		"astro": "^7.4.7",
 		"emdash": "^1.4.0",
 		"github-slugger": "^2.0.0",

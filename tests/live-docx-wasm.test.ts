@@ -16,6 +16,9 @@ const TRIAL = process.env.TRIAL_ROOT ?? "/Users/arthrod/temp/T/editors_trial";
 const PUBLIC = join(__dirname, "../public");
 const REF = join(PUBLIC, "editors-trial/reference.docx");
 const ready = existsSync(TRIAL) && existsSync(REF);
+// A whole report through the WASM converter: the largest (report-c) takes ~7s
+// on a laptop, past vitest's 5s default.
+const CONVERT_TIMEOUT_MS = 30_000;
 
 const load = async (src: string) => {
 	const p = join(PUBLIC, decodeURIComponent(src));
@@ -40,6 +43,6 @@ describe.skipIf(!ready)("live .docx of every report", async () => {
 			expect(Object.keys(files).filter((k) => k.startsWith("word/media/")).length).toBe(figures);
 			const audit = JSON.parse(w.auditDocument(docx));
 			expect(audit.findings.filter((x: { severity: string }) => x.severity === "error")).toEqual([]);
-		});
+		}, CONVERT_TIMEOUT_MS);
 	}
 });

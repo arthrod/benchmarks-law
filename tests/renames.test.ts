@@ -5,7 +5,12 @@ import vendors from "../src/data/vendors.json";
 import { REPORT_FILES, RENAMED_SLUGS } from "../src/lib/reports";
 
 const SITE = resolve(__dirname, "..");
-const REPORTS_ROOT = resolve(process.env.REPORTS_ROOT ?? join(SITE, "../../editors_trial"));
+// The pinned editors_trial release (`bench fetch`, bench.lock) is what the site
+// ships, so it is the default; a sibling checkout can sit on any branch.
+const PINNED = join(SITE, ".bench/editors_trial");
+const REPORTS_ROOT = resolve(
+	process.env.REPORTS_ROOT ?? (existsSync(join(PINNED, "reports")) ? PINNED : join(SITE, "../../editors_trial")),
+);
 
 describe("Report E became Reports D1 and D2", () => {
 	it("redirects each old slug to a report that exists", () => {
@@ -59,7 +64,12 @@ const headings = () =>
 			.filter((l) => l.startsWith("### "))
 			.map((l) => l.slice(4).trim()),
 	);
-describe.skipIf(!existsSync(reportC))("vendor render sections", () => {
+// Skipped only when no reports directory is available at all; once one is
+// selected, a missing Report C fails rather than skipping every check.
+describe.skipIf(!existsSync(join(REPORTS_ROOT, "reports")))("vendor render sections", () => {
+	it("Report C is in the selected reports directory", () => {
+		expect(existsSync(reportC), reportC).toBe(true);
+	});
 	it.each((vendors as { name: string; renderSection?: string }[]).filter((v) => v.renderSection).map((v) => [v.name, v.renderSection!]))(
 		"%s points at a real Report C heading",
 		(_name, section) => {
